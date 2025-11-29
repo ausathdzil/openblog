@@ -1,13 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { AlertCircleIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -65,7 +66,12 @@ export default function SignUpPage() {
       onRequest: () => setLoading(true),
       onResponse: () => {
         setLoading(false);
+      },
+      onSuccess: () => {
         router.push('/');
+      },
+      onError: (ctx) => {
+        form.setError('root', { message: ctx.error.message });
       },
     });
   };
@@ -177,6 +183,14 @@ export default function SignUpPage() {
             Already have an account? <Link href="/sign-in">Sign in</Link>
           </FieldDescription>
         </Field>
+        {form.formState.errors.root && (
+          <Field>
+            <Alert variant="destructive">
+              <AlertCircleIcon />
+              <AlertTitle>{form.formState.errors.root.message}</AlertTitle>
+            </Alert>
+          </Field>
+        )}
       </FieldGroup>
     </form>
   );

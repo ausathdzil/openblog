@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 import { signOut, useSession } from '@/lib/auth/client';
 import { cn } from '@/lib/utils';
-import { Lead } from './typography';
+import { Text } from './typography';
 import { Button, type buttonVariants } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 
@@ -63,7 +63,7 @@ export function UserButton({
     <div className={cn('flex items-center gap-4', className)} {...props}>
       {data?.user ? (
         <>
-          <Lead>Hey 👋, {data.user.name}!</Lead>
+          <Text>Hey 👋, {data.user.name}!</Text>
           <Button
             disabled={loading}
             onClick={handleSignOut}
