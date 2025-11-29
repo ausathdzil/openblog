@@ -3,6 +3,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 
 import { Button, type buttonVariants } from '@/components/ui/button';
+import { authClient } from '@/lib/auth-client';
 
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
   return (
@@ -31,7 +32,9 @@ const navItems: NavItem<Route>[] = [
   },
 ];
 
-function Header() {
+async function Header() {
+  const session = await authClient.getSession();
+
   return (
     <header className="border-b p-4">
       <nav className="mx-auto flex max-w-6xl items-center">
@@ -39,6 +42,7 @@ function Header() {
           <Link href="/">Peruere</Link>
         </Button>
         <div className="ml-auto space-x-2">
+          {session.data?.user.email}
           {navItems.map((item) => (
             <Button
               asChild

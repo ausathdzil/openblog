@@ -25,11 +25,11 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "complexity": {
-        "noStaticOnlyClass": "off"
-      },
       "nursery": {
         "useSortedClasses": "on"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
       },
       "suspicious": {
         "noUnknownAtRules": "off"
