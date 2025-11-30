@@ -26,7 +26,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
-import { signUp } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth/client';
 
 const signUpFormSchema = z.object({
   name: z
@@ -71,8 +71,10 @@ export default function SignUpPage() {
   const handleSubmit = async (values: SignUpFieldValues) => {
     const key = crypto.randomUUID();
 
-    await signUp.email(values, {
-      onRequest: () => setLoading(true),
+    await authClient.signUp.email(values, {
+      onRequest: () => {
+        setLoading(true);
+      },
       onResponse: () => {
         setLoading(false);
       },

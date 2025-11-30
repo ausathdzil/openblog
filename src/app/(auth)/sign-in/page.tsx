@@ -11,6 +11,7 @@ import * as z from 'zod';
 import { Muted, Title } from '@/components/typography';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Field,
   FieldDescription,
@@ -26,7 +27,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
-import { signIn } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth/client';
 
 const signInFormSchema = z.object({
   email: z
@@ -38,6 +39,7 @@ const signInFormSchema = z.object({
     .min(1, { error: 'Password is required.' })
     .max(128, { error: 'Password must be 128 characters or fewer.' })
     .trim(),
+  rememberMe: z.optional(z.boolean()),
 });
 
 type SignInFieldValues = z.infer<typeof signInFormSchema>;
@@ -52,6 +54,7 @@ export default function SignInPage() {
     defaultValues: {
       email: '',
       password: '',
+      rememberMe: false,
     },
   });
 
@@ -60,8 +63,10 @@ export default function SignInPage() {
   const handleSubmit = async (values: SignInFieldValues) => {
     const key = crypto.randomUUID();
 
-    await signIn.email(values, {
-      onRequest: () => setLoading(true),
+    await authClient.signIn.email(values, {
+      onRequest: () => {
+        setLoading(true);
+      },
       onResponse: () => {
         setLoading(false);
       },
@@ -146,6 +151,25 @@ export default function SignInPage() {
                   <FieldError errors={[fieldState.error]} />
                 </>
               )}
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="rememberMe"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} orientation="horizontal">
+              <Checkbox
+                aria-invalid={fieldState.invalid}
+                checked={field.value}
+                id={`${id}-rememberMe`}
+                name={field.name}
+                onCheckedChange={field.onChange}
+              />
+              <FieldLabel className="font-normal" htmlFor={`${id}-rememberMe`}>
+                Remember Me
+              </FieldLabel>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
