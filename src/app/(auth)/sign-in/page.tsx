@@ -89,9 +89,9 @@ export default function SignInPage() {
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <Title className="text-2xl">Create your account</Title>
+          <Title className="text-2xl">Login to your account</Title>
           <Muted className="text-balance">
-            Fill in the form below to create your account
+            Enter your email below to login to your account
           </Muted>
         </div>
         <Controller
