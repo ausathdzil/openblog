@@ -2,6 +2,7 @@ import { openapi } from '@elysiajs/openapi';
 import Elysia from 'elysia';
 
 import { auth } from '@/lib/auth';
+import { article } from '../modules/article';
 
 const app = new Elysia({ prefix: '/elysia' })
   .use(
@@ -14,6 +15,7 @@ const app = new Elysia({ prefix: '/elysia' })
       },
     }),
   )
+  .use(article)
   .mount('/auth', auth.handler)
   .get('/', 'Hello, World!', { tags: ['Root'] });
 
