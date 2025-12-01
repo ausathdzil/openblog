@@ -123,7 +123,10 @@ export const articles = pgTable(
     status: articleStatus('status').default('draft').notNull(),
     coverImage: text('cover_image'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
     authorId: text('author_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
@@ -133,7 +136,3 @@ export const articles = pgTable(
     index('article_excerpt_idx').on(table.excerpt),
   ],
 );
-
-export const table = { articles } as const;
-
-export type Table = typeof table;

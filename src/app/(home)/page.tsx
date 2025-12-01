@@ -29,9 +29,9 @@ export default function Home() {
 }
 
 async function Articles() {
-  const articles = await elysia.articles.get();
+  const { data: articles } = await elysia.articles.get();
 
-  if (articles.data?.length === 0) {
+  if (!articles) {
     return (
       <Empty>
         <EmptyHeader>
@@ -46,7 +46,7 @@ async function Articles() {
 
   return (
     <ItemGroup className="list-none gap-4">
-      {articles.data?.map((article) => (
+      {articles.map((article) => (
         <li key={article.publicId}>
           <Item variant="muted">
             <ItemContent>

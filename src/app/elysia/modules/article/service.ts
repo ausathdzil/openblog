@@ -1,6 +1,9 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: Elysia Service */
+import { eq } from 'drizzle-orm';
+import { NotFoundError } from 'elysia';
+
 import { db } from '@/db';
-import { table } from '@/db/schema';
+import { articles, user } from '@/db/schema';
 import { slugify } from '@/lib/utils';
 import type { ArticleModel } from './model';
 
@@ -12,12 +15,18 @@ export abstract class Article {
     coverImage,
     authorId,
   }: ArticleModel.CreateArticleBody) {
+    const [author] = await db.select().from(user).where(eq(user.id, authorId));
+
+    if (!author) {
+      throw new NotFoundError('Author not found');
+    }
+
     const [article] = await db
-      .insert(table.articles)
+      .insert(articles)
       .values({
-        title,
+        title: title.trim(),
         slug: slugify(title),
-        content,
+        content: title.trim(),
         excerpt: content.substring(0, 255),
         status,
         coverImage,
@@ -40,7 +49,17 @@ export abstract class Article {
 
   static async getArticles() {
     return (await db
-      .select()
-      .from(table.articles)) satisfies ArticleModel.GetArticlesResponse;
+      .select({
+        publicId: articles.publicId,
+        status: articles.status,
+        coverImage: articles.coverImage,
+        createdAt: articles.createdAt,
+        updatedAt: articles.updatedAt,
+        title: articles.title,
+        slug: articles.slug,
+        content: articles.content,
+        excerpt: articles.excerpt,
+      })
+      .from(articles)) satisfies ArticleModel.GetArticlesResponse;
   }
 }

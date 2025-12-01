@@ -29,6 +29,10 @@ export namespace ArticleModel {
 
   export type CreateArticleResponse = typeof createArticleResponse.static;
 
+  export const createArticleInvalid = t.Object({ message: t.String() });
+
+  export type CreateArticleInvalid = typeof createArticleInvalid.static;
+
   export const getArticlesResponse = t.Array(
     t.Object({
       publicId: articles.publicId,
