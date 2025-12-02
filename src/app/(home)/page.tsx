@@ -1,4 +1,5 @@
 import { MoreHorizontalIcon } from 'lucide-react';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import {
@@ -48,11 +49,13 @@ async function Articles() {
     <ItemGroup className="list-none gap-4">
       {articles.map((article) => (
         <li key={article.publicId}>
-          <Item variant="muted">
-            <ItemContent>
-              <ItemTitle>{article.title}</ItemTitle>
-              <ItemDescription>{article.excerpt}</ItemDescription>
-            </ItemContent>
+          <Item asChild>
+            <Link href={`/articles/${article.publicId}`}>
+              <ItemContent>
+                <ItemTitle>{article.title}</ItemTitle>
+                <ItemDescription>{article.excerpt}</ItemDescription>
+              </ItemContent>
+            </Link>
           </Item>
         </li>
       ))}
