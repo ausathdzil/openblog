@@ -42,11 +42,11 @@ const signUpFormSchema = z.object({
     .string()
     .min(8, { error: 'Password must be at least 8 characters long.' })
     .max(128, { error: 'Password must be 128 characters or fewer.' })
-    // .regex(/[a-zA-Z]/, { error: 'Contain at least one letter.' })
-    // .regex(/[0-9]/, { error: 'Contain at least one number.' })
-    // .regex(/[^a-zA-Z0-9]/, {
-    //   error: 'Contain at least one special character.',
-    // })
+    .regex(/[a-zA-Z]/, { error: 'Password must contain at least one letter.' })
+    .regex(/[0-9]/, { error: 'Password must contain at least one number.' })
+    .regex(/[^a-zA-Z0-9]/, {
+      error: 'Password must contain at least one special character.',
+    })
     .trim(),
 });
 
@@ -158,7 +158,7 @@ export default function SignUpPage() {
                   {...field}
                   aria-invalid={fieldState.invalid}
                   id={`${id}-password`}
-                  maxLength={255}
+                  maxLength={128}
                   minLength={8}
                   name="password"
                   required

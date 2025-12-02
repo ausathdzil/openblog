@@ -145,12 +145,7 @@ export default function SignInPage() {
                   </InputGroupButton>
                 </InputGroupAddon>
               </InputGroup>
-              {fieldState.invalid && (
-                <>
-                  <FieldDescription>Password Must:</FieldDescription>
-                  <FieldError errors={[fieldState.error]} />
-                </>
-              )}
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
