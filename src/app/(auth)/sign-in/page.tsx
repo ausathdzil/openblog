@@ -27,7 +27,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
-import { authClient } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth-client';
 
 const signInFormSchema = z.object({
   email: z

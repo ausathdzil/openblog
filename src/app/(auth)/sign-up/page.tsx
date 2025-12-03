@@ -8,7 +8,7 @@ import { useId, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-import { Muted, Text, Title } from '@/components/typography';
+import { Muted, Title } from '@/components/typography';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,9 +24,10 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
+  InputGroupText,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
-import { authClient } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth-client';
 
 const signUpFormSchema = z.object({
   name: z
@@ -38,6 +39,19 @@ const signUpFormSchema = z.object({
     .string()
     .min(3, { error: 'Username must be at least 3 characters long.' })
     .max(30, { error: 'Username must be 30 characters or fewer.' })
+    .regex(/^[a-zA-Z0-9._]+$/, {
+      error:
+        'Username can only contain letters, numbers, underscores, and dots.',
+    })
+    .regex(/^[^0-9].*$/, {
+      error: 'Username cannot start with a number.',
+    })
+    .regex(/^(?!\.)(?!.*\.$).+$/, {
+      error: 'Username cannot start or end with a dot.',
+    })
+    .regex(/^(?!.*\.\.).*$/, {
+      error: 'Username cannot contain consecutive dots.',
+    })
     .trim(),
   email: z
     .email({ error: 'Please enter a valid email.' })
@@ -58,7 +72,6 @@ const signUpFormSchema = z.object({
 type SignUpFieldValues = z.infer<typeof signUpFormSchema>;
 
 export default function SignUpPage() {
-  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const id = useId();
@@ -71,20 +84,7 @@ export default function SignUpPage() {
       email: '',
       password: '',
     },
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
   });
-
-  const handleNext = async () => {
-    const isValid = await form.trigger(['name', 'email', 'password']);
-    if (isValid) {
-      setStep(2);
-    }
-  };
-
-  const handleBack = () => {
-    setStep(1);
-  };
 
   const router = useRouter();
 
@@ -112,7 +112,7 @@ export default function SignUpPage() {
       },
     });
 
-    if (!response?.available) {
+    if (response?.available === false) {
       form.setFocus('username');
       form.setError('username', {
         type: 'manual',
@@ -155,155 +155,125 @@ export default function SignUpPage() {
             Fill in the form below to create your account
           </Muted>
         </div>
-        {step === 1 && (
-          <>
-            <Text className="mt-0!">Step 1 of 2</Text>
-            <Controller
-              control={form.control}
-              name="name"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`${id}-name`}>Full Name</FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="name"
-                    id={`${id}-name`}
-                    maxLength={30}
-                    minLength={3}
-                    name="name"
-                    placeholder="John Doe"
-                    required
-                    spellCheck="false"
-                    type="text"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="email"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`${id}-email`}>Email</FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="email"
-                    id={`${id}-email`}
-                    maxLength={255}
-                    name="email"
-                    placeholder="m@example.com"
-                    required
-                    spellCheck="false"
-                    type="email"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="password"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`${id}-password`}>Password</FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      id={`${id}-password`}
-                      maxLength={128}
-                      minLength={8}
-                      name="password"
-                      required
-                      spellCheck="false"
-                      type={showPassword ? 'text' : 'password'}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        aria-label={showPassword ? 'Hide' : 'Show'}
-                        onClick={() => setShowPassword(!showPassword)}
-                        size="icon-xs"
-                        title={showPassword ? 'Hide' : 'Show'}
-                        type="button"
-                        variant="ghost"
-                      >
-                        {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </>
-        )}
-        {step === 2 && (
-          <>
-            <Text className="mt-0!">Step 2 of 2</Text>
-            <Controller
-              control={form.control}
-              name="username"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`${id}-username`}>Username</FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="username"
-                    id={`${id}-username`}
-                    maxLength={30}
-                    minLength={3}
-                    name="username"
-                    placeholder="johndoe.peruere.com"
-                    required
-                    spellCheck="false"
-                    type="text"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </>
-        )}
+        <Controller
+          control={form.control}
+          name="name"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={`${id}-name`}>Name</FieldLabel>
+              <Input
+                {...field}
+                aria-invalid={fieldState.invalid}
+                autoComplete="name"
+                id={`${id}-name`}
+                maxLength={30}
+                minLength={3}
+                name="name"
+                placeholder="Alice"
+                required
+                spellCheck="false"
+                type="text"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="username"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={`${id}-username`}>Username</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText>@</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  autoComplete="username"
+                  id={`${id}-username`}
+                  maxLength={30}
+                  minLength={3}
+                  name="username"
+                  placeholder="alice"
+                  required
+                  spellCheck="false"
+                  type="text"
+                />
+              </InputGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={`${id}-email`}>Email</FieldLabel>
+              <Input
+                {...field}
+                aria-invalid={fieldState.invalid}
+                autoComplete="email"
+                id={`${id}-email`}
+                maxLength={255}
+                name="email"
+                placeholder="m@example.com"
+                required
+                spellCheck="false"
+                type="email"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="password"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={`${id}-password`}>Password</FieldLabel>
+              <InputGroup>
+                <InputGroupInput
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  id={`${id}-password`}
+                  maxLength={128}
+                  minLength={8}
+                  name="password"
+                  required
+                  spellCheck="false"
+                  type={showPassword ? 'text' : 'password'}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    aria-label={showPassword ? 'Hide' : 'Show'}
+                    onClick={() => setShowPassword(!showPassword)}
+                    size="icon-xs"
+                    title={showPassword ? 'Hide' : 'Show'}
+                    type="button"
+                    variant="ghost"
+                  >
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
         <Field>
-          {step === 1 && (
-            <Button disabled={loading} onClick={handleNext} type="button">
-              Next
-            </Button>
-          )}
-          {step === 2 && (
-            <>
-              <Button disabled={loading} type="submit">
-                {loading ? (
-                  <>
-                    <Spinner />
-                    Creating Account…
-                  </>
-                ) : (
-                  'Create Account'
-                )}
-              </Button>
-              <Button
-                disabled={loading}
-                onClick={handleBack}
-                type="button"
-                variant="outline"
-              >
-                Back
-              </Button>
-            </>
-          )}
+          <Button disabled={loading} type="submit">
+            {loading ? (
+              <>
+                <Spinner />
+                Creating Account…
+              </>
+            ) : (
+              'Create Account'
+            )}
+          </Button>
           <FieldDescription className="text-center">
             Already have an account? <Link href="/sign-in">Sign in</Link>
           </FieldDescription>

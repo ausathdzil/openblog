@@ -15,5 +15,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [openAPI(), username()],
+  plugins: [
+    openAPI(),
+    username({
+      usernameValidator: (username) => {
+        return /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/.test(
+          username,
+        );
+      },
+    }),
+  ],
 });

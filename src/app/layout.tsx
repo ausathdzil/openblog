@@ -7,6 +7,7 @@ import './globals.css';
 const inter = localFont({
   src: './fonts/InterVariable.woff2',
   variable: '--font-inter',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {

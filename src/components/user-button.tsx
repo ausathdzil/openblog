@@ -4,7 +4,7 @@ import type { VariantProps } from 'class-variance-authority';
 import type { Route } from 'next';
 import Link from 'next/link';
 
-import { authClient } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import { Button, type buttonVariants } from './ui/button';
 import { Skeleton } from './ui/skeleton';
