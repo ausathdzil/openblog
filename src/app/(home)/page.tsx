@@ -1,13 +1,7 @@
-import { MoreHorizontalIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import {
-  Empty,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
+import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
   Item,
   ItemContent,
@@ -32,13 +26,10 @@ export default function Home() {
 async function Articles() {
   const { data: articles } = await elysia.articles.get();
 
-  if (!articles) {
+  if (articles?.length === 0) {
     return (
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <MoreHorizontalIcon />
-          </EmptyMedia>
           <EmptyTitle>No articles yet…</EmptyTitle>
         </EmptyHeader>
       </Empty>
@@ -47,7 +38,7 @@ async function Articles() {
 
   return (
     <ItemGroup className="list-none gap-4">
-      {articles.map((article) => (
+      {articles?.map((article) => (
         <li key={article.publicId}>
           <Item asChild>
             <Link href={`/articles/${article.publicId}`}>

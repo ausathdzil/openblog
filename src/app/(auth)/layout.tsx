@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
+    <main className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
           <Button asChild size="sm" variant="ghost">
@@ -16,6 +16,6 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
         </div>
       </div>
       <div className="relative hidden bg-muted lg:block" />
-    </div>
+    </main>
   );
 }
