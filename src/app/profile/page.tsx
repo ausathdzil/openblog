@@ -1,11 +1,28 @@
+import { cacheLife } from 'next/cache';
 import { headers } from 'next/headers';
 import { unauthorized } from 'next/navigation';
+import { Suspense } from 'react';
 
 import { SignOutButton } from '@/components/sign-out-button';
 import { Lead } from '@/components/typography';
 import { auth } from '@/lib/auth';
 
-export default async function ProfilePage() {
+export default function ProfilePage() {
+  return (
+    <main className="grid min-h-screen place-items-center">
+      <Suspense fallback={null}>
+        <ProfileInfo />
+      </Suspense>
+      <SignOutButton />
+    </main>
+  );
+}
+
+async function ProfileInfo() {
+  'use cache: private';
+
+  cacheLife('seconds');
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -14,10 +31,5 @@ export default async function ProfilePage() {
     unauthorized();
   }
 
-  return (
-    <main className="grid min-h-screen place-items-center">
-      <Lead>Hello, {session.user.name}</Lead>
-      <SignOutButton />
-    </main>
-  );
+  return <Lead>Hello, {session.user.name}</Lead>;
 }
