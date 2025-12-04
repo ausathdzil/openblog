@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { UserButton } from '@/components/user-button';
 
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
@@ -19,7 +21,11 @@ function Header() {
         <Button asChild size="sm" variant="ghost">
           <Link href="/">Peruere</Link>
         </Button>
-        <UserButton className="ml-auto" />
+        <Suspense
+          fallback={<Skeleton className="ml-auto h-8 w-[200px] rounded-full" />}
+        >
+          <UserButton className="ml-auto" />
+        </Suspense>
       </nav>
     </header>
   );

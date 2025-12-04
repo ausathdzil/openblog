@@ -1,13 +1,11 @@
-'use client';
-
 import type { VariantProps } from 'class-variance-authority';
 import type { Route } from 'next';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 
-import { authClient } from '@/lib/auth-client';
+import { auth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { Button, type buttonVariants } from './ui/button';
-import { Skeleton } from './ui/skeleton';
 
 type NavItem<T extends string = string> = {
   href: T;
@@ -27,23 +25,17 @@ const navItems: NavItem<Route>[] = [
   },
 ];
 
-export function UserButton({
+export async function UserButton({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const { data, isPending } = authClient.useSession();
-
-  if (isPending) {
-    return (
-      <div className={className} {...props}>
-        <Skeleton className="h-8 w-[200px] rounded-full" />
-      </div>
-    );
-  }
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   return (
     <div className={cn('flex items-center gap-2', className)} {...props}>
-      {data?.user ? (
+      {session?.user ? (
         <Button asChild size="pill-sm" variant="secondary">
           <Link href="/profile">Profile</Link>
         </Button>
