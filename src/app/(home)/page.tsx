@@ -1,4 +1,3 @@
-import { cacheLife } from 'next/cache';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -25,10 +24,6 @@ export default function Home() {
 }
 
 async function Articles() {
-  'use cache';
-
-  cacheLife('days');
-
   const { data: articles } = await elysia.articles.get();
 
   if (articles?.length === 0) {
@@ -46,7 +41,7 @@ async function Articles() {
       {articles?.map((article) => (
         <li key={article.publicId}>
           <Item asChild>
-            <Link href={`/articles/${article.publicId}`}>
+            <Link href={`/articles/${article.slug}`}>
               <ItemContent>
                 <ItemTitle>{article.title}</ItemTitle>
                 <ItemDescription>{article.excerpt}</ItemDescription>

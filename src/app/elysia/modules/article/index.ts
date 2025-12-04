@@ -48,9 +48,9 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     }
   })
   .get(
-    '/:publicId',
-    async ({ params: { publicId } }) => {
-      return await Article.getArticle(publicId);
+    '/:slug',
+    async ({ params: { slug } }) => {
+      return await Article.getArticle(slug);
     },
     {
       response: {

@@ -1,4 +1,3 @@
-import { cacheLife } from 'next/cache';
 import { headers } from 'next/headers';
 import { unauthorized } from 'next/navigation';
 import { Suspense } from 'react';
@@ -19,10 +18,6 @@ export default function ProfilePage() {
 }
 
 async function ProfileInfo() {
-  'use cache: private';
-
-  cacheLife('seconds');
-
   const session = await auth.api.getSession({
     headers: await headers(),
   });

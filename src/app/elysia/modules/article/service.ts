@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
@@ -24,7 +24,7 @@ export abstract class Article {
       .insert(articles)
       .values({
         title: title.trim(),
-        slug: slugify(title),
+        slug: await Article.generateArticleSlug(title),
         content: title.trim(),
         excerpt: content.substring(0, 255),
         status,
@@ -62,7 +62,7 @@ export abstract class Article {
       .from(articles)) satisfies Array<ArticleModel.ArticleResponse>;
   }
 
-  static async getArticle(publicId: string) {
+  static async getArticle(slug: string) {
     const [article] = await db
       .select({
         publicId: articles.publicId,
@@ -76,7 +76,7 @@ export abstract class Article {
         updatedAt: articles.updatedAt,
       })
       .from(articles)
-      .where(eq(articles.publicId, publicId))
+      .where(eq(articles.slug, slug))
       .limit(1);
 
     if (!article) {
@@ -84,5 +84,30 @@ export abstract class Article {
     }
 
     return article satisfies ArticleModel.ArticleResponse;
+  }
+
+  static async generateArticleSlug(title: string) {
+    const base = slugify(title);
+
+    const rows = await db
+      .select({ slug: articles.slug })
+      .from(articles)
+      .where(ilike(articles.slug, `${base}%`));
+
+    const existing = rows.map((r) => r.slug);
+
+    if (!existing.includes(base)) {
+      return base;
+    }
+
+    let i = 2;
+    let candidate = `${base}-${i}`;
+
+    while (existing.includes(candidate)) {
+      i++;
+      candidate = `${base}-${i}`;
+    }
+
+    return candidate;
   }
 }
