@@ -41,7 +41,6 @@ const signInFormSchema = z.object({
     .check(
       z.minLength(1, 'Password is required.'),
       z.maxLength(128, 'Password must be 128 characters or fewer.'),
-      z.trim(),
     ),
   rememberMe: z.optional(z.boolean()),
 });
