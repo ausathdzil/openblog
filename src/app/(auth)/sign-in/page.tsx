@@ -74,7 +74,10 @@ export default function SignInPage() {
         router.push('/profile');
       },
       onError: (ctx) => {
-        form.setError('root', { message: ctx.error.message });
+        form.setError('root', {
+          type: 'manual',
+          message: ctx.error.message || 'An unexpected error occurred',
+        });
       },
       headers: {
         'Idempotency-Key': key,

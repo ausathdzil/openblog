@@ -103,7 +103,7 @@ export default function SignUpPage() {
         onError: (ctx) => {
           form.setError('root', {
             type: 'manual',
-            message: ctx.error.message,
+            message: ctx.error.message || 'An unexpected error occurred',
           });
         },
         headers: {
@@ -134,7 +134,7 @@ export default function SignUpPage() {
       onError: (ctx) => {
         form.setError('root', {
           type: 'manual',
-          message: ctx.error.message,
+          message: ctx.error.message || 'An unexpected error occurred',
         });
       },
       headers: {
@@ -191,7 +191,9 @@ export default function SignUpPage() {
                 <InputGroupInput
                   {...field}
                   aria-invalid={fieldState.invalid}
+                  autoCapitalize="off"
                   autoComplete="username"
+                  autoCorrect="off"
                   id={`${id}-username`}
                   maxLength={30}
                   minLength={3}
