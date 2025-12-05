@@ -20,7 +20,7 @@ type ArticleContentProps = {
 
 async function ArticleContent({ params }: ArticleContentProps) {
   const { slug } = await params;
-  const { data: article, error } = await elysia.articles({ slug }).get();
+  const { data: article, error } = await elysia.articles.lookup({ slug }).get();
 
   if (error?.status === 404 || !article) {
     notFound();

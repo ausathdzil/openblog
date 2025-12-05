@@ -42,16 +42,21 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       },
     },
   )
+  .error({
+    AuthError,
+  })
   .onError(({ code, status, error }) => {
     switch (code) {
       case 'NOT_FOUND':
         return status(404, { message: error.message });
+      case 'AuthError':
+        return status(error.status, { message: error.message });
     }
   })
   .get(
-    '/:slug',
-    async ({ params: { slug } }) => {
-      return await Article.getArticleBySlug(slug);
+    '/:publicId',
+    async ({ params: { publicId } }) => {
+      return await Article.getArticleByPublicId(publicId);
     },
     {
       response: {
@@ -60,15 +65,6 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       },
     },
   )
-  .error({
-    AuthError,
-  })
-  .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'AuthError':
-        return status(error.status, { message: error.message });
-    }
-  })
   .patch(
     '/:publicId',
     async ({ params: { publicId }, body, user }) => {
@@ -94,6 +90,18 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       response: {
         200: t.Object({ message: t.String() }),
         401: ArticleModel.articleInvalid,
+        404: ArticleModel.articleInvalid,
+      },
+    },
+  )
+  .get(
+    '/lookup/:slug',
+    async ({ params: { slug } }) => {
+      return await Article.getArticleBySlug(slug);
+    },
+    {
+      response: {
+        200: 'Article',
         404: ArticleModel.articleInvalid,
       },
     },
