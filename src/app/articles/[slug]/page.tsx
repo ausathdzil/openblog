@@ -21,7 +21,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: PageProps<'/articles/[slug]'>) {
+export default function Page({ params }: PageProps<'/articles/[slug]'>) {
   return (
     <main className="mx-auto max-w-[60ch] p-16">
       <Suspense fallback={null}>
