@@ -34,7 +34,7 @@ export async function UserButton({
   });
 
   return (
-    <div className={cn('flex items-center gap-2', className)} {...props}>
+    <div className={cn('flex items-center gap-4', className)} {...props}>
       {session?.user ? (
         <Button asChild size="pill-sm" variant="secondary">
           <Link href="/profile">Profile</Link>
