@@ -13,12 +13,10 @@ import { elysia } from '@/lib/eden';
 
 export default function Home() {
   return (
-    <main className="mx-auto grid w-full max-w-4xl flex-1">
-      <section className="w-full p-4">
-        <Suspense fallback={null}>
-          <Articles />
-        </Suspense>
-      </section>
+    <main className="mx-auto grid w-full max-w-4xl flex-1 p-4">
+      <Suspense fallback={null}>
+        <Articles />
+      </Suspense>
     </main>
   );
 }

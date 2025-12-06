@@ -16,7 +16,7 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
 
 function Header() {
   return (
-    <header className="p-4">
+    <header className="sticky top-0 bg-background p-4 pt-safe-top">
       <nav className="mx-auto flex max-w-6xl items-center">
         <Button asChild size="sm" variant="ghost">
           <Link href="/">Peruere</Link>
