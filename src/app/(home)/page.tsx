@@ -9,12 +9,13 @@ import {
   ItemGroup,
   ItemTitle,
 } from '@/components/ui/item';
+import { Skeleton } from '@/components/ui/skeleton';
 import { elysia } from '@/lib/eden';
 
 export default function Home() {
   return (
     <main className="mx-auto grid w-full max-w-4xl flex-1 p-4">
-      <Suspense fallback={null}>
+      <Suspense fallback={<ArticlesSkeleton />}>
         <Articles />
       </Suspense>
     </main>
@@ -49,5 +50,17 @@ async function Articles() {
         </li>
       ))}
     </ItemGroup>
+  );
+}
+
+function ArticlesSkeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-[77.85px] w-full" />
+      <Skeleton className="h-[77.85px] w-full" />
+      <Skeleton className="h-[77.85px] w-full" />
+      <Skeleton className="h-[77.85px] w-full" />
+      <Skeleton className="h-[77.85px] w-full" />
+    </div>
   );
 }
