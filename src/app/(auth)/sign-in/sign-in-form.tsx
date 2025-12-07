@@ -68,8 +68,6 @@ export function SignInForm({
   const router = useRouter();
 
   const handleSubmit = async (values: SignInFieldValues) => {
-    const key = crypto.randomUUID();
-
     await authClient.signIn.username(values, {
       onRequest: () => {
         setLoading(true);
@@ -85,9 +83,6 @@ export function SignInForm({
           type: 'manual',
           message: ctx.error.message || 'An unexpected error occurred',
         });
-      },
-      headers: {
-        'Idempotency-Key': key,
       },
     });
   };

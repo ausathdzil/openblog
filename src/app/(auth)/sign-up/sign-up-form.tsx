@@ -93,8 +93,6 @@ export function SignUpForm() {
   const router = useRouter();
 
   const handleSubmit = async (values: SignUpFieldValues) => {
-    const key = crypto.randomUUID();
-
     const { data: response } = await authClient.isUsernameAvailable({
       username: values.username,
       fetchOptions: {
@@ -109,9 +107,6 @@ export function SignUpForm() {
             type: 'manual',
             message: ctx.error.message || 'An unexpected error occurred',
           });
-        },
-        headers: {
-          'Idempotency-Key': key,
         },
       },
     });
@@ -140,9 +135,6 @@ export function SignUpForm() {
           type: 'manual',
           message: ctx.error.message || 'An unexpected error occurred',
         });
-      },
-      headers: {
-        'Idempotency-Key': key,
       },
     });
   };

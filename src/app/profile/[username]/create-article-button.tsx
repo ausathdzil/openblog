@@ -29,11 +29,6 @@ export function CreateArticleButton({
           status: 'draft',
           coverImage: null,
         },
-        {
-          headers: {
-            'Idempotency-Key': crypto.randomUUID(),
-          },
-        },
       );
 
       if (error) {
