@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -222,4 +223,32 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+}
+
+.tiptap {
+  *.is-empty::before {
+    color: var(--muted-foreground);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  ul.is-empty::before {
+    margin-left: 0.375em;
+  }
+
+  .ProseMirror-trailingBreak::selection {
+    background: transparent;
+  }
+}
+
+.prose blockquote {
+  font-family: var(--font-serif);
+  font-style: normal;
+}
+
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none;
 }

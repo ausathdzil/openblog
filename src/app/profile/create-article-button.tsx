@@ -29,7 +29,7 @@ export function CreateArticleButton(
       }
 
       if (data) {
-        router.push(`/articles/${data.publicId}`);
+        router.push(`/profile/articles/${data.publicId}`);
       }
     });
   };
