@@ -13,7 +13,7 @@ export default async function proxy(req: NextRequest) {
     headers: await headers(),
   });
 
-  if (isAuthRoute && session && !req.nextUrl.pathname.startsWith('/profile')) {
+  if (isAuthRoute && session && path.startsWith('/profile')) {
     return NextResponse.redirect(
       new URL(`/profile/${session.user.username}`, req.nextUrl),
     );
@@ -23,5 +23,5 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: ['/((?!elysia|_next/static|_next/image|.*\\.png$).*)'],
 };
