@@ -22,14 +22,12 @@ export function CreateArticleButton({
 
   const handleClick = () => {
     startTransition(async () => {
-      const { data, error } = await elysia.articles.post(
-        {
-          title: '',
-          content: '',
-          status: 'draft',
-          coverImage: null,
-        },
-      );
+      const { data, error } = await elysia.articles.post({
+        title: '',
+        content: '',
+        status: 'draft',
+        coverImage: null,
+      });
 
       if (error) {
         toast.error(error.value.message, { position: 'top-center' });

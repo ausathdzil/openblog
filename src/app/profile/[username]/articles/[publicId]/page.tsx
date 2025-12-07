@@ -1,8 +1,25 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { elysia } from '@/lib/eden';
 import { ContentEditor } from './content-editor';
+
+export async function generateMetadata({
+  params,
+}: PageProps<'/profile/[username]/articles/[publicId]'>): Promise<Metadata> {
+  const { publicId } = await params;
+  const { data: article, error } = await elysia.articles({ publicId }).get();
+
+  if (error?.status === 404 || !article) {
+    return {};
+  }
+
+  return {
+    title: article.title,
+    description: article.excerpt,
+  };
+}
 
 export default function ArticlePage({
   params,
