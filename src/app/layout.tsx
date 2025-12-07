@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
 import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = localFont({
   src: './fonts/InterVariable.woff2',
@@ -42,6 +43,7 @@ export default function RootLayout({
           enableSystem
         >
           {children}
+          <Toaster richColors />
         </ThemeProvider>
       </body>
     </html>
