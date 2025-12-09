@@ -16,7 +16,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: article.title,
+    title: article.title || 'Untitled Draft',
     description: article.excerpt,
   };
 }
