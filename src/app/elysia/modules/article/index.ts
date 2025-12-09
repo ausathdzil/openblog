@@ -33,10 +33,13 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   )
   .get(
     '',
-    async () => {
-      return await Article.getArticles();
+    async ({ query }) => {
+      return await Article.getArticles(query.handle);
     },
     {
+      query: t.Object({
+        handle: t.Optional(t.String()),
+      }),
       response: {
         200: t.Array(Ref(ArticleModel.articleResponse)),
       },

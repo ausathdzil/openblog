@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { Lead, Muted, Text } from '@/components/typography';
+import { Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
@@ -68,9 +68,11 @@ async function ProfileInfo({
     headers: await headers(),
   });
 
-  const { data: articles } = await elysia
-    .authors({ handle: author.username ?? '' })
-    .articles.get();
+  const { data: articles } = await elysia.articles.get({
+    query: {
+      handle: username,
+    },
+  });
 
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 p-8">

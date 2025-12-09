@@ -1,4 +1,4 @@
-import { eq, ilike } from 'drizzle-orm';
+import { and, eq, ilike } from 'drizzle-orm';
 import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
@@ -44,7 +44,7 @@ export abstract class Article {
     } satisfies ArticleModel.ArticleResponse;
   }
 
-  static async getArticles() {
+  static async getArticles(handle?: string | undefined) {
     return (await db
       .select({
         publicId: articles.publicId,
@@ -67,7 +67,10 @@ export abstract class Article {
       .from(articles)
       .leftJoin(user, eq(articles.authorId, user.id))
       .where(
-        eq(articles.status, 'published'),
+        and(
+          eq(articles.status, 'published'),
+          handle ? eq(user.username, handle) : undefined,
+        ),
       )) satisfies Array<ArticleModel.ArticleResponse>;
   }
 

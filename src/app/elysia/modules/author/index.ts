@@ -1,6 +1,5 @@
 import Elysia, { t } from 'elysia';
 
-import { ArticleModel } from '../article/model';
 import { Ref } from '../utils';
 import { AuthorModel } from './model';
 import { Author } from './service';
@@ -34,18 +33,6 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     {
       response: {
         200: 'Author',
-        404: AuthorModel.authorInvalid,
-      },
-    },
-  )
-  .get(
-    '/:handle/articles',
-    async ({ params: { handle } }) => {
-      return await Author.getAuthorArticles(handle);
-    },
-    {
-      response: {
-        200: t.Array(Ref(ArticleModel.articleResponse)),
         404: AuthorModel.authorInvalid,
       },
     },
