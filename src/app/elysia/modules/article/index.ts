@@ -37,7 +37,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       return await Article.getArticles(query);
     },
     {
-      query: ArticleModel.articlesQuery,
+      query: t.Omit(ArticleModel.articlesQuery, ['status', 'authorId']),
       response: {
         200: t.Array(Ref(ArticleModel.articleResponse)),
       },
@@ -92,6 +92,19 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
         200: ArticleModel.articleInvalid,
         401: ArticleModel.articleInvalid,
         404: ArticleModel.articleInvalid,
+      },
+    },
+  )
+  .get(
+    '/drafts',
+    async ({ user }) => {
+      return await Article.getDrafts(user.id);
+    },
+    {
+      auth: true,
+      response: {
+        200: t.Array(Ref(ArticleModel.articleResponse)),
+        401: ArticleModel.articleInvalid,
       },
     },
   );

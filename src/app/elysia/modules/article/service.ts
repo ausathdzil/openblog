@@ -44,7 +44,11 @@ export abstract class Article {
     } satisfies ArticleModel.ArticleResponse;
   }
 
-  static async getArticles({ username }: ArticleModel.ArticlesQuery) {
+  static async getArticles({
+    status,
+    authorId,
+    username,
+  }: ArticleModel.ArticlesQuery) {
     return (await db
       .select({
         publicId: articles.publicId,
@@ -68,8 +72,9 @@ export abstract class Article {
       .leftJoin(user, eq(articles.authorId, user.id))
       .where(
         and(
-          eq(articles.status, 'published'),
+          eq(articles.status, status ?? 'published'),
           username ? eq(user.username, username) : undefined,
+          authorId ? eq(articles.authorId, authorId) : undefined,
         ),
       )) satisfies Array<ArticleModel.ArticleResponse>;
   }
@@ -179,6 +184,13 @@ export abstract class Article {
     await db.delete(articles).where(eq(articles.publicId, publicId));
 
     return { message: 'Article deleted successfully' };
+  }
+
+  static async getDrafts(userId: string) {
+    return (await Article.getArticles({
+      status: 'draft',
+      authorId: userId,
+    })) satisfies Array<ArticleModel.ArticleResponse>;
   }
 
   static async generateArticleSlug(title: string) {

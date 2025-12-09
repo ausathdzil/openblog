@@ -24,7 +24,7 @@ function Header() {
           </Button>
           <Suspense
             fallback={
-              <Skeleton className="ml-auto h-8 w-[200px] rounded-full" />
+              <Skeleton className="ml-auto h-8 w-[204px] rounded-full" />
             }
           >
             <UserButton className="ml-auto" />

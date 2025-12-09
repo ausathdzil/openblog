@@ -4,7 +4,7 @@ import { db } from '@/db/models';
 import { AuthorModel } from '../author/model';
 
 export namespace ArticleModel {
-  const { articles } = db.select;
+  const { articles, user } = db.select;
   const { createArticle } = db.insert;
   const { updateArticle } = db.update;
 
@@ -18,7 +18,9 @@ export namespace ArticleModel {
   export type CreateArticleBody = typeof createArticleBody.static;
 
   export const articlesQuery = t.Object({
-    username: t.Optional(t.String()),
+    status: t.Optional(articles.status),
+    authorId: t.Optional(articles.authorId),
+    username: t.Optional(user.username),
   });
 
   export type ArticlesQuery = typeof articlesQuery.static;
