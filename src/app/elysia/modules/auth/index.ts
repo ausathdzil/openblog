@@ -3,10 +3,14 @@ import { Elysia } from 'elysia';
 import { auth as betterAuth } from '@/lib/auth';
 
 export class AuthError extends Error {
-  status = 401;
+  status: number;
 
-  constructor(public message: string) {
+  constructor(
+    public message: string,
+    status = 401,
+  ) {
     super(message);
+    this.status = status;
   }
 }
 

@@ -186,10 +186,19 @@ export abstract class Article {
     return { message: 'Article deleted successfully' };
   }
 
-  static async getDrafts(userId: string) {
+  static async getDrafts(
+    { username }: ArticleModel.ArticlesQuery,
+    userId: string,
+  ) {
+    const author = await Author.getAuthor(username ?? '');
+
+    if (author.id !== userId) {
+      throw new AuthError('You are not allowed to access this resource', 403);
+    }
+
     return (await Article.getArticles({
       status: 'draft',
-      authorId: userId,
+      authorId: author.id,
     })) satisfies Array<ArticleModel.ArticleResponse>;
   }
 

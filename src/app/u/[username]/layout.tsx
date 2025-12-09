@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { elysia } from '@/lib/eden';
+import { UserNav } from './articles/user-nav';
 import { CreateArticleButton } from './create-article-button';
 import { SignOutButton } from './sign-out-button';
 
@@ -57,14 +58,20 @@ async function Profile({ params }: { params: Promise<{ username: string }> }) {
           <CreateArticleButton username={session.user.username ?? ''} />
         )}
       </div>
+      <UserNav
+        className="col-span-full place-self-center"
+        user={session?.user}
+        username={username}
+      />
     </div>
   );
 }
 
 function ProfileSkeleton() {
   return (
-    <div className="w-full px-4">
+    <div className="flex w-full flex-col items-center gap-4 px-4">
       <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-8 w-[164px] rounded-full" />
     </div>
   );
 }

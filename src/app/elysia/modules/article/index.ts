@@ -97,14 +97,16 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   )
   .get(
     '/drafts',
-    async ({ user }) => {
-      return await Article.getDrafts(user.id);
+    async ({ query, user }) => {
+      return await Article.getDrafts({ username: query.username }, user.id);
     },
     {
       auth: true,
+      query: t.Omit(ArticleModel.articlesQuery, ['status', 'authorId']),
       response: {
         200: t.Array(Ref(ArticleModel.articleResponse)),
         401: ArticleModel.articleInvalid,
+        403: ArticleModel.articleInvalid,
       },
     },
   );
