@@ -21,6 +21,7 @@ export namespace ArticleModel {
     status: t.Optional(articles.status),
     authorId: t.Optional(articles.authorId),
     username: t.Optional(user.username),
+    search: t.Optional(t.String()),
   });
 
   export type ArticlesQuery = typeof articlesQuery.static;
