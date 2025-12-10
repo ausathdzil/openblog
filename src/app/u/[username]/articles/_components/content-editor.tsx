@@ -6,7 +6,14 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useState } from 'react';
 
-export function ContentEditor({ initialContent }: { initialContent: string }) {
+export function ContentEditor({
+  initialTitle,
+  initialContent,
+}: {
+  initialTitle: string;
+  initialContent: string;
+}) {
+  const [title, setTitle] = useState(initialTitle);
   const [serializedContent, setSerializedContent] = useState(initialContent);
 
   const editor = useEditor({
@@ -43,7 +50,6 @@ export function ContentEditor({ initialContent }: { initialContent: string }) {
         class: 'focus:outline-none',
       },
     },
-    autofocus: 'end',
     content: serializedContent,
     contentType: 'markdown',
     onUpdate: ({ editor: currentEditor }) => {
@@ -57,6 +63,16 @@ export function ContentEditor({ initialContent }: { initialContent: string }) {
 
   return (
     <div className="prose prose-neutral dark:prose-invert mx-auto size-full py-16">
+      <input
+        autoCapitalize="on"
+        autoCorrect="on"
+        className="w-full scroll-m-20 text-balance font-medium text-4xl tracking-tight focus:outline-none"
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        spellCheck="true"
+        type="text"
+        value={title}
+      />
       <EditorContent editor={editor} />
     </div>
   );

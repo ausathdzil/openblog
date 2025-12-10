@@ -52,5 +52,10 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
     redirect(`/u/${article.author?.username}/articles/${publicId}`);
   }
 
-  return <ContentEditor initialContent={article.content} />;
+  return (
+    <ContentEditor
+      initialContent={article.content}
+      initialTitle={article.title}
+    />
+  );
 }
