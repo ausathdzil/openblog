@@ -39,7 +39,9 @@ export async function getDrafts(username: string, q?: string) {
       headers: await headers(),
       query: { username, q },
       fetch: {
+        cache: 'force-cache',
         next: {
+          revalidate: 900,
           tags: [`drafts-${username}`],
         },
       },
