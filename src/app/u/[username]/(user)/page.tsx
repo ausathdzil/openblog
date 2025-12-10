@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { SearchInput } from '@/components/search-input';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
   Item,
@@ -18,9 +19,14 @@ export default function UserPage({
   searchParams,
 }: PageProps<'/u/[username]'>) {
   return (
-    <Suspense fallback={<ArticlesSkeleton />}>
-      <Articles params={params} searchParams={searchParams} />
-    </Suspense>
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-4">
+      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+        <SearchInput placeholder="Search articles…" />
+      </Suspense>
+      <Suspense fallback={<ArticlesSkeleton />}>
+        <Articles params={params} searchParams={searchParams} />
+      </Suspense>
+    </main>
   );
 }
 
@@ -46,7 +52,7 @@ async function Articles({
     return (
       <Empty>
         <EmptyHeader>
-          <EmptyTitle>No articles yet…</EmptyTitle>
+          <EmptyTitle>No articles found…</EmptyTitle>
         </EmptyHeader>
       </Empty>
     );
@@ -72,7 +78,7 @@ async function Articles({
 
 function ArticlesSkeleton() {
   return (
-    <div className="flex w-full flex-col gap-4 px-4">
+    <div className="flex w-full flex-col gap-4">
       <Skeleton className="h-[77.85px] w-full" />
       <Skeleton className="h-[77.85px] w-full" />
       <Skeleton className="h-[77.85px] w-full" />

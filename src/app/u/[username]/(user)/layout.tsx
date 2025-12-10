@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { Muted } from '@/components/typography';
+import { Lead } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
@@ -33,17 +33,15 @@ type UserLayoutProps = LayoutProps<'/u/[username]'> &
 
 export default function UserLayout({ children, params }: UserLayoutProps) {
   return (
-    <main className="grid min-h-screen grid-rows-[1fr_auto] gap-4 pt-safe-top">
-      <section className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 p-8">
-        <Suspense fallback={<ProfileSkeleton />}>
-          <Header params={params} />
-        </Suspense>
-        {children}
-      </section>
-      <div className="place-self-center p-8">
+    <div className="relative flex min-h-screen flex-col">
+      <Suspense fallback={<ProfileSkeleton />}>
+        <Header params={params} />
+      </Suspense>
+      {children}
+      <div className="-translate-x-1/2 absolute bottom-4 left-1/2">
         <SignOutButton />
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -60,10 +58,15 @@ async function Header({ params }: { params: Promise<{ username: string }> }) {
   });
 
   return (
-    <div className="grid w-full gap-4">
-      <div className="grid grid-cols-[1fr_auto] items-center gap-4 pl-4">
-        <Muted>@{author.displayUsername}</Muted>
-        <div className="flex items-center gap-2">
+    <header className="grid w-full gap-4 pt-safe-top">
+      <div className="relative mx-auto flex w-full max-w-6xl items-center gap-4 p-4">
+        <Lead>@{author.displayUsername}</Lead>
+        <UserNav
+          className="-translate-x-1/2 absolute left-1/2"
+          user={session?.user}
+          username={username}
+        />
+        <div className="ml-auto flex items-center gap-2">
           <Button asChild size="sm" variant="ghost">
             <Link href="/">
               <HouseIcon />
@@ -75,20 +78,16 @@ async function Header({ params }: { params: Promise<{ username: string }> }) {
           )}
         </div>
       </div>
-      <UserNav
-        className="place-self-center"
-        user={session?.user}
-        username={username}
-      />
-    </div>
+    </header>
   );
 }
 
 function ProfileSkeleton() {
   return (
-    <div className="flex w-full flex-col items-center gap-4 px-4">
-      <Skeleton className="h-8 w-full" />
-      <Skeleton className="h-8 w-[164px] rounded-full" />
+    <div className="grid w-full gap-4 pt-safe-top">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-4 p-4">
+        <Skeleton className="h-8 w-full" />
+      </div>
     </div>
   );
 }
