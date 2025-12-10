@@ -92,6 +92,7 @@ export function ContentEditor({
         class: 'focus:outline-none',
       },
     },
+    autofocus: true,
     content,
     contentType: 'markdown',
     onUpdate: ({ editor }) => {
