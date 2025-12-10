@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Text, Title } from '@/components/typography';
+import { Spinner } from '@/components/ui/spinner';
 import { getArticle } from '../_lib/data';
 
 export async function generateMetadata({
@@ -25,8 +26,8 @@ export default function Page({
   params,
 }: PageProps<'/u/[username]/articles/[publicId]'>) {
   return (
-    <main className="p-16">
-      <Suspense fallback={null}>
+    <main className="grid min-h-screen pt-safe-top">
+      <Suspense fallback={<Spinner className="place-self-center" />}>
         <ArticleContent params={params} />
       </Suspense>
     </main>
@@ -46,7 +47,7 @@ async function ArticleContent({ params }: ArticleContentProps) {
   }
 
   return (
-    <article className="prose prose-neutral dark:prose-invert mx-auto">
+    <article className="prose prose-neutral dark:prose-invert mx-auto size-full py-16">
       <Title>{article.title}</Title>
       <Text>{article.content}</Text>
     </article>

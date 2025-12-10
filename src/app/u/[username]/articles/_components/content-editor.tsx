@@ -40,8 +40,7 @@ export function ContentEditor({ initialContent }: { initialContent: string }) {
     ],
     editorProps: {
       attributes: {
-        class:
-          'prose prose-neutral dark:prose-invert mx-auto size-full px-4 py-16 focus:outline-none',
+        class: 'focus:outline-none',
       },
     },
     autofocus: 'end',
@@ -56,5 +55,9 @@ export function ContentEditor({ initialContent }: { initialContent: string }) {
     immediatelyRender: false,
   });
 
-  return <EditorContent editor={editor} />;
+  return (
+    <div className="prose prose-neutral dark:prose-invert mx-auto size-full py-16">
+      <EditorContent editor={editor} />
+    </div>
+  );
 }

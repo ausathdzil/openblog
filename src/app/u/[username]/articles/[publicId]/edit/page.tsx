@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { Spinner } from '@/components/ui/spinner';
+import { auth } from '@/lib/auth';
 import { ContentEditor } from '../../_components/content-editor';
 import { getArticle } from '../../_lib/data';
 
@@ -26,7 +29,7 @@ export default function ArticlePage({
 }: PageProps<'/u/[username]/articles/[publicId]'>) {
   return (
     <main className="grid min-h-screen pt-safe-top">
-      <Suspense fallback={null}>
+      <Suspense fallback={<Spinner className="place-self-center" />}>
         <Article params={params} />
       </Suspense>
     </main>
@@ -39,6 +42,14 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
 
   if (error?.status === 404 || !article) {
     notFound();
+  }
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (session?.user.username !== article.author?.username) {
+    redirect(`/u/${article.author?.username}/articles/${publicId}`);
   }
 
   return <ContentEditor initialContent={article.content} />;

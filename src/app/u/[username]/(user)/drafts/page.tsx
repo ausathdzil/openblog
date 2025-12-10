@@ -49,7 +49,7 @@ async function UserDrafts({
 
   const { drafts, draftsError } = await getDrafts(username, q);
 
-  if (draftsError?.status === 403) {
+  if (draftsError?.status === 403 || draftsError?.status === 401) {
     redirect(`/u/${author.username}`);
   }
 
