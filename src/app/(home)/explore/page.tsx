@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { SearchParams } from 'nuqs';
 import { Suspense } from 'react';
 
 import { SearchInput } from '@/components/search-input';
@@ -11,7 +13,12 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
+import { searchParamsCache } from '@/lib/search-params';
 import { getArticles } from '../_lib/data';
+
+export const metadata: Metadata = {
+  title: 'Explore',
+};
 
 export default function ExplorePage({ searchParams }: PageProps<'/explore'>) {
   return (
@@ -26,12 +33,12 @@ export default function ExplorePage({ searchParams }: PageProps<'/explore'>) {
   );
 }
 
-async function Articles({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
-  const { q } = await searchParams;
+type ArticlesProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+async function Articles({ searchParams }: ArticlesProps) {
+  const { q } = await searchParamsCache.parse(searchParams);
   const { articles } = await getArticles(q);
 
   if (!articles || articles.length === 0) {
