@@ -111,6 +111,10 @@ export abstract class Article {
       throw new NotFoundError('Article not found');
     }
 
+    if (article.status !== 'published') {
+      throw new NotFoundError('Article not found');
+    }
+
     return article satisfies ArticleModel.ArticleResponse;
   }
 

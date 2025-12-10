@@ -1,3 +1,6 @@
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
+import { marked } from 'marked';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -37,6 +40,17 @@ type ArticleContentProps = {
   params: Promise<{ publicId: string }>;
 };
 
+const DOMPurify = createDOMPurify(new JSDOM('').window);
+
+async function renderMarkdown(markdown: string) {
+  const html = await marked.parse(markdown, {
+    gfm: true,
+    breaks: true,
+  });
+
+  return DOMPurify.sanitize(html);
+}
+
 async function ArticleContent({ params }: ArticleContentProps) {
   const { publicId } = await params;
   const { article, error } = await getArticle(publicId);
@@ -45,11 +59,13 @@ async function ArticleContent({ params }: ArticleContentProps) {
     notFound();
   }
 
+  const html = await renderMarkdown(article.content ?? '');
+
   return (
     <article className="prose prose-neutral dark:prose-invert mx-auto size-full px-4 py-16">
       <h1>{article.title}</h1>
-      {/** biome-ignore lint/security/noDangerouslySetInnerHtml: TODO: Add MDX renderer */}
-      <div dangerouslySetInnerHTML={{ __html: article.content }} />
+      {/** biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized markdown render */}
+      <div dangerouslySetInnerHTML={{ __html: html }} />
     </article>
   );
 }
