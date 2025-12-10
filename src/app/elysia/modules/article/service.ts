@@ -139,19 +139,21 @@ export abstract class Article {
       payload.slug = await Article.generateArticleSlug(trimmedTitle);
     }
 
-    const trimmedContent = content?.trim();
-
-    if (trimmedContent && trimmedContent !== article.content) {
-      payload.content = trimmedContent;
-      payload.excerpt = trimmedContent.substring(0, 255);
+    if (content !== undefined && content !== article.content) {
+      payload.content = content;
+      payload.excerpt = content.substring(0, 255);
     }
 
     if (articleStatus !== undefined) {
-      payload.status === articleStatus;
+      payload.status = articleStatus;
     }
 
     if (coverImage !== undefined) {
-      payload.coverImage === coverImage;
+      payload.coverImage = coverImage;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      return article;
     }
 
     const [updatedData] = await db

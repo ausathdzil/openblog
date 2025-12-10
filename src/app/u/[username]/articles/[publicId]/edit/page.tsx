@@ -54,8 +54,9 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
 
   return (
     <ContentEditor
-      initialContent={article.content}
-      initialTitle={article.title}
+      currentContent={article.content}
+      currentTitle={article.title}
+      publicId={publicId}
     />
   );
 }

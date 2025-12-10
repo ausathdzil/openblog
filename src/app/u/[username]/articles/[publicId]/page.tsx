@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { Text, Title } from '@/components/typography';
 import { Spinner } from '@/components/ui/spinner';
 import { getArticle } from '../_lib/data';
 
@@ -47,9 +46,10 @@ async function ArticleContent({ params }: ArticleContentProps) {
   }
 
   return (
-    <article className="prose prose-neutral dark:prose-invert mx-auto size-full py-16">
-      <Title>{article.title}</Title>
-      <Text>{article.content}</Text>
+    <article className="prose prose-neutral dark:prose-invert mx-auto size-full px-4 py-16">
+      <h1>{article.title}</h1>
+      {/** biome-ignore lint/security/noDangerouslySetInnerHtml: TODO: Add MDX renderer */}
+      <div dangerouslySetInnerHTML={{ __html: article.content }} />
     </article>
   );
 }
