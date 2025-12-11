@@ -143,26 +143,26 @@ export abstract class Article {
 
     const payload: Partial<ArticleModel.UpdateArticleBody> = {};
 
-    if (title !== undefined) {
+    if (title !== undefined && title !== article.title) {
       payload.title = title?.trim();
       payload.slug = slugify(title);
     }
 
-    if (content !== undefined) {
+    if (content !== undefined && content !== article.content) {
       payload.content = content?.trim();
       payload.excerpt = content?.substring(0, 255);
     }
 
-    if (articleStatus !== undefined) {
+    if (articleStatus !== undefined && articleStatus !== article.status) {
       payload.status = articleStatus;
     }
 
-    if (coverImage !== undefined) {
+    if (coverImage !== undefined && coverImage !== article.coverImage) {
       payload.coverImage = coverImage;
     }
 
     if (Object.keys(payload).length === 0) {
-      return article;
+      return article satisfies ArticleModel.ArticleResponse;
     }
 
     const [updatedData] = await db

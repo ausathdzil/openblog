@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
 import { auth } from '@/lib/auth';
-import { ContentEditor } from '../../_components/content-editor';
+import { ArticleEditor } from '../../_components/article-editor';
 import { getArticle } from '../../_lib/data';
 
 export async function generateMetadata({
@@ -24,7 +24,7 @@ export async function generateMetadata({
   };
 }
 
-export default function ArticlePage({
+export default function EditArticlePage({
   params,
 }: PageProps<'/u/[username]/articles/[publicId]'>) {
   return (
@@ -53,7 +53,7 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   }
 
   return (
-    <ContentEditor
+    <ArticleEditor
       currentContent={article.content}
       currentTitle={article.title}
       publicId={publicId}
