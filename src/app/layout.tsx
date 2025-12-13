@@ -1,12 +1,11 @@
 import type { Metadata, Viewport } from 'next';
-import { Cal_Sans } from 'next/font/google';
 import localFont from 'next/font/local';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { Toaster } from '@/components/ui/sonner';
 
 const inter = localFont({
   src: './fonts/InterVariable.woff2',
@@ -17,6 +16,12 @@ const inter = localFont({
 const calSans = localFont({
   src: './fonts/CalSans-Semibold.woff2',
   variable: '--font-cal-sans',
+  display: 'swap',
+});
+
+const commitMono = localFont({
+  src: './fonts/CommitMono VariableFont.woff2',
+  variable: '--font-commit-mono',
   display: 'swap',
 });
 
@@ -33,7 +38,6 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   viewportFit: 'cover',
-  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -47,6 +51,7 @@ export default function RootLayout({
         className={cn(
           inter.variable,
           calSans.variable,
+          commitMono.variable,
           'font-sans dark:antialiased',
         )}
       >

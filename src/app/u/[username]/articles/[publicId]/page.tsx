@@ -1,6 +1,6 @@
-import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-import { marked } from 'marked';
+import { Markdown, MarkdownManager } from '@tiptap/markdown';
+import StarterKit from '@tiptap/starter-kit';
+import { renderToHTMLString } from '@tiptap/static-renderer/pm/html-string';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -30,28 +30,20 @@ export default function Page({
   return (
     <main className="grid min-h-screen pt-safe-top">
       <Suspense fallback={<Spinner className="place-self-center" />}>
-        <ArticleContent params={params} />
+        <Article params={params} />
       </Suspense>
     </main>
   );
 }
 
-type ArticleContentProps = {
+type ArticleProps = {
   params: Promise<{ publicId: string }>;
 };
 
-const DOMPurify = createDOMPurify(new JSDOM('').window);
+const extensions = [StarterKit, Markdown];
+const markdownManager = new MarkdownManager({ extensions });
 
-async function renderMarkdown(markdown: string) {
-  const html = await marked.parse(markdown, {
-    gfm: true,
-    breaks: true,
-  });
-
-  return DOMPurify.sanitize(html);
-}
-
-async function ArticleContent({ params }: ArticleContentProps) {
+async function Article({ params }: ArticleProps) {
   const { publicId } = await params;
   const { article, error } = await getArticle(publicId);
 
@@ -59,12 +51,13 @@ async function ArticleContent({ params }: ArticleContentProps) {
     notFound();
   }
 
-  const html = await renderMarkdown(article.content ?? '');
+  const content = markdownManager.parse(article.content ?? '');
+  const html = renderToHTMLString({ content, extensions });
 
   return (
     <article className="prose prose-neutral dark:prose-invert mx-auto size-full px-4 py-16">
       <h1>{article.title}</h1>
-      {/** biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized markdown render */}
+      {/** biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized HTML */}
       <div dangerouslySetInnerHTML={{ __html: html }} />
     </article>
   );

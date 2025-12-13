@@ -17,7 +17,7 @@ export function SearchInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isFocused, setIsFocused] = useState(false);
 
-  const [{ q }, setQ] = useQueryStates(searchParamsParser);
+  const [{ q }, setSearchParams] = useQueryStates(searchParamsParser);
   const isMac = useMac();
 
   useEffect(() => {
@@ -37,22 +37,22 @@ export function SearchInput({
     };
   }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQ(
-      { q: e.target.value },
+  const handleSearch = (term: string) => {
+    setSearchParams(
+      { q: term },
       {
-        limitUrlUpdates: e.target.value === '' ? undefined : debounce(300),
+        limitUrlUpdates: term === '' ? undefined : debounce(300),
       },
     );
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      setQ({ q: e.currentTarget.value });
+  const handleKeyDown = (key: string, term: string) => {
+    if (key === 'Enter') {
+      setSearchParams({ q: term });
     }
 
-    if (e.key === 'Escape' && q) {
-      setQ(null);
+    if (key === 'Escape' && term) {
+      setSearchParams(null);
     }
   };
 
@@ -67,9 +67,9 @@ export function SearchInput({
         className={className}
         name="q"
         onBlur={() => setIsFocused(false)}
-        onChange={handleSearch}
+        onChange={(e) => handleSearch(e.target.value)}
         onFocus={() => setIsFocused(true)}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e) => handleKeyDown(e.key, e.currentTarget.value)}
         ref={inputRef}
         spellCheck="true"
         type="search"

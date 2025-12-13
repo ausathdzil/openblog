@@ -1,5 +1,6 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Placeholder } from '@tiptap/extensions';
@@ -7,8 +8,10 @@ import { Markdown } from '@tiptap/markdown';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef, useState, useTransition } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
+import * as z from 'zod/mini';
 
 import { Button } from '@/components/ui/button';
 import { updateArticle } from '../_lib/actions';
@@ -64,18 +67,34 @@ type TitleEditorProps = {
   onSavingChange?: (isSaving: boolean) => void;
 };
 
+const titleSchema = z.object({
+  title: z
+    .string()
+    .check(
+      z.maxLength(255, 'Title must be 255 characters or fewer.'),
+      z.trim(),
+    ),
+});
+
+type TitleFieldValues = z.infer<typeof titleSchema>;
+
 function TitleEditor({
   publicId,
   initialTitle,
   onSavingChange,
 }: TitleEditorProps) {
-  const [title, setTitle] = useState(initialTitle ?? '');
   const [isPending, startTransition] = useTransition();
   const titleRef = useRef<HTMLTextAreaElement | null>(null);
 
-  useEffect(() => {
-    setTitle(initialTitle ?? '');
-  }, [initialTitle]);
+  const form = useForm<TitleFieldValues>({
+    resolver: zodResolver(titleSchema),
+    defaultValues: {
+      title: initialTitle ?? '',
+    },
+    mode: 'onChange',
+  });
+
+  const title = form.watch('title');
 
   useEffect(() => {
     onSavingChange?.(isPending);
@@ -86,6 +105,7 @@ function TitleEditor({
     if (!el) {
       return;
     }
+
     el.value = title;
     el.style.height = '0px';
     el.style.height = `${el.scrollHeight}px`;
@@ -101,26 +121,43 @@ function TitleEditor({
   }, 1000);
 
   return (
-    <textarea
-      aria-label="Article title"
-      autoCapitalize="on"
-      autoComplete="on"
-      autoCorrect="on"
-      className="font-(family-name:--font-cal-sans) mt-0 mb-[0.888889em] block w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-(--tw-prose-headings) text-4xl leading-[1.11111] focus:outline-none"
+    <Controller
+      control={form.control}
       name="title"
-      onInput={(e) => {
-        const el = e.currentTarget;
-        el.style.height = '0px';
-        el.style.height = `${el.scrollHeight}px`;
-        const nextTitle = el.value;
-        setTitle(nextTitle);
-        autosaveTitle(nextTitle);
-      }}
-      placeholder="Title"
-      ref={titleRef}
-      rows={1}
-      spellCheck="true"
-      value={title}
+      render={({ field, fieldState }) => (
+        <div className="mb-[0.888889em]">
+          <textarea
+            {...field}
+            aria-invalid={fieldState.invalid}
+            aria-label="Title"
+            autoCapitalize="on"
+            autoComplete="on"
+            autoCorrect="on"
+            className="w-full resize-none overflow-hidden font-display text-(--tw-prose-headings) text-4xl leading-[1.11111] focus:outline-none"
+            maxLength={255}
+            name="Title"
+            onChange={(e) => {
+              const el = e.currentTarget;
+              el.style.height = '0px';
+              el.style.height = `${el.scrollHeight}px`;
+              field.onChange(e.target.value);
+              if (!fieldState.invalid) {
+                autosaveTitle(e.target.value);
+              }
+            }}
+            placeholder="Title"
+            ref={titleRef}
+            required
+            rows={1}
+            spellCheck="true"
+          />
+          {fieldState.invalid && (
+            <p className="text-destructive text-sm">
+              {fieldState.error?.message}
+            </p>
+          )}
+        </div>
+      )}
     />
   );
 }
