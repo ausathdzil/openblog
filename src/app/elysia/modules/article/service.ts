@@ -48,11 +48,10 @@ export abstract class Article {
     } satisfies ArticleModel.ArticleResponse;
   }
 
-  static async getArticles({
-    status,
-    username,
-    q,
-  }: ArticleModel.ArticlesQuery) {
+  static async getArticles(
+    { status, q }: ArticleModel.ArticlesQuery,
+    username?: string | null | undefined,
+  ) {
     return (await db
       .select({
         publicId: articles.publicId,
@@ -123,10 +122,7 @@ export abstract class Article {
     return article satisfies ArticleModel.ArticleResponse;
   }
 
-  static async getArticleBySlug(
-    slug: string,
-    username: ArticleModel.ArticlesQuery['username'],
-  ) {
+  static async getArticleBySlug(slug: string, username: string) {
     const [article] = await db
       .select({
         publicId: articles.publicId,

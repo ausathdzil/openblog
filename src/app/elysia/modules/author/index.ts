@@ -28,6 +28,12 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
         return status(404, { message: error.message });
     }
   })
+  .onError(({ code, status, error }) => {
+    switch (code) {
+      case 'NOT_FOUND':
+        return status(404, { message: error.message });
+    }
+  })
   .get(
     '/:username',
     async ({ params }) => {
@@ -42,12 +48,13 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   )
   .get(
     '/:username/articles',
-    async ({ params }) => {
-      return await Author.getAuthor(params.username);
+    async ({ params, query }) => {
+      return await Article.getArticles(query, params.username);
     },
     {
+      query: t.Pick(ArticleModel.articlesQuery, ['q']),
       response: {
-        200: 'Author',
+        200: t.Array(Ref(ArticleModel.articleResponse)),
         404: AuthorModel.authorInvalid,
       },
     },

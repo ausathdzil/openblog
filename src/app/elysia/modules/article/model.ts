@@ -4,7 +4,7 @@ import { db } from '@/db/models';
 import { AuthorModel } from '../author/model';
 
 export namespace ArticleModel {
-  const { articles, user } = db.select;
+  const { articles } = db.select;
   const { createArticle } = db.insert;
   const { updateArticle } = db.update;
 
@@ -19,7 +19,6 @@ export namespace ArticleModel {
 
   export const articlesQuery = t.Object({
     status: t.Optional(articles.status),
-    username: t.Optional(user.username),
     q: t.Optional(t.String()),
   });
 
