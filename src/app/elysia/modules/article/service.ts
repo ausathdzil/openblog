@@ -3,24 +3,21 @@ import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
 import { articles, user } from '@/db/schema';
-import type { auth } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
 import { AuthError } from '../auth';
 import { Author } from '../author/service';
 import type { ArticleModel } from './model';
 
-type User = (typeof auth.$Infer.Session)['user'];
-
 export abstract class Article {
   static async createArticle(
     { title, content, status, coverImage }: ArticleModel.CreateArticleBody,
-    username: User['username'],
+    userId: string | undefined,
   ) {
-    if (!username) {
+    if (!userId) {
       throw new AuthError('You are not allowed to perform this action');
     }
 
-    const author = await Author.getAuthor(username);
+    const author = await Author.getAuthorById(userId);
 
     const [article] = await db
       .insert(articles)
@@ -53,7 +50,6 @@ export abstract class Article {
 
   static async getArticles({
     status,
-    authorId,
     username,
     q,
   }: ArticleModel.ArticlesQuery) {
@@ -81,14 +77,16 @@ export abstract class Article {
       .where(
         and(
           eq(articles.status, status ?? 'published'),
-          authorId ? eq(articles.authorId, authorId) : undefined,
           username ? eq(user.username, username) : undefined,
           q ? ilike(articles.title, `%${q.toLowerCase()}%`) : undefined,
         ),
       )) satisfies Array<ArticleModel.ArticleResponse>;
   }
 
-  static async getArticle(publicId: string, userId: User['id'] | undefined) {
+  static async getArticleByPublicId(
+    publicId: string,
+    userId: string | undefined,
+  ) {
     const [article] = await db
       .select({
         publicId: articles.publicId,
@@ -125,6 +123,48 @@ export abstract class Article {
     return article satisfies ArticleModel.ArticleResponse;
   }
 
+  static async getArticleBySlug(
+    slug: string,
+    username: ArticleModel.ArticlesQuery['username'],
+  ) {
+    const [article] = await db
+      .select({
+        publicId: articles.publicId,
+        title: articles.title,
+        slug: articles.slug,
+        content: articles.content,
+        excerpt: articles.excerpt,
+        status: articles.status,
+        coverImage: articles.coverImage,
+        createdAt: articles.createdAt,
+        updatedAt: articles.updatedAt,
+        authorId: articles.authorId,
+        author: {
+          name: user.name,
+          image: user.image,
+          createdAt: user.createdAt,
+          username: user.username,
+          displayUsername: user.displayUsername,
+        },
+      })
+      .from(articles)
+      .leftJoin(user, eq(articles.authorId, user.id))
+      .where(
+        and(
+          eq(articles.status, 'published'),
+          eq(articles.slug, slug),
+          username ? eq(user.username, username) : undefined,
+        ),
+      )
+      .limit(1);
+
+    if (!article) {
+      throw new NotFoundError('Article not found');
+    }
+
+    return article satisfies ArticleModel.ArticleResponse;
+  }
+
   static async updateArticle(
     publicId: string,
     {
@@ -133,13 +173,13 @@ export abstract class Article {
       status: articleStatus,
       coverImage,
     }: ArticleModel.UpdateArticleBody,
-    userId: User['id'] | undefined,
+    userId: string | undefined,
   ) {
     if (!userId) {
       throw new AuthError('You are not allowed to perform this action');
     }
 
-    const article = await Article.getArticle(publicId, userId);
+    const article = await Article.getArticleByPublicId(publicId, userId);
 
     const payload: Partial<ArticleModel.UpdateArticleBody> = {};
 
@@ -187,30 +227,15 @@ export abstract class Article {
     } satisfies ArticleModel.ArticleResponse;
   }
 
-  static async deleteArticle(publicId: string, userId: User['id'] | undefined) {
+  static async deleteArticle(publicId: string, userId: string | undefined) {
     if (!userId) {
       throw new AuthError('You are not allowed to perform this action');
     }
 
-    const article = await Article.getArticle(publicId, userId);
+    const article = await Article.getArticleByPublicId(publicId, userId);
 
     await db.delete(articles).where(eq(articles.publicId, article.publicId));
 
     return { message: 'Article deleted successfully' };
-  }
-
-  static async getDrafts(
-    { q }: Pick<ArticleModel.ArticlesQuery, 'q'>,
-    userId: User['id'] | undefined,
-  ) {
-    if (!userId) {
-      throw new AuthError('You are not allowed to access this resource');
-    }
-
-    return (await Article.getArticles({
-      status: 'draft',
-      authorId: userId,
-      q,
-    })) satisfies Array<ArticleModel.ArticleResponse>;
   }
 }

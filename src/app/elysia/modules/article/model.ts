@@ -19,7 +19,6 @@ export namespace ArticleModel {
 
   export const articlesQuery = t.Object({
     status: t.Optional(articles.status),
-    authorId: t.Optional(articles.authorId),
     username: t.Optional(user.username),
     q: t.Optional(t.String()),
   });

@@ -38,4 +38,25 @@ export abstract class Author {
 
     return author satisfies AuthorModel.AuthorResponse;
   }
+
+  static async getAuthorById(id: string) {
+    const [author] = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+        username: user.username,
+        displayUsername: user.displayUsername,
+      })
+      .from(user)
+      .where(eq(user.id, id))
+      .limit(1);
+
+    if (!author) {
+      throw new NotFoundError('Author not found');
+    }
+
+    return author satisfies AuthorModel.AuthorResponse;
+  }
 }

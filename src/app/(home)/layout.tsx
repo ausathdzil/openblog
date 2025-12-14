@@ -19,7 +19,7 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
 
 function Header() {
   return (
-    <header className="sticky top-0 bg-background pt-safe-top">
+    <header className="sticky top-0 z-10 border-b bg-background pt-safe-top">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-4 p-4">
         <nav className="flex flex-1 items-center gap-4">
           <Button

@@ -173,6 +173,7 @@ export function SignUpForm({
                 {...field}
                 aria-invalid={fieldState.invalid}
                 autoComplete="name"
+                autoCorrect="off"
                 id={`${id}-name`}
                 maxLength={30}
                 minLength={3}
@@ -231,7 +232,6 @@ export function SignUpForm({
                 name="email"
                 placeholder="m@example.com"
                 required
-                spellCheck="false"
                 type="email"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

@@ -1,5 +1,7 @@
 import Elysia, { t } from 'elysia';
 
+import { ArticleModel } from '../article/model';
+import { Article } from '../article/service';
 import { Ref } from '../utils';
 import { AuthorModel } from './model';
 import { Author } from './service';
@@ -7,6 +9,7 @@ import { Author } from './service';
 export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .model({
     Author: AuthorModel.authorResponse,
+    Article: ArticleModel.articleResponse,
   })
   .get(
     '',
@@ -27,13 +30,37 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   })
   .get(
     '/:username',
-    async ({ params: { username } }) => {
-      return await Author.getAuthor(username);
+    async ({ params }) => {
+      return await Author.getAuthor(params.username);
     },
     {
       response: {
         200: 'Author',
         404: AuthorModel.authorInvalid,
+      },
+    },
+  )
+  .get(
+    '/:username/articles',
+    async ({ params }) => {
+      return await Author.getAuthor(params.username);
+    },
+    {
+      response: {
+        200: 'Author',
+        404: AuthorModel.authorInvalid,
+      },
+    },
+  )
+  .get(
+    '/:username/articles/:slug',
+    async ({ params }) => {
+      return await Article.getArticleBySlug(params.slug, params.username);
+    },
+    {
+      response: {
+        200: 'Article',
+        404: ArticleModel.articleInvalid,
       },
     },
   );

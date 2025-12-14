@@ -6,13 +6,13 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
-import { getArticle } from '../_lib/data';
+import { getArticleBySlug } from '../_lib/data';
 
 export async function generateMetadata({
   params,
 }: PageProps<'/u/[username]/articles/[slug]'>): Promise<Metadata> {
-  const { slug } = await params;
-  const { article, error } = await getArticle(slug);
+  const { username, slug } = await params;
+  const { article, error } = await getArticleBySlug(slug, username);
 
   if (error?.status === 404 || !article) {
     return {};
@@ -37,15 +37,15 @@ export default function Page({
 }
 
 type ArticleProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ username: string; slug: string }>;
 };
 
 const extensions = [StarterKit, Markdown];
 const markdownManager = new MarkdownManager({ extensions });
 
 async function Article({ params }: ArticleProps) {
-  const { slug } = await params;
-  const { article, error } = await getArticle(slug);
+  const { username, slug } = await params;
+  const { article, error } = await getArticleBySlug(slug, username);
 
   if (error?.status === 404 || !article) {
     notFound();
