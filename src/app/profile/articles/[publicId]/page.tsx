@@ -1,16 +1,14 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
-import { auth } from '@/lib/auth';
 import { ArticleEditor } from '../../_components/article-editor';
 import { getArticle } from '../../_lib/data';
 
 export async function generateMetadata({
   params,
-}: PageProps<'/u/[username]/articles/[publicId]'>): Promise<Metadata> {
+}: PageProps<'/profile/articles/[publicId]'>): Promise<Metadata> {
   const { publicId } = await params;
   const { article, error } = await getArticle(publicId);
 
@@ -26,7 +24,7 @@ export async function generateMetadata({
 
 export default function EditArticlePage({
   params,
-}: PageProps<'/u/[username]/articles/[publicId]'>) {
+}: PageProps<'/profile/articles/[publicId]'>) {
   return (
     <main className="grid min-h-screen pt-safe-top">
       <Suspense fallback={<Spinner className="place-self-center" />}>
@@ -42,14 +40,6 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
 
   if (error?.status === 404 || !article) {
     notFound();
-  }
-
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (session?.user.username !== article.author?.username) {
-    redirect(`/u/${article.author?.username}/articles/${publicId}`);
   }
 
   return (

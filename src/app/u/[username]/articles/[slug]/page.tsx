@@ -10,9 +10,9 @@ import { getArticle } from '../_lib/data';
 
 export async function generateMetadata({
   params,
-}: PageProps<'/u/[username]/articles/[publicId]'>): Promise<Metadata> {
-  const { publicId } = await params;
-  const { article, error } = await getArticle(publicId);
+}: PageProps<'/u/[username]/articles/[slug]'>): Promise<Metadata> {
+  const { slug } = await params;
+  const { article, error } = await getArticle(slug);
 
   if (error?.status === 404 || !article) {
     return {};
@@ -26,7 +26,7 @@ export async function generateMetadata({
 
 export default function Page({
   params,
-}: PageProps<'/u/[username]/articles/[publicId]'>) {
+}: PageProps<'/u/[username]/articles/[slug]'>) {
   return (
     <main className="grid min-h-screen pt-safe-top">
       <Suspense fallback={<Spinner className="place-self-center" />}>
@@ -37,15 +37,15 @@ export default function Page({
 }
 
 type ArticleProps = {
-  params: Promise<{ publicId: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 const extensions = [StarterKit, Markdown];
 const markdownManager = new MarkdownManager({ extensions });
 
 async function Article({ params }: ArticleProps) {
-  const { publicId } = await params;
-  const { article, error } = await getArticle(publicId);
+  const { slug } = await params;
+  const { article, error } = await getArticle(slug);
 
   if (error?.status === 404 || !article) {
     notFound();

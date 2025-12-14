@@ -1,5 +1,7 @@
 'use client';
 
+import { LogoutCircle02Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -36,11 +38,15 @@ export function SignOutButton(props: React.ComponentProps<typeof Button>) {
     <Button
       disabled={loading}
       onClick={handleSignOut}
-      size="pill-sm"
+      size="sm"
       variant="destructive"
       {...props}
     >
-      {loading && <Spinner />}
+      {loading ? (
+        <Spinner />
+      ) : (
+        <HugeiconsIcon icon={LogoutCircle02Icon} strokeWidth={2} />
+      )}
       Sign Out
     </Button>
   );

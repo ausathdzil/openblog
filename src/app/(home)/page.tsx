@@ -14,7 +14,7 @@ import { getArticles } from './_lib/data';
 
 export default function Home() {
   return (
-    <main className="mx-auto grid w-full max-w-4xl flex-1 p-4">
+    <main className="mx-auto grid w-full max-w-5xl flex-1 p-4">
       <Suspense fallback={<ArticlesSkeleton />}>
         <Articles />
       </Suspense>
@@ -48,7 +48,7 @@ async function Articles() {
           >
             <ItemContent>
               <ItemTitle>{article.title}</ItemTitle>
-              <ItemDescription>{article.excerpt}</ItemDescription>
+              <ItemDescription>{article.excerpt}…</ItemDescription>
             </ItemContent>
           </Item>
         </li>

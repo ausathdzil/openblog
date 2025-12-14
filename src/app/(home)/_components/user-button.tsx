@@ -38,7 +38,7 @@ export async function UserButton({
       {session?.user ? (
         <Button
           nativeButton={false}
-          render={<Link href={`/u/${session.user.username}`} />}
+          render={<Link href="/profile" />}
           size="pill-sm"
           variant="secondary"
         >

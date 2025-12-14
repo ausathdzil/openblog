@@ -1,7 +1,6 @@
 import { Home01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -9,9 +8,6 @@ import { Suspense } from 'react';
 import { Lead } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { auth } from '@/lib/auth';
-import { CreateArticleButton } from './_components/create-article-button';
-import { SignOutButton } from './_components/sign-out-button';
 import { UserNav } from './_components/user-nav';
 import { getAuthor } from './_lib/data';
 
@@ -39,9 +35,6 @@ export default function UserLayout({ children, params }: UserLayoutProps) {
         <Header params={params} />
       </Suspense>
       {children}
-      <div className="-translate-x-1/2 absolute bottom-4 left-1/2">
-        <SignOutButton />
-      </div>
     </div>
   );
 }
@@ -54,18 +47,13 @@ async function Header({ params }: { params: Promise<{ username: string }> }) {
     notFound();
   }
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
   return (
     <header className="grid w-full gap-4 pt-safe-top">
       <div className="relative mx-auto flex w-full max-w-6xl items-center gap-4 p-4">
         <Lead>@{author.displayUsername}</Lead>
         <UserNav
           className="-translate-x-1/2 absolute left-1/2"
-          user={session?.user}
-          username={username}
+          username={author.username ?? ''}
         />
         <div className="ml-auto flex items-center gap-2">
           <Button
@@ -77,9 +65,6 @@ async function Header({ params }: { params: Promise<{ username: string }> }) {
             <HugeiconsIcon icon={Home01Icon} strokeWidth={2} />
             Home
           </Button>
-          {session?.user.username === author.username && (
-            <CreateArticleButton />
-          )}
         </div>
       </div>
     </header>
