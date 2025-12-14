@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { ArticleEditor } from '@/app/(home)/_components/article-editor';
+import { getArtcileByPublicId } from '@/app/(home)/_lib/data';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { ArticleEditor } from '../../_components/article-editor';
-import { getArtcileByPublicId } from '../../_lib/data';
 
 export async function generateMetadata({
   params,

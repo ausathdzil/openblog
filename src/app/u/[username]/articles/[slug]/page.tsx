@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
-import { getArticleBySlug } from '../_lib/data';
+import { getArticleBySlug } from '../../../_lib/data';
 
 export async function generateMetadata({
   params,

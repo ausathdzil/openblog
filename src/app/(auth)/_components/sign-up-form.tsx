@@ -136,8 +136,8 @@ export function SignUpForm({
       onResponse: () => {
         setLoading(false);
       },
-      onSuccess: (ctx) => {
-        router.push(`/u/${ctx.data.user.username}`);
+      onSuccess: () => {
+        router.push('/profile');
       },
       onError: (ctx) => {
         if (ctx.error.code === 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL') {

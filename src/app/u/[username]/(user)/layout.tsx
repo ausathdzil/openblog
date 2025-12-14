@@ -8,8 +8,8 @@ import { Suspense } from 'react';
 import { Lead } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { UserNav } from './_components/user-nav';
-import { getAuthor } from './_lib/data';
+import { UserNav } from '../../_components/user-nav';
+import { getAuthor } from '../../_lib/data';
 
 export async function generateMetadata({
   params,

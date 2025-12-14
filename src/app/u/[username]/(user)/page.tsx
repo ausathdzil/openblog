@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { searchParamsCache } from '@/lib/search-params';
-import { getArticles, getAuthor } from './_lib/data';
+import { getArticles, getAuthor } from '../../_lib/data';
 
 export default function UserPage({
   params,
