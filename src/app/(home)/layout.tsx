@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import pereure from '../../../public/peruere.png';
@@ -54,7 +53,6 @@ function Header() {
             <UserButton className="ml-auto" />
           </Suspense>
         </nav>
-        <ModeToggle />
       </div>
     </header>
   );
