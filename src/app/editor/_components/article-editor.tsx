@@ -36,7 +36,7 @@ export function ArticleEditor({
     <div className="prose prose-neutral dark:prose-invert mx-auto size-full px-4 py-16">
       {isSaving && (
         <Button
-          className="pointer-events-none absolute top-4 left-4 animate-pulse"
+          className="pointer-events-none absolute right-4 bottom-4 animate-pulse"
           disabled
           nativeButton={false}
           render={<div />}

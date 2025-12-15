@@ -43,7 +43,7 @@ export default function EditArticlePage({
 
 function Header() {
   return (
-    <header className="sticky top-0 z-10 border-b bg-background pt-safe-top">
+    <header className="sticky top-0 z-10 bg-background pt-safe-top">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-4 p-4">
         <Button
           nativeButton={false}

@@ -41,7 +41,9 @@ export default function ProfilePage({ searchParams }: PageProps<'/profile'>) {
       <Suspense fallback={<ProfileSkeleton />}>
         <Profile />
       </Suspense>
-      <Suspense fallback={<Skeleton className="h-10 w-[307px]" />}>
+      <Suspense
+        fallback={<Skeleton className="h-10 w-[307px] justify-self-center" />}
+      >
         <StatusToggle className="justify-self-center" />
       </Suspense>
       <Suspense fallback={<ArticlesSkeleton />}>
@@ -61,9 +63,8 @@ async function Profile() {
   }
 
   return (
-    <div className="grid grid-rows-[auto_auto_auto]">
-      <div className="min-h-48 w-full bg-primary/50" />
-      <Avatar className="-mt-18 size-36 justify-self-center">
+    <div className="grid grid-rows-[auto_auto_auto] p-4">
+      <Avatar className="size-36 justify-self-center">
         <AvatarImage src={session.user.image ?? ''} />
         <AvatarFallback className="text-6xl">
           {session.user.name.charAt(0)}
@@ -126,9 +127,8 @@ async function Articles({ searchParams }: ArticlesProps) {
 }
 function ProfileSkeleton() {
   return (
-    <div className="grid grid-rows-[auto_auto_auto]">
-      <div className="min-h-48 w-full bg-primary/50" />
-      <Skeleton className="-mt-18 size-36 animate-none justify-self-center rounded-full" />
+    <div className="grid grid-rows-[auto_auto_auto] p-4">
+      <Skeleton className="size-36 animate-none justify-self-center rounded-full" />
       <div className="mt-4 flex flex-col items-center gap-2">
         <Skeleton className="h-9 w-40" />
         <Skeleton className="h-7 w-36" />
