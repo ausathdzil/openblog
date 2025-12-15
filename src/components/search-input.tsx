@@ -3,19 +3,21 @@
 import { Search01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { debounce, useQueryStates } from 'nuqs';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
 import { useMac } from '@/hooks/use-mac';
 import { searchParamsParser } from '@/lib/search-params';
 import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
 import { Kbd } from './ui/kbd';
+import { Spinner } from './ui/spinner';
 
 export function SearchInput({
   className,
   ...props
 }: React.ComponentProps<typeof InputGroupInput>) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [{ q }, setSearchParams] = useQueryStates(searchParamsParser);
   const isMac = useMac();
@@ -38,12 +40,15 @@ export function SearchInput({
   }, []);
 
   const handleSearch = (term: string) => {
-    setSearchParams(
-      { q: term },
-      {
-        limitUrlUpdates: term === '' ? undefined : debounce(300),
-      },
-    );
+    startTransition(async () => {
+      await setSearchParams(
+        { q: term },
+        {
+          limitUrlUpdates: term === '' ? undefined : debounce(300),
+          startTransition,
+        },
+      );
+    });
   };
 
   const handleKeyDown = (key: string, term: string) => {
@@ -57,14 +62,17 @@ export function SearchInput({
   };
 
   return (
-    <InputGroup>
+    <InputGroup className={className}>
       <InputGroupAddon>
-        <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
+        {isPending ? (
+          <Spinner />
+        ) : (
+          <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
+        )}
       </InputGroupAddon>
       <InputGroupInput
         aria-label="Search"
         autoCorrect="on"
-        className={className}
         name="q"
         onBlur={() => setIsFocused(false)}
         onChange={(e) => handleSearch(e.target.value)}

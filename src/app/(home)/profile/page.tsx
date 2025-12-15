@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { SearchParams } from 'nuqs';
 import { Suspense } from 'react';
-
+import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function ProfilePage({ searchParams }: PageProps<'/profile'>) {
   return (
-    <main className="grid gap-8 pb-32">
+    <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
       <Suspense fallback={<ProfileSkeleton />}>
         <Profile />
       </Suspense>
@@ -45,6 +45,9 @@ export default function ProfilePage({ searchParams }: PageProps<'/profile'>) {
         fallback={<Skeleton className="h-10 w-[307px] justify-self-center" />}
       >
         <StatusToggle className="justify-self-center" />
+      </Suspense>
+      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+        <SearchInput placeholder="Search articles…" />
       </Suspense>
       <Suspense fallback={<ArticlesSkeleton />}>
         <Articles searchParams={searchParams} />
@@ -63,7 +66,7 @@ async function Profile() {
   }
 
   return (
-    <div className="grid grid-rows-[auto_auto_auto] p-4">
+    <div className="grid grid-rows-[auto_auto_auto]">
       <Avatar className="size-36 justify-self-center">
         <AvatarImage src={session.user.image ?? ''} />
         <AvatarFallback className="text-6xl">
@@ -101,7 +104,7 @@ async function Articles({ searchParams }: ArticlesProps) {
   }
 
   return (
-    <ItemGroup className="mx-auto max-w-2xl list-none gap-4">
+    <ItemGroup className="list-none gap-4">
       {articles.map((article) => (
         <li key={article.publicId}>
           <Item
@@ -127,7 +130,7 @@ async function Articles({ searchParams }: ArticlesProps) {
 }
 function ProfileSkeleton() {
   return (
-    <div className="grid grid-rows-[auto_auto_auto] p-4">
+    <div className="grid grid-rows-[auto_auto_auto]">
       <Skeleton className="size-36 animate-none justify-self-center rounded-full" />
       <div className="mt-4 flex flex-col items-center gap-2">
         <Skeleton className="h-9 w-40" />
@@ -139,10 +142,10 @@ function ProfileSkeleton() {
 
 function ArticlesSkeleton() {
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-      <Skeleton className="h-[77.85px] w-full" />
-      <Skeleton className="h-[77.85px] w-full" />
-      <Skeleton className="h-[77.85px] w-full" />
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-[95px] w-full" />
+      <Skeleton className="h-[95px] w-full" />
+      <Skeleton className="h-[95px] w-full" />
     </div>
   );
 }
