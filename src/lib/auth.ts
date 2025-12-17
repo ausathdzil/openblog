@@ -1,5 +1,6 @@
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
+import { nextCookies } from 'better-auth/next-js';
 import { openAPI, username } from 'better-auth/plugins';
 
 import { db } from '@/db';
@@ -29,6 +30,7 @@ export const auth = betterAuth({
         );
       },
     }),
+    nextCookies(),
   ],
   session: {
     cookieCache: {

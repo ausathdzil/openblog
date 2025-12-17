@@ -21,8 +21,10 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   })
   .post(
     '',
-    async ({ body, user }) => {
-      return await Article.createArticle(body, user?.id);
+    async ({ body, set, user }) => {
+      const article = await Article.createArticle(body, user?.id);
+      set.status = 201;
+      return article;
     },
     {
       auth: true,

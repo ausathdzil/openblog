@@ -9,21 +9,6 @@ const nextConfig: NextConfig = {
   },
   reactCompiler: true,
   typedRoutes: true,
-
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/@:username/articles/:publicId',
-          destination: '/u/:username/articles/:publicId',
-        },
-        {
-          source: '/@:username',
-          destination: '/u/:username',
-        },
-      ],
-    };
-  },
 };
 
 const withBundleAnalyzer = bundleAnalyzer({

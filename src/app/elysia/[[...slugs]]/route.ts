@@ -23,7 +23,8 @@ export const app = new Elysia({ prefix: '/elysia' })
   .use(auth)
   .use(article)
   .use(author)
-  .use(me);
+  .use(me)
+  .get('/', 'Hello, World!', { tags: ['Root'] });
 
 export const GET = app.fetch;
 export const POST = app.fetch;
