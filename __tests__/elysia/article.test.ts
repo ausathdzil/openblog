@@ -86,4 +86,14 @@ describe('Article controller', () => {
       );
     });
   });
+
+  describe.todo('Get article by publicId', () => {
+    test('should return 404 if article not found', async () => {
+      const { status } = await elysia
+        .articles({ publicId: 'non-existent' })
+        .get();
+
+      expect(status).toBe(404);
+    });
+  });
 });

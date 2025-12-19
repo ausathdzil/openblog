@@ -33,7 +33,7 @@ export function ModeToggle(props: React.ComponentProps<typeof Button>) {
         }
       >
         <HugeiconsIcon
-          className="dark:-rotate-90 rotate-0 scale-100 dark:scale-0"
+          className="rotate-0 scale-100 dark:-rotate-90 dark:scale-0"
           icon={Sun02Icon}
           strokeWidth={2}
         />

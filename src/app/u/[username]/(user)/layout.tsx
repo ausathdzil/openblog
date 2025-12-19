@@ -52,7 +52,7 @@ async function Header({ params }: { params: Promise<{ username: string }> }) {
       <div className="relative mx-auto flex w-full max-w-6xl items-center gap-4 p-4">
         <Lead>@{author.displayUsername}</Lead>
         <UserNav
-          className="-translate-x-1/2 absolute left-1/2"
+          className="absolute left-1/2 -translate-x-1/2"
           username={author.username ?? ''}
         />
         <div className="ml-auto flex items-center gap-2">
