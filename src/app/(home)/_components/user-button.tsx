@@ -9,6 +9,7 @@ import type { Route } from 'next';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 
+import { ModeToggle } from '@/components/mode-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button, type buttonVariants } from '@/components/ui/button';
 import {
@@ -24,6 +25,7 @@ import { auth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { CreateArticleButton } from './create-article-button';
 import { SignOutButton } from './sign-out-button';
+import { UserModeToggle } from './user-mode-toggle';
 
 type NavItem<T extends string = string> = {
   href: T;
@@ -58,17 +60,20 @@ export async function UserButton({
       {session?.user ? (
         <UserDropdown user={session.user} />
       ) : (
-        authNav.map((item) => (
-          <Button
-            key={item.href}
-            nativeButton={false}
-            render={<Link href={item.href} />}
-            size="pill-sm"
-            variant={item.variant}
-          >
-            {item.label}
-          </Button>
-        ))
+        <>
+          {authNav.map((item) => (
+            <Button
+              key={item.href}
+              nativeButton={false}
+              render={<Link href={item.href} />}
+              size="pill-sm"
+              variant={item.variant}
+            >
+              {item.label}
+            </Button>
+          ))}
+          <ModeToggle />
+        </>
       )}
     </div>
   );
@@ -78,12 +83,14 @@ const dropdownItems: NavItem<Route>[] = [
   {
     href: '/',
     label: 'Home',
-    icon: <HugeiconsIcon icon={HomeIcon} strokeWidth={2} />,
+    icon: <HugeiconsIcon className="ml-auto" icon={HomeIcon} strokeWidth={2} />,
   },
   {
     href: '/explore',
     label: 'Explore',
-    icon: <HugeiconsIcon icon={SearchIcon} strokeWidth={2} />,
+    icon: (
+      <HugeiconsIcon className="ml-auto" icon={SearchIcon} strokeWidth={2} />
+    ),
   },
 ];
 
@@ -92,9 +99,7 @@ type User = (typeof auth.$Infer.Session)['user'];
 function UserDropdown({ user }: { user: User }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<button aria-label="Menu" title="Menu" type="button" />}
-      >
+      <DropdownMenuTrigger aria-label="Menu" title="Menu">
         <Avatar>
           <AvatarImage src={user.image ?? ''} />
           <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
@@ -122,18 +127,26 @@ function UserDropdown({ user }: { user: User }) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem render={<Link href="/profile" />}>
-            <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />
             Profile
+            <HugeiconsIcon
+              className="ml-auto"
+              icon={UserCircleIcon}
+              strokeWidth={2}
+            />
           </DropdownMenuItem>
           {dropdownItems.map((item) => (
             <DropdownMenuItem
               key={item.href}
               render={<Link href={item.href} />}
             >
-              {item.icon}
               {item.label}
+              {item.icon}
             </DropdownMenuItem>
           ))}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <UserModeToggle />
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

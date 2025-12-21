@@ -177,7 +177,6 @@ export function SignUpForm({
                 id={`${id}-name`}
                 maxLength={30}
                 minLength={3}
-                name="name"
                 placeholder="Alice"
                 required
                 spellCheck="false"
@@ -206,7 +205,6 @@ export function SignUpForm({
                   id={`${id}-username`}
                   maxLength={30}
                   minLength={3}
-                  name="username"
                   placeholder="alice"
                   required
                   spellCheck="false"
@@ -229,9 +227,9 @@ export function SignUpForm({
                 autoComplete="email"
                 id={`${id}-email`}
                 maxLength={255}
-                name="email"
                 placeholder="m@example.com"
                 required
+                spellCheck="false"
                 type="email"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -251,7 +249,6 @@ export function SignUpForm({
                   id={`${id}-password`}
                   maxLength={128}
                   minLength={8}
-                  name="password"
                   required
                   spellCheck="false"
                   type={showPassword ? 'text' : 'password'}

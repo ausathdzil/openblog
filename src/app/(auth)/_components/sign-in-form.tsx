@@ -117,7 +117,6 @@ export function SignInForm({
                   autoCorrect="off"
                   id={`${id}-username`}
                   maxLength={30}
-                  name="username"
                   placeholder="alice"
                   required
                   spellCheck="false"
@@ -139,7 +138,6 @@ export function SignInForm({
                   {...field}
                   id={`${id}-password`}
                   maxLength={128}
-                  name="password"
                   required
                   spellCheck="false"
                   type={showPassword ? 'text' : 'password'}

@@ -10,7 +10,9 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
-export function SignOutButton(props: React.ComponentProps<'button'>) {
+export function SignOutButton(
+  props: React.ComponentProps<typeof DropdownMenuItem>,
+) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -37,24 +39,20 @@ export function SignOutButton(props: React.ComponentProps<'button'>) {
     <DropdownMenuItem
       closeOnClick={false}
       disabled={loading}
-      nativeButton
-      render={
-        <button
-          className="w-full"
-          disabled={loading}
-          onClick={handleSignOut}
-          type="button"
-          {...props}
-        />
-      }
+      onClick={handleSignOut}
       variant="destructive"
+      {...props}
     >
-      {loading ? (
-        <Spinner />
-      ) : (
-        <HugeiconsIcon icon={LogoutCircle02Icon} strokeWidth={2} />
-      )}
       Sign Out
+      {loading ? (
+        <Spinner className="ml-auto" />
+      ) : (
+        <HugeiconsIcon
+          className="ml-auto"
+          icon={LogoutCircle02Icon}
+          strokeWidth={2}
+        />
+      )}
     </DropdownMenuItem>
   );
 }
