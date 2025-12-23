@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
   description: 'A new world to share your thoughts.',
   appleWebApp: {
+    capable: true,
     statusBarStyle: 'black-translucent',
   },
 };

@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
     inlineCss: true,
+    typedEnv: true,
   },
   reactCompiler: true,
   typedRoutes: true,
