@@ -133,7 +133,7 @@ function TitleEditor({
             autoCapitalize="on"
             autoComplete="on"
             autoCorrect="on"
-            className="w-full resize-none overflow-hidden font-display text-(--tw-prose-headings) text-4xl leading-[1.11111] focus:outline-none"
+            className="w-full resize-none overflow-hidden font-extrabold text-(--tw-prose-headings) text-4xl leading-[1.11111] focus:outline-none"
             maxLength={255}
             name="Title"
             onChange={(e) => {

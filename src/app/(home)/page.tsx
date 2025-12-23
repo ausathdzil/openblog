@@ -48,7 +48,7 @@ async function Articles() {
           >
             <ItemContent>
               <ItemTitle>{article.title}</ItemTitle>
-              <ItemDescription>{article.excerpt}…</ItemDescription>
+              <ItemDescription>{article.excerpt}</ItemDescription>
             </ItemContent>
           </Item>
         </li>

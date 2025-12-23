@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { SearchParams } from 'nuqs';
 import { Suspense } from 'react';
+
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -42,7 +43,7 @@ export default function ProfilePage({ searchParams }: PageProps<'/profile'>) {
         <Profile />
       </Suspense>
       <Suspense
-        fallback={<Skeleton className="h-10 w-[307px] justify-self-center" />}
+        fallback={<Skeleton className="h-10 w-76.75 justify-self-center" />}
       >
         <StatusToggle className="justify-self-center" />
       </Suspense>
@@ -119,8 +120,8 @@ async function Articles({ searchParams }: ArticlesProps) {
             }
           >
             <ItemContent>
-              <ItemTitle>{article.title}</ItemTitle>
-              <ItemDescription>{article.excerpt}…</ItemDescription>
+              <ItemTitle>{article.title || 'Untitled Draft'}</ItemTitle>
+              <ItemDescription>{article.excerpt}</ItemDescription>
             </ItemContent>
           </Item>
         </li>
@@ -143,9 +144,9 @@ function ProfileSkeleton() {
 function ArticlesSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      <Skeleton className="h-[95px] w-full" />
-      <Skeleton className="h-[95px] w-full" />
-      <Skeleton className="h-[95px] w-full" />
+      <Skeleton className="h-23.75 w-full" />
+      <Skeleton className="h-23.75 w-full" />
+      <Skeleton className="h-23.75 w-full" />
     </div>
   );
 }

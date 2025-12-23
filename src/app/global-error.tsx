@@ -2,7 +2,8 @@
 
 import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import localFont from 'next/font/local';
+import { Public_Sans } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
 
 import {
   Empty,
@@ -12,13 +13,13 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import './globals.css';
-import { ThemeProvider } from 'next-themes';
 import { cn } from '@/lib/utils';
+import './globals.css';
 
-const inter = localFont({
-  src: './fonts/InterVariable.woff2',
-  variable: '--font-inter',
+const publicSans = Public_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-public-sans',
   display: 'swap',
 });
 
@@ -29,7 +30,7 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body className={cn(inter.variable, 'font-sans dark:antialiased')}>
+      <body className={cn(publicSans.variable, 'font-sans dark:antialiased')}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
