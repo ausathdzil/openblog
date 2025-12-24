@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Public_Sans, Roboto_Mono } from 'next/font/google';
+import { Fira_Code, Libre_Franklin } from 'next/font/google';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { ThemeProvider } from '@/components/theme-provider';
@@ -7,17 +7,17 @@ import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import './globals.css';
 
-const publicSans = Public_Sans({
+const libreFranklin = Libre_Franklin({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-public-sans',
+  weight: ['500', '600', '700', '800'],
+  variable: '--font-libre-franklin',
   display: 'swap',
 });
 
-const robotoMono = Roboto_Mono({
+const firaCode = Fira_Code({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-roboto-mono',
+  variable: '--font-fira-code',
   display: 'swap',
 });
 
@@ -46,8 +46,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          publicSans.variable,
-          robotoMono.variable,
+          libreFranklin.variable,
+          firaCode.variable,
           'font-sans dark:antialiased',
         )}
       >

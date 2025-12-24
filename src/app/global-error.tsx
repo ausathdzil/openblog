@@ -2,7 +2,7 @@
 
 import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Public_Sans } from 'next/font/google';
+import { Libre_Franklin } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 
 import {
@@ -16,10 +16,10 @@ import {
 import { cn } from '@/lib/utils';
 import './globals.css';
 
-const publicSans = Public_Sans({
+const libreFranklin = Libre_Franklin({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-public-sans',
+  variable: '--font-libre-franklin',
   display: 'swap',
 });
 
@@ -30,7 +30,9 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body className={cn(publicSans.variable, 'font-sans dark:antialiased')}>
+      <body
+        className={cn(libreFranklin.variable, 'font-sans dark:antialiased')}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
