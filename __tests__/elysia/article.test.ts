@@ -153,4 +153,43 @@ describe('Article', () => {
       expect(data).toMatchObject(body);
     });
   });
+
+  describe('Delete article', () => {
+    let testArticle: Awaited<ReturnType<typeof createTestArticle>>;
+
+    beforeEach(async () => {
+      testArticle = await createTestArticle(testUser.headers);
+    });
+
+    test('return 404 if article does not exist', async () => {
+      const { status } = await elysia
+        .articles({ publicId: 'non-existent' })
+        .delete({}, { headers: testUser.headers });
+
+      expect(status).toBe(404);
+    });
+
+    test('return 401 if not authenticated', async () => {
+      const { status } = await elysia
+        .articles({ publicId: testArticle.publicId })
+        .delete();
+
+      expect(status).toBe(401);
+    });
+
+    test('return 200 and verify that the article is deleted', async () => {
+      const { status: deleteStatus } = await elysia
+        .articles({ publicId: testArticle.publicId })
+        .delete({}, { headers: testUser.headers });
+
+      expect(deleteStatus).toBe(200);
+
+      const { data, status: getStatus } = await elysia
+        .articles({ publicId: testArticle.publicId })
+        .get();
+
+      expect(getStatus).toBe(404);
+      expect(data).toBeNull();
+    });
+  });
 });
