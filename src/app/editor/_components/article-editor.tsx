@@ -36,14 +36,14 @@ export function ArticleEditor({
   const isSaving = titleSaving || contentSaving;
 
   return (
-    <div className="prose prose-neutral dark:prose-invert relative mx-auto size-full p-8">
+    <div className="prose prose-neutral dark:prose-invert mx-auto size-full p-8">
       {isSaving && (
         <Button
-          className="pointer-events-none absolute right-4 bottom-4 animate-pulse"
+          className="pointer-events-none fixed right-4 bottom-4 z-20 animate-pulse"
           disabled
           nativeButton={false}
           render={<div />}
-          size="sm"
+          size="lg"
           variant="ghost"
         >
           <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} />
