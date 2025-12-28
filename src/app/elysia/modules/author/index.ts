@@ -28,12 +28,6 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
         return status(404, { message: error.message });
     }
   })
-  .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'NOT_FOUND':
-        return status(404, { message: error.message });
-    }
-  })
   .get(
     '/:username',
     async ({ params }) => {

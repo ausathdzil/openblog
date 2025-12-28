@@ -161,6 +161,10 @@ describe('Article', () => {
       testArticle = await createTestArticle(testUser.headers);
     });
 
+    afterEach(async () => {
+      await cleanupTestArticle(testArticle.publicId);
+    });
+
     test('return 404 if article does not exist', async () => {
       const { status } = await elysia
         .articles({ publicId: 'non-existent' })
