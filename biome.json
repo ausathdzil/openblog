@@ -26,9 +26,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "complexity": {
-        "noStaticOnlyClass": "off"
-      },
       "correctness": {
         "noChildrenProp": "off"
       },
@@ -37,9 +34,6 @@
       },
       "style": {
         "noNonNullAssertion": "off"
-      },
-      "suspicious": {
-        "noUnknownAtRules": "off"
       }
     },
     "domains": {

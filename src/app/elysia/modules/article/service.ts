@@ -5,233 +5,234 @@ import { db } from '@/db';
 import { articles, user } from '@/db/schema';
 import { slugify } from '@/lib/utils';
 import { AuthError } from '../auth';
-import { Author } from '../author/service';
+import * as AuthorService from '../author/service';
 import type { ArticleModel } from './model';
 
-export abstract class Article {
-  static async createArticle(
-    { title, content, status, coverImage }: ArticleModel.CreateArticleBody,
-    userId: string | undefined,
-  ) {
-    if (!userId) {
-      throw new AuthError('You are not allowed to perform this action');
-    }
-
-    const author = await Author.getAuthorById(userId);
-
-    const [article] = await db
-      .insert(articles)
-      .values({
-        title: title?.trim(),
-        slug: slugify(title),
-        content: content?.trim(),
-        excerpt: content?.substring(0, 255),
-        status,
-        coverImage,
-        authorId: author.id,
-      })
-      .returning({
-        publicId: articles.publicId,
-        title: articles.title,
-        slug: articles.slug,
-        content: articles.content,
-        excerpt: articles.excerpt,
-        status: articles.status,
-        coverImage: articles.coverImage,
-        createdAt: articles.createdAt,
-        updatedAt: articles.updatedAt,
-      });
-
-    return {
-      ...article,
-      author,
-    } satisfies ArticleModel.ArticleResponse;
+export async function createArticle(
+  { title, content, status, coverImage }: ArticleModel.CreateArticleBody,
+  userId: string | undefined,
+) {
+  if (!userId) {
+    throw new AuthError('You are not allowed to perform this action');
   }
 
-  static async getArticles(
-    { status, q }: ArticleModel.ArticlesQuery,
-    username?: string | null | undefined,
-  ) {
-    return (await db
-      .select({
-        publicId: articles.publicId,
-        title: articles.title,
-        slug: articles.slug,
-        content: articles.content,
-        excerpt: articles.excerpt,
-        status: articles.status,
-        coverImage: articles.coverImage,
-        createdAt: articles.createdAt,
-        updatedAt: articles.updatedAt,
-        author: {
-          name: user.name,
-          image: user.image,
-          createdAt: user.createdAt,
-          username: user.username,
-          displayUsername: user.displayUsername,
-        },
-      })
-      .from(articles)
-      .leftJoin(user, eq(articles.authorId, user.id))
-      .where(
-        and(
-          eq(articles.status, status ?? 'published'),
-          username ? eq(user.username, username) : undefined,
-          q ? ilike(articles.title, `%${q.toLowerCase()}%`) : undefined,
-        ),
-      )) satisfies Array<ArticleModel.ArticleResponse>;
-  }
+  const author = await AuthorService.getAuthorById(userId);
 
-  static async getArticleByPublicId(
-    publicId: string,
-    userId: string | undefined,
-  ) {
-    const [article] = await db
-      .select({
-        publicId: articles.publicId,
-        title: articles.title,
-        slug: articles.slug,
-        content: articles.content,
-        excerpt: articles.excerpt,
-        status: articles.status,
-        coverImage: articles.coverImage,
-        createdAt: articles.createdAt,
-        updatedAt: articles.updatedAt,
-        authorId: articles.authorId,
-        author: {
-          name: user.name,
-          image: user.image,
-          createdAt: user.createdAt,
-          username: user.username,
-          displayUsername: user.displayUsername,
-        },
-      })
-      .from(articles)
-      .leftJoin(user, eq(articles.authorId, user.id))
-      .where(eq(articles.publicId, publicId))
-      .limit(1);
-
-    if (!article) {
-      throw new NotFoundError('Article not found');
-    }
-
-    if (article.status !== 'published' && article.authorId !== userId) {
-      throw new AuthError('You are not allowed to access this resource', 403);
-    }
-
-    return article satisfies ArticleModel.ArticleResponse;
-  }
-
-  static async getArticleBySlug(slug: string, username: string) {
-    const [article] = await db
-      .select({
-        publicId: articles.publicId,
-        title: articles.title,
-        slug: articles.slug,
-        content: articles.content,
-        excerpt: articles.excerpt,
-        status: articles.status,
-        coverImage: articles.coverImage,
-        createdAt: articles.createdAt,
-        updatedAt: articles.updatedAt,
-        authorId: articles.authorId,
-        author: {
-          name: user.name,
-          image: user.image,
-          createdAt: user.createdAt,
-          username: user.username,
-          displayUsername: user.displayUsername,
-        },
-      })
-      .from(articles)
-      .leftJoin(user, eq(articles.authorId, user.id))
-      .where(
-        and(
-          eq(articles.status, 'published'),
-          eq(articles.slug, slug),
-          username ? eq(user.username, username) : undefined,
-        ),
-      )
-      .limit(1);
-
-    if (!article) {
-      throw new NotFoundError('Article not found');
-    }
-
-    return article satisfies ArticleModel.ArticleResponse;
-  }
-
-  static async updateArticle(
-    publicId: string,
-    {
-      title,
-      content,
-      status: articleStatus,
+  const [article] = await db
+    .insert(articles)
+    .values({
+      title: title?.trim(),
+      slug: slugify(title),
+      content: content?.trim(),
+      excerpt: content?.substring(0, 255),
+      status,
       coverImage,
-    }: ArticleModel.UpdateArticleBody,
-    userId: string | undefined,
-  ) {
-    if (!userId) {
-      throw new AuthError('You are not allowed to perform this action');
-    }
+      authorId: author.id,
+    })
+    .returning({
+      publicId: articles.publicId,
+      title: articles.title,
+      slug: articles.slug,
+      content: articles.content,
+      excerpt: articles.excerpt,
+      status: articles.status,
+      coverImage: articles.coverImage,
+      createdAt: articles.createdAt,
+      updatedAt: articles.updatedAt,
+    });
 
-    const article = await Article.getArticleByPublicId(publicId, userId);
+  return {
+    ...article,
+    author,
+  } satisfies ArticleModel.ArticleResponse;
+}
 
-    const payload: Partial<ArticleModel.UpdateArticleBody> = {};
+export async function getArticles(
+  { status, q }: ArticleModel.ArticlesQuery,
+  username?: string | null | undefined,
+) {
+  return (await db
+    .select({
+      publicId: articles.publicId,
+      title: articles.title,
+      slug: articles.slug,
+      content: articles.content,
+      excerpt: articles.excerpt,
+      status: articles.status,
+      coverImage: articles.coverImage,
+      createdAt: articles.createdAt,
+      updatedAt: articles.updatedAt,
+      author: {
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+        username: user.username,
+        displayUsername: user.displayUsername,
+      },
+    })
+    .from(articles)
+    .leftJoin(user, eq(articles.authorId, user.id))
+    .where(
+      and(
+        eq(articles.status, status ?? 'published'),
+        username ? eq(user.username, username) : undefined,
+        q ? ilike(articles.title, `%${q.toLowerCase()}%`) : undefined,
+      ),
+    )) satisfies Array<ArticleModel.ArticleResponse>;
+}
 
-    if (title !== undefined && title !== article.title) {
-      payload.title = title?.trim();
-      payload.slug = slugify(title);
-    }
+export async function getArticleByPublicId(
+  publicId: string,
+  userId: string | undefined,
+) {
+  const [article] = await db
+    .select({
+      publicId: articles.publicId,
+      title: articles.title,
+      slug: articles.slug,
+      content: articles.content,
+      excerpt: articles.excerpt,
+      status: articles.status,
+      coverImage: articles.coverImage,
+      createdAt: articles.createdAt,
+      updatedAt: articles.updatedAt,
+      authorId: articles.authorId,
+      author: {
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+        username: user.username,
+        displayUsername: user.displayUsername,
+      },
+    })
+    .from(articles)
+    .leftJoin(user, eq(articles.authorId, user.id))
+    .where(eq(articles.publicId, publicId))
+    .limit(1);
 
-    if (content !== undefined && content !== article.content) {
-      payload.content = content?.trim();
-      payload.excerpt = content?.substring(0, 255);
-    }
-
-    if (articleStatus !== undefined && articleStatus !== article.status) {
-      payload.status = articleStatus;
-    }
-
-    if (coverImage !== undefined && coverImage !== article.coverImage) {
-      payload.coverImage = coverImage;
-    }
-
-    if (Object.keys(payload).length === 0) {
-      return article satisfies ArticleModel.ArticleResponse;
-    }
-
-    const [updatedData] = await db
-      .update(articles)
-      .set({ ...payload })
-      .where(eq(articles.publicId, publicId))
-      .returning({
-        publicId: articles.publicId,
-        title: articles.title,
-        slug: articles.slug,
-        content: articles.content,
-        excerpt: articles.excerpt,
-        status: articles.status,
-        coverImage: articles.coverImage,
-        createdAt: articles.createdAt,
-        updatedAt: articles.updatedAt,
-      });
-
-    return {
-      ...updatedData,
-      author: article.author,
-    } satisfies ArticleModel.ArticleResponse;
+  if (!article) {
+    throw new NotFoundError('Article not found');
   }
 
-  static async deleteArticle(publicId: string, userId: string | undefined) {
-    if (!userId) {
-      throw new AuthError('You are not allowed to perform this action');
-    }
-
-    const article = await Article.getArticleByPublicId(publicId, userId);
-
-    await db.delete(articles).where(eq(articles.publicId, article.publicId));
-
-    return { message: 'Article deleted successfully' };
+  if (article.status !== 'published' && article.authorId !== userId) {
+    throw new AuthError('You are not allowed to access this resource', 403);
   }
+
+  return article satisfies ArticleModel.ArticleResponse;
+}
+
+export async function getArticleBySlug(slug: string, username: string) {
+  const [article] = await db
+    .select({
+      publicId: articles.publicId,
+      title: articles.title,
+      slug: articles.slug,
+      content: articles.content,
+      excerpt: articles.excerpt,
+      status: articles.status,
+      coverImage: articles.coverImage,
+      createdAt: articles.createdAt,
+      updatedAt: articles.updatedAt,
+      authorId: articles.authorId,
+      author: {
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+        username: user.username,
+        displayUsername: user.displayUsername,
+      },
+    })
+    .from(articles)
+    .leftJoin(user, eq(articles.authorId, user.id))
+    .where(
+      and(
+        eq(articles.status, 'published'),
+        eq(articles.slug, slug),
+        username ? eq(user.username, username) : undefined,
+      ),
+    )
+    .limit(1);
+
+  if (!article) {
+    throw new NotFoundError('Article not found');
+  }
+
+  return article satisfies ArticleModel.ArticleResponse;
+}
+
+export async function updateArticle(
+  publicId: string,
+  {
+    title,
+    content,
+    status: articleStatus,
+    coverImage,
+  }: ArticleModel.UpdateArticleBody,
+  userId: string | undefined,
+) {
+  if (!userId) {
+    throw new AuthError('You are not allowed to perform this action');
+  }
+
+  const article = await getArticleByPublicId(publicId, userId);
+
+  const payload: Partial<ArticleModel.UpdateArticleBody> = {};
+
+  if (title !== undefined && title !== article.title) {
+    payload.title = title?.trim();
+    payload.slug = slugify(title);
+  }
+
+  if (content !== undefined && content !== article.content) {
+    payload.content = content?.trim();
+    payload.excerpt = content?.substring(0, 255);
+  }
+
+  if (articleStatus !== undefined && articleStatus !== article.status) {
+    payload.status = articleStatus;
+  }
+
+  if (coverImage !== undefined && coverImage !== article.coverImage) {
+    payload.coverImage = coverImage;
+  }
+
+  if (Object.keys(payload).length === 0) {
+    return article satisfies ArticleModel.ArticleResponse;
+  }
+
+  const [updatedData] = await db
+    .update(articles)
+    .set({ ...payload })
+    .where(eq(articles.publicId, publicId))
+    .returning({
+      publicId: articles.publicId,
+      title: articles.title,
+      slug: articles.slug,
+      content: articles.content,
+      excerpt: articles.excerpt,
+      status: articles.status,
+      coverImage: articles.coverImage,
+      createdAt: articles.createdAt,
+      updatedAt: articles.updatedAt,
+    });
+
+  return {
+    ...updatedData,
+    author: article.author,
+  } satisfies ArticleModel.ArticleResponse;
+}
+
+export async function deleteArticle(
+  publicId: string,
+  userId: string | undefined,
+) {
+  if (!userId) {
+    throw new AuthError('You are not allowed to perform this action');
+  }
+
+  const article = await getArticleByPublicId(publicId, userId);
+
+  await db.delete(articles).where(eq(articles.publicId, article.publicId));
+
+  return { message: 'Article deleted successfully' };
 }

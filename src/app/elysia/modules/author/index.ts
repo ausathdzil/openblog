@@ -1,10 +1,10 @@
 import Elysia, { t } from 'elysia';
 
 import { ArticleModel } from '../article/model';
-import { Article } from '../article/service';
+import * as ArticleService from '../article/service';
 import { Ref } from '../utils';
 import { AuthorModel } from './model';
-import { Author } from './service';
+import * as AuthorService from './service';
 
 export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .model({
@@ -14,7 +14,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .get(
     '',
     async () => {
-      return await Author.getAuthors();
+      return await AuthorService.getAuthors();
     },
     {
       response: {
@@ -31,7 +31,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .get(
     '/:username',
     async ({ params }) => {
-      return await Author.getAuthor(params.username);
+      return await AuthorService.getAuthor(params.username);
     },
     {
       response: {
@@ -43,7 +43,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .get(
     '/:username/articles',
     async ({ params, query }) => {
-      return await Article.getArticles(query, params.username);
+      return await ArticleService.getArticles(query, params.username);
     },
     {
       query: t.Omit(ArticleModel.articlesQuery, ['status']),
@@ -56,7 +56,10 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .get(
     '/:username/articles/:slug',
     async ({ params }) => {
-      return await Article.getArticleBySlug(params.slug, params.username);
+      return await ArticleService.getArticleBySlug(
+        params.slug,
+        params.username,
+      );
     },
     {
       response: {

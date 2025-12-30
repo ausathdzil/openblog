@@ -3,7 +3,7 @@ import Elysia, { t } from 'elysia';
 import { AuthError, auth } from '../auth';
 import { Ref } from '../utils';
 import { ArticleModel } from './model';
-import { Article } from './service';
+import * as ArticleService from './service';
 
 export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .use(auth)
@@ -22,7 +22,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .post(
     '',
     async ({ body, set, user }) => {
-      const article = await Article.createArticle(body, user?.id);
+      const article = await ArticleService.createArticle(body, user?.id);
       set.status = 201;
       return article;
     },
@@ -39,7 +39,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .get(
     '',
     async ({ query }) => {
-      return await Article.getArticles(query);
+      return await ArticleService.getArticles(query);
     },
     {
       query: t.Omit(ArticleModel.articlesQuery, ['status']),
@@ -57,7 +57,10 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .get(
     '/:publicId',
     async ({ params, user }) => {
-      return await Article.getArticleByPublicId(params.publicId, user?.id);
+      return await ArticleService.getArticleByPublicId(
+        params.publicId,
+        user?.id,
+      );
     },
     {
       auth: true,
@@ -71,7 +74,11 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .patch(
     '/:publicId',
     async ({ params, body, user }) => {
-      return await Article.updateArticle(params.publicId, body, user?.id);
+      return await ArticleService.updateArticle(
+        params.publicId,
+        body,
+        user?.id,
+      );
     },
     {
       auth: true,
@@ -87,7 +94,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .delete(
     '/:publicId',
     async ({ params, user }) => {
-      return await Article.deleteArticle(params.publicId, user?.id);
+      return await ArticleService.deleteArticle(params.publicId, user?.id);
     },
     {
       auth: true,
