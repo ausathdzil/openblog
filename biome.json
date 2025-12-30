@@ -29,6 +29,9 @@
       "complexity": {
         "noStaticOnlyClass": "off"
       },
+      "correctness": {
+        "noChildrenProp": "off"
+      },
       "nursery": {
         "useSortedClasses": "on"
       },

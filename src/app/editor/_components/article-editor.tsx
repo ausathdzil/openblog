@@ -1,8 +1,8 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
+import { useForm, useStore } from '@tanstack/react-form';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Placeholder } from '@tiptap/extensions';
 import { Markdown } from '@tiptap/markdown';
@@ -10,12 +10,12 @@ import { EditorContent, ReactNodeViewRenderer, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { common, createLowlight } from 'lowlight';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 import * as z from 'zod/mini';
 
 import { Button } from '@/components/ui/button';
+import { FieldError } from '@/components/ui/field';
 import { updateArticle } from '../_lib/actions';
 import { CodeBlock } from './code-block';
 
@@ -79,8 +79,6 @@ const titleSchema = z.object({
     ),
 });
 
-type TitleFieldValues = z.infer<typeof titleSchema>;
-
 function TitleEditor({
   publicId,
   initialTitle,
@@ -89,15 +87,16 @@ function TitleEditor({
   const [isPending, startTransition] = useTransition();
   const titleRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const form = useForm<TitleFieldValues>({
-    resolver: zodResolver(titleSchema),
+  const form = useForm({
     defaultValues: {
       title: initialTitle ?? '',
     },
-    mode: 'onChange',
+    validators: {
+      onChange: titleSchema,
+    },
   });
 
-  const title = form.watch('title');
+  const title = useStore(form.store, (state) => state.values.title);
 
   useEffect(() => {
     onSavingChange?.(isPending);
@@ -124,44 +123,44 @@ function TitleEditor({
   }, 1000);
 
   return (
-    <Controller
-      control={form.control}
-      name="title"
-      render={({ field, fieldState }) => (
-        <div className="mb-[0.888889em]">
-          <textarea
-            {...field}
-            aria-invalid={fieldState.invalid}
-            aria-label="Title"
-            autoCapitalize="on"
-            autoComplete="on"
-            autoCorrect="on"
-            className="w-full resize-none overflow-hidden font-extrabold text-(--tw-prose-headings) text-4xl leading-[1.11111] focus:outline-none"
-            maxLength={255}
-            name="Title"
-            onChange={(e) => {
-              const el = e.currentTarget;
-              el.style.height = '0px';
-              el.style.height = `${el.scrollHeight}px`;
-              field.onChange(e.target.value);
-              if (!fieldState.invalid) {
-                autosaveTitle(e.target.value);
-              }
-            }}
-            placeholder="Title"
-            ref={titleRef}
-            required
-            rows={1}
-            spellCheck="true"
-          />
-          {fieldState.invalid && (
-            <p className="text-destructive text-sm">
-              {fieldState.error?.message}
-            </p>
-          )}
-        </div>
-      )}
-    />
+    <form.Field name="title">
+      {(field) => {
+        const isInvalid =
+          field.state.meta.isTouched && !field.state.meta.isValid;
+
+        return (
+          <div className="mb-[0.888889em]">
+            <textarea
+              aria-invalid={isInvalid}
+              aria-label="Title"
+              autoCapitalize="on"
+              autoComplete="on"
+              autoCorrect="on"
+              className="w-full resize-none overflow-hidden font-extrabold text-(--tw-prose-headings) text-4xl leading-[1.11111] focus:outline-none"
+              maxLength={255}
+              name="Title"
+              onBlur={field.handleBlur}
+              onChange={(e) => {
+                const el = e.currentTarget;
+                el.style.height = '0px';
+                el.style.height = `${el.scrollHeight}px`;
+                field.handleChange(e.target.value);
+                if (!isInvalid) {
+                  autosaveTitle(e.target.value);
+                }
+              }}
+              placeholder="Title"
+              ref={titleRef}
+              required
+              rows={1}
+              spellCheck="true"
+              value={field.state.value}
+            />
+            {isInvalid && <FieldError errors={field.state.meta.errors} />}
+          </div>
+        );
+      }}
+    </form.Field>
   );
 }
 
@@ -241,7 +240,6 @@ function ContentEditor({
         class: 'focus:outline-none',
       },
     },
-    autofocus: 'end',
     content,
     contentType: 'markdown',
     onUpdate: ({ editor }) => {

@@ -1,16 +1,15 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircleIcon,
   ViewIcon,
   ViewOffSlashIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
+import { useForm, useStore } from '@tanstack/react-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useId, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useState } from 'react';
 import * as z from 'zod/mini';
 
 import { Alert, AlertTitle } from '@/components/ui/alert';
@@ -48,10 +47,8 @@ const signInFormSchema = z.object({
       z.minLength(1, 'Password is required.'),
       z.maxLength(128, 'Password must be 128 characters or fewer.'),
     ),
-  rememberMe: z.optional(z.boolean()),
+  rememberMe: z.boolean(),
 });
-
-type SignInFieldValues = z.infer<typeof signInFormSchema>;
 
 export function SignInForm({
   className,
@@ -59,128 +56,154 @@ export function SignInForm({
 }: React.ComponentProps<'form'>) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const id = useId();
+  const router = useRouter();
 
-  const form = useForm<SignInFieldValues>({
-    resolver: zodResolver(signInFormSchema),
+  const form = useForm({
     defaultValues: {
       username: '',
       password: '',
       rememberMe: false,
     },
+    validators: {
+      onChange: signInFormSchema,
+      onSubmitAsync: async ({ value }) => {
+        const { error } = await authClient.signIn.username(value, {
+          onRequest: () => {
+            setLoading(true);
+          },
+          onResponse: () => {
+            setLoading(false);
+          },
+          onSuccess: () => {
+            router.push('/profile');
+          },
+        });
+
+        if (error) {
+          return error.message || 'An unknown error occurred';
+        }
+
+        return undefined;
+      },
+    },
   });
 
-  const router = useRouter();
-
-  const handleSubmit = async (values: SignInFieldValues) => {
-    await authClient.signIn.username(values, {
-      onRequest: () => {
-        setLoading(true);
-      },
-      onResponse: () => {
-        setLoading(false);
-      },
-      onSuccess: () => {
-        router.push('/profile');
-      },
-      onError: (ctx) => {
-        form.setError('root', {
-          type: 'manual',
-          message: ctx.error.message || 'An unexpected error occurred',
-        });
-      },
-    });
-  };
+  const formErrorMap = useStore(form.store, (state) => state.errorMap);
 
   return (
     <form
       className={cn('flex flex-col gap-6', className)}
-      onSubmit={form.handleSubmit(handleSubmit)}
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
       {...props}
     >
       <FieldGroup>
-        <Controller
-          control={form.control}
+        <form.Field
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Username</FieldLabel>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <InputGroupText>@</InputGroupText>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    aria-invalid={isInvalid}
+                    autoCapitalize="off"
+                    autoComplete="username"
+                    autoCorrect="off"
+                    id={field.name}
+                    maxLength={30}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="alice"
+                    required
+                    spellCheck="false"
+                    type="text"
+                  />
+                </InputGroup>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
           name="username"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={`${id}-username`}>Username</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon>
-                  <InputGroupText>@</InputGroupText>
-                </InputGroupAddon>
-                <InputGroupInput
-                  {...field}
-                  aria-invalid={fieldState.invalid}
-                  autoCapitalize="off"
-                  autoComplete="username"
-                  autoCorrect="off"
-                  id={`${id}-username`}
-                  maxLength={30}
-                  placeholder="alice"
-                  required
-                  spellCheck="false"
-                  type="text"
-                />
-              </InputGroup>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
         />
-        <Controller
-          control={form.control}
+        <form.Field
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                <InputGroup aria-invalid={isInvalid}>
+                  <InputGroupInput
+                    aria-invalid={isInvalid}
+                    autoCapitalize="off"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    id={field.name}
+                    maxLength={128}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    required
+                    spellCheck="false"
+                    type={showPassword ? 'text' : 'password'}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      aria-label={showPassword ? 'Hide' : 'Show'}
+                      onClick={() => setShowPassword(!showPassword)}
+                      size="icon-xs"
+                      title={showPassword ? 'Hide' : 'Show'}
+                      type="button"
+                      variant="ghost"
+                    >
+                      {showPassword ? (
+                        <HugeiconsIcon
+                          icon={ViewOffSlashIcon}
+                          strokeWidth={2}
+                        />
+                      ) : (
+                        <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
+                      )}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
           name="password"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={`${id}-password`}>Password</FieldLabel>
-              <InputGroup aria-invalid={fieldState.invalid}>
-                <InputGroupInput
-                  {...field}
-                  id={`${id}-password`}
-                  maxLength={128}
-                  required
-                  spellCheck="false"
-                  type={showPassword ? 'text' : 'password'}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    aria-label={showPassword ? 'Hide' : 'Show'}
-                    onClick={() => setShowPassword(!showPassword)}
-                    size="icon-xs"
-                    title={showPassword ? 'Hide' : 'Show'}
-                    type="button"
-                    variant="ghost"
-                  >
-                    {showPassword ? (
-                      <HugeiconsIcon icon={ViewOffSlashIcon} strokeWidth={2} />
-                    ) : (
-                      <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
-                    )}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
         />
-        <Controller
-          control={form.control}
+        <form.Field
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid} orientation="horizontal">
+                <Checkbox
+                  aria-invalid={isInvalid}
+                  checked={field.state.value}
+                  id={field.name}
+                  name={field.name}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                />
+                <FieldLabel className="font-normal" htmlFor={field.name}>
+                  Remember Me
+                </FieldLabel>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
           name="rememberMe"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} orientation="horizontal">
-              <Checkbox
-                aria-invalid={fieldState.invalid}
-                checked={field.value}
-                id={`${id}-rememberMe`}
-                name={field.name}
-                onCheckedChange={field.onChange}
-              />
-              <FieldLabel className="font-normal" htmlFor={`${id}-rememberMe`}>
-                Remember Me
-              </FieldLabel>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
         />
         <Field>
           <Button disabled={loading} type="submit">
@@ -190,12 +213,12 @@ export function SignInForm({
           <FieldDescription className="text-center">
             Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
           </FieldDescription>
-          {form.formState.errors.root && (
+          {formErrorMap.onSubmit ? (
             <Alert variant="destructive">
               <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
-              <AlertTitle>{form.formState.errors.root.message}</AlertTitle>
+              <AlertTitle>{formErrorMap.onSubmit}</AlertTitle>
             </Alert>
-          )}
+          ) : null}
         </Field>
       </FieldGroup>
     </form>
