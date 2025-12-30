@@ -65,7 +65,7 @@ export function SignInForm({
       rememberMe: false,
     },
     validators: {
-      onChange: signInFormSchema,
+      onSubmit: signInFormSchema,
       onSubmitAsync: async ({ value }) => {
         const { error } = await authClient.signIn.username(value, {
           onRequest: () => {
@@ -125,6 +125,7 @@ export function SignInForm({
                     required
                     spellCheck="false"
                     type="text"
+                    value={field.state.value}
                   />
                 </InputGroup>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -154,6 +155,7 @@ export function SignInForm({
                     required
                     spellCheck="false"
                     type={showPassword ? 'text' : 'password'}
+                    value={field.state.value}
                   />
                   <InputGroupAddon align="inline-end">
                     <InputGroupButton
@@ -213,7 +215,7 @@ export function SignInForm({
           <FieldDescription className="text-center">
             Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
           </FieldDescription>
-          {formErrorMap.onSubmit ? (
+          {typeof formErrorMap.onSubmit === 'string' ? (
             <Alert variant="destructive">
               <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
               <AlertTitle>{formErrorMap.onSubmit}</AlertTitle>

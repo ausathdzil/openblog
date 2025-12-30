@@ -92,7 +92,7 @@ function TitleEditor({
       title: initialTitle ?? '',
     },
     validators: {
-      onChange: titleSchema,
+      onBlur: titleSchema,
     },
   });
 
@@ -141,10 +141,12 @@ function TitleEditor({
               name="Title"
               onBlur={field.handleBlur}
               onChange={(e) => {
+                field.handleChange(e.target.value);
+
                 const el = e.currentTarget;
                 el.style.height = '0px';
                 el.style.height = `${el.scrollHeight}px`;
-                field.handleChange(e.target.value);
+
                 if (!isInvalid) {
                   autosaveTitle(e.target.value);
                 }

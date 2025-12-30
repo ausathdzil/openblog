@@ -1,4 +1,4 @@
-import { and, eq, ilike } from 'drizzle-orm';
+import { and, count, desc, eq, ilike } from 'drizzle-orm';
 import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
@@ -48,10 +48,18 @@ export async function createArticle(
 }
 
 export async function getArticles(
-  { status, q }: ArticleModel.ArticlesQuery,
+  { status, q, page = 1, limit = 20 }: ArticleModel.ArticlesQuery,
   username?: string | null | undefined,
 ) {
-  return (await db
+  const offset = (page - 1) * limit;
+
+  const whereConditions = and(
+    eq(articles.status, status ?? 'published'),
+    username ? eq(user.username, username) : undefined,
+    q ? ilike(articles.title, `%${q}%`) : undefined,
+  );
+
+  const dataQuery = db
     .select({
       publicId: articles.publicId,
       title: articles.title,
@@ -72,13 +80,36 @@ export async function getArticles(
     })
     .from(articles)
     .leftJoin(user, eq(articles.authorId, user.id))
-    .where(
-      and(
-        eq(articles.status, status ?? 'published'),
-        username ? eq(user.username, username) : undefined,
-        q ? ilike(articles.title, `%${q.toLowerCase()}%`) : undefined,
-      ),
-    )) satisfies Array<ArticleModel.ArticleResponse>;
+    .where(whereConditions)
+    .orderBy(desc(articles.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const baseCountQuery = db
+    .select({ count: count() })
+    .from(articles)
+    .where(whereConditions);
+
+  const countQuery = username
+    ? baseCountQuery.leftJoin(user, eq(articles.authorId, user.id))
+    : baseCountQuery;
+
+  const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
+
+  const total = totalResult[0].count;
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    data,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrev: page > 1,
+    },
+  } satisfies ArticleModel.ArticlesResponse;
 }
 
 export async function getArticleByPublicId(

@@ -39,7 +39,7 @@ type ArticlesProps = {
 
 async function Articles({ params, searchParams }: ArticlesProps) {
   const { username } = await params;
-  const { q } = await searchParamsCache.parse(searchParams);
+  const { q, page, limit } = await searchParamsCache.parse(searchParams);
 
   const { author, authorError } = await getAuthor(username);
 
@@ -47,9 +47,9 @@ async function Articles({ params, searchParams }: ArticlesProps) {
     notFound();
   }
 
-  const { articles } = await getArticles(username, q);
+  const { articles } = await getArticles(username, q, page, limit);
 
-  if (!articles || articles.length === 0) {
+  if (articles?.data.length === 0) {
     return (
       <Empty>
         <EmptyHeader>
@@ -61,7 +61,7 @@ async function Articles({ params, searchParams }: ArticlesProps) {
 
   return (
     <ItemGroup className="w-full list-none gap-4">
-      {articles.map((article) => (
+      {articles?.data.map((article) => (
         <li key={article.publicId}>
           <Item
             render={

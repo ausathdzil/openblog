@@ -1,14 +1,14 @@
-import Elysia, { t } from 'elysia';
+import Elysia from 'elysia';
 
 import { ArticleModel } from '../article/model';
 import * as ArticleService from '../article/service';
 import { AuthError, auth } from '../auth';
-import { Ref } from '../utils';
 
 export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
   .use(auth)
   .model({
     Article: ArticleModel.articleResponse,
+    Articles: ArticleModel.articlesResposnse,
   })
   .error({
     AuthError,
@@ -32,7 +32,7 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
       auth: true,
       query: ArticleModel.articlesQuery,
       response: {
-        200: t.Array(Ref(ArticleModel.articleResponse)),
+        200: 'Articles',
         401: ArticleModel.articleInvalid,
       },
     },

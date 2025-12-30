@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { SearchParams } from 'nuqs';
 import { Suspense } from 'react';
-
+import { PaginationControl } from '@/components/pagination-control';
 import { SearchInput } from '@/components/search-input';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
@@ -38,38 +38,64 @@ type ArticlesProps = {
 };
 
 async function Articles({ searchParams }: ArticlesProps) {
-  const { q } = await searchParamsCache.parse(searchParams);
-  const { articles } = await getArticles(q);
+  const { q, page, limit } = await searchParamsCache.parse(searchParams);
+  const { articles } = await getArticles(q, page, limit);
 
-  if (!articles || articles.length === 0) {
+  const {
+    page: currentPage,
+    hasNext,
+    hasPrev,
+    totalPages,
+  } = articles?.pagination ?? {};
+
+  if (articles?.data.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>No articles found…</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
+      <>
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>No articles found…</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
+        <PaginationControl
+          currentPage={currentPage ?? 1}
+          hasNext={hasNext ?? false}
+          hasPrev={hasPrev ?? false}
+          pathname="/explore"
+          totalPages={totalPages ?? 1}
+        />
+      </>
     );
   }
 
   return (
-    <ItemGroup className="list-none gap-4">
-      {articles.map((article) => (
-        <li key={article.publicId}>
-          <Item
-            render={
-              <Link
-                href={`/u/${article.author?.username}/articles/${article.slug}`}
-              />
-            }
-          >
-            <ItemContent>
-              <ItemTitle>{article.title}</ItemTitle>
-              <ItemDescription>{article.excerpt}</ItemDescription>
-            </ItemContent>
-          </Item>
-        </li>
-      ))}
-    </ItemGroup>
+    <>
+      <ItemGroup className="list-none gap-4">
+        {articles?.data.map((article) => (
+          <li key={article.publicId}>
+            <Item
+              render={
+                <Link
+                  href={`/u/${article.author?.username}/articles/${article.slug}`}
+                />
+              }
+            >
+              <ItemContent>
+                <ItemTitle>{article.title}</ItemTitle>
+                <ItemDescription>{article.excerpt}</ItemDescription>
+              </ItemContent>
+            </Item>
+          </li>
+        ))}
+      </ItemGroup>
+      <PaginationControl
+        className="mt-auto"
+        currentPage={currentPage ?? 1}
+        hasNext={hasNext ?? false}
+        hasPrev={hasPrev ?? false}
+        pathname="/explore"
+        totalPages={totalPages ?? 1}
+      />
+    </>
   );
 }
 

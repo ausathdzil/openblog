@@ -20,6 +20,8 @@ export namespace ArticleModel {
   export const articlesQuery = t.Object({
     status: t.Optional(articles.status),
     q: t.Optional(t.String()),
+    page: t.Optional(t.Number({ minimum: 1 })),
+    limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
   });
 
   export type ArticlesQuery = typeof articlesQuery.static;
@@ -38,6 +40,24 @@ export namespace ArticleModel {
   });
 
   export type ArticleResponse = typeof articleResponse.static;
+
+  export const paginationMetaResponse = t.Object({
+    page: t.Number(),
+    limit: t.Number(),
+    total: t.Number(),
+    totalPages: t.Number(),
+    hasNext: t.Boolean(),
+    hasPrev: t.Boolean(),
+  });
+
+  export type PaginationMetaResponse = typeof paginationMetaResponse.static;
+
+  export const articlesResposnse = t.Object({
+    data: t.Array(articleResponse),
+    pagination: paginationMetaResponse,
+  });
+
+  export type ArticlesResponse = typeof articlesResposnse.static;
 
   export const updateArticleBody = t.Object({
     title: updateArticle.title,

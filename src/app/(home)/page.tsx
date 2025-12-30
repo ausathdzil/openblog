@@ -25,7 +25,7 @@ export default function Home() {
 async function Articles() {
   const { articles } = await getArticles();
 
-  if (!articles || articles.length === 0) {
+  if (articles?.data.length === 0) {
     return (
       <Empty>
         <EmptyHeader>
@@ -37,7 +37,7 @@ async function Articles() {
 
   return (
     <ItemGroup className="list-none gap-4">
-      {articles.map((article) => (
+      {articles?.data.map((article) => (
         <li key={article.publicId}>
           <Item
             render={

@@ -2,9 +2,9 @@ import { headers } from 'next/headers';
 
 import { elysia } from '@/lib/eden';
 
-export async function getArticles(q?: string) {
+export async function getArticles(q?: string, page?: number, limit?: number) {
   const { data: articles } = await elysia.articles.get({
-    query: { q },
+    query: { q, page, limit },
     fetch: {
       cache: 'force-cache',
       next: {
@@ -20,10 +20,12 @@ export async function getArticles(q?: string) {
 export async function getUserArticles(
   status?: 'draft' | 'published' | 'archived' | null | undefined,
   q?: string | undefined,
+  page?: number,
+  limit?: number,
 ) {
   const { data: articles, error } = await elysia.me.articles.get({
     headers: await headers(),
-    query: { status, q },
+    query: { status, q, page, limit },
     fetch: {
       cache: 'force-cache',
       next: {

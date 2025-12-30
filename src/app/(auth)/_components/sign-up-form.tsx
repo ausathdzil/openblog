@@ -151,6 +151,7 @@ export function SignUpForm({
                   required
                   spellCheck="false"
                   type="text"
+                  value={field.state.value}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -190,6 +191,7 @@ export function SignUpForm({
                     required
                     spellCheck="false"
                     type="text"
+                    value={field.state.value}
                   />
                 </InputGroup>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -203,7 +205,7 @@ export function SignUpForm({
                 return undefined;
               }
 
-              const { data } = await authClient.isUsernameAvailable(
+              const { data, error } = await authClient.isUsernameAvailable(
                 {
                   username: value,
                 },
@@ -216,6 +218,10 @@ export function SignUpForm({
                   },
                 },
               );
+
+              if (error) {
+                return undefined;
+              }
 
               if (!data?.available) {
                 return { message: 'Username is not available.' };
@@ -243,6 +249,7 @@ export function SignUpForm({
                   placeholder="m@example.com"
                   required
                   type="email"
+                  value={field.state.value}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -270,6 +277,7 @@ export function SignUpForm({
                     required
                     spellCheck="false"
                     type={showPassword ? 'text' : 'password'}
+                    value={field.state.value}
                   />
                   <InputGroupAddon align="inline-end">
                     <InputGroupButton

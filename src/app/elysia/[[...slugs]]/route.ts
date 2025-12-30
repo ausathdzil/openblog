@@ -1,4 +1,4 @@
-import { openapi } from '@elysiajs/openapi';
+import { fromTypes, openapi } from '@elysiajs/openapi';
 import Elysia from 'elysia';
 
 import { article } from '../modules/article';
@@ -18,6 +18,7 @@ export const app = new Elysia({ prefix: '/elysia' })
         components: await BetterAuthOpenAPI.components,
         paths: await BetterAuthOpenAPI.getPaths(),
       },
+      references: fromTypes(),
     }),
   )
   .use(auth)

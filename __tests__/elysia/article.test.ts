@@ -66,18 +66,18 @@ describe('Article', () => {
 
   describe('Get all articles', () => {
     test('return 200 and an array of published articles', async () => {
-      const { data, status } = await elysia.articles.get();
+      const { data: articles, status } = await elysia.articles.get();
 
       expect(status).toBe(200);
-      expect(data).toBeInstanceOf(Array);
+      expect(articles).not.toBeNull();
 
-      if (data?.length === 0) {
+      if (articles?.data.length === 0) {
         return;
       }
 
-      expect(data?.every((article) => article.status === 'published')).toBe(
-        true,
-      );
+      expect(
+        articles?.data.every((article) => article.status === 'published'),
+      ).toBe(true);
     });
   });
 

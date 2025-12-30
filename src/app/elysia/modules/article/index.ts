@@ -1,7 +1,6 @@
 import Elysia, { t } from 'elysia';
 
 import { AuthError, auth } from '../auth';
-import { Ref } from '../utils';
 import { ArticleModel } from './model';
 import * as ArticleService from './service';
 
@@ -9,6 +8,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .use(auth)
   .model({
     Article: ArticleModel.articleResponse,
+    Articles: ArticleModel.articlesResposnse,
   })
   .error({
     AuthError,
@@ -44,7 +44,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     {
       query: t.Omit(ArticleModel.articlesQuery, ['status']),
       response: {
-        200: t.Array(Ref(ArticleModel.articleResponse)),
+        200: 'Articles',
       },
     },
   )

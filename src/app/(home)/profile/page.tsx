@@ -87,14 +87,15 @@ type ArticlesProps = {
 };
 
 async function Articles({ searchParams }: ArticlesProps) {
-  const { status, q } = await searchParamsCache.parse(searchParams);
-  const { articles, error } = await getUserArticles(status, q);
+  const { status, q, page, limit } =
+    await searchParamsCache.parse(searchParams);
+  const { articles, error } = await getUserArticles(status, q, page, limit);
 
   if (error?.status === 401) {
     redirect('/sign-in');
   }
 
-  if (!articles || articles.length === 0) {
+  if (articles?.data.length === 0) {
     return (
       <Empty>
         <EmptyHeader>
@@ -106,7 +107,7 @@ async function Articles({ searchParams }: ArticlesProps) {
 
   return (
     <ItemGroup className="list-none gap-4">
-      {articles.map((article) => (
+      {articles?.data.map((article) => (
         <li key={article.publicId}>
           <Item
             render={

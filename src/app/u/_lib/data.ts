@@ -16,11 +16,16 @@ export async function getAuthor(username: string) {
   return { author, authorError };
 }
 
-export async function getArticles(username: string, q?: string) {
+export async function getArticles(
+  username: string,
+  q?: string,
+  page?: number,
+  limit?: number,
+) {
   const { data: articles, error: articlesError } = await elysia
     .authors({ username })
     .articles.get({
-      query: { q },
+      query: { q, page, limit },
       fetch: {
         cache: 'force-cache',
         next: {

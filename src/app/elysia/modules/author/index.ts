@@ -10,6 +10,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .model({
     Author: AuthorModel.authorResponse,
     Article: ArticleModel.articleResponse,
+    Articles: ArticleModel.articlesResposnse,
   })
   .get(
     '',
@@ -48,7 +49,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     {
       query: t.Omit(ArticleModel.articlesQuery, ['status']),
       response: {
-        200: t.Array(Ref(ArticleModel.articleResponse)),
+        200: 'Articles',
         404: AuthorModel.authorInvalid,
       },
     },
