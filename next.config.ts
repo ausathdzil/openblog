@@ -6,7 +6,17 @@ const nextConfig: NextConfig = {
     typedEnv: true,
   },
   reactCompiler: true,
-  typedRoutes: true,
+
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/@:username/:path*',
+          destination: '/u/:username/:path*',
+        },
+      ],
+    };
+  },
 };
 
 export default nextConfig;

@@ -3,9 +3,9 @@ import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
 import { articles, user } from '@/db/schema';
-import { slugify } from '@/lib/utils';
 import { AuthError } from '../auth';
 import * as AuthorService from '../author/service';
+import { slugify } from '../utils';
 import type { ArticleModel } from './model';
 
 export async function createArticle(
@@ -22,7 +22,7 @@ export async function createArticle(
     .insert(articles)
     .values({
       title: title?.trim(),
-      slug: slugify(title),
+      slug: await slugify(title, author.username),
       content: content?.trim(),
       excerpt: content?.substring(0, 255),
       status,
@@ -206,12 +206,13 @@ export async function updateArticle(
   }
 
   const article = await getArticleByPublicId(publicId, userId);
+  const author = await AuthorService.getAuthorById(article.authorId);
 
   const payload: Partial<ArticleModel.UpdateArticleBody> = {};
 
   if (title !== undefined && title !== article.title) {
     payload.title = title?.trim();
-    payload.slug = slugify(title);
+    payload.slug = await slugify(title, author.username);
   }
 
   if (content !== undefined && content !== article.content) {
@@ -249,7 +250,7 @@ export async function updateArticle(
 
   return {
     ...updatedData,
-    author: article.author,
+    author,
   } satisfies ArticleModel.ArticleResponse;
 }
 

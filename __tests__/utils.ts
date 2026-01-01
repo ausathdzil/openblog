@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 
+import { slugify } from '@/app/elysia/modules/utils';
 import { db } from '@/db';
 import { articles, user } from '@/db/schema';
 import { auth } from '@/lib/auth';
-import { slugify } from '@/lib/utils';
 
 function generateUniqueId(): string {
   const bytes = new Uint8Array(10);
@@ -49,9 +49,9 @@ export async function createTestArticle(headers: HeadersInit) {
   const [article] = await db
     .insert(articles)
     .values({
-      title: title,
-      slug: slugify(title),
-      content: content,
+      title,
+      slug: await slugify(title, session.user.username),
+      content,
       excerpt: content,
       status,
       coverImage,

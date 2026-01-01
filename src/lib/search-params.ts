@@ -2,6 +2,7 @@ import {
   createLoader,
   createSearchParamsCache,
   createSerializer,
+  type inferParserType,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
@@ -23,6 +24,8 @@ export const searchParamsParser = {
     .withDefault(20)
     .withOptions({ shallow: false, history: 'push' }),
 };
+
+export type SearchParams = inferParserType<typeof searchParamsParser>;
 
 export const loadSearchParams = createLoader(searchParamsParser);
 export const searchParamsCache = createSearchParamsCache(searchParamsParser);

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { SearchParams } from 'nuqs';
 import { Suspense } from 'react';
 
 import { PaginationControl } from '@/components/pagination-control';
@@ -14,14 +13,18 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { searchParamsCache } from '@/lib/search-params';
+import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { getArticles } from '../_lib/data';
 
 export const metadata: Metadata = {
   title: 'Explore',
 };
 
-export default function ExplorePage({ searchParams }: PageProps<'/explore'>) {
+type ExplorePageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default function ExplorePage({ searchParams }: ExplorePageProps) {
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-4">
       <Suspense fallback={<Skeleton className="h-9 w-full" />}>
@@ -34,11 +37,7 @@ export default function ExplorePage({ searchParams }: PageProps<'/explore'>) {
   );
 }
 
-type ArticlesProps = {
-  searchParams: Promise<SearchParams>;
-};
-
-async function Articles({ searchParams }: ArticlesProps) {
+async function Articles({ searchParams }: ExplorePageProps) {
   const { q, page, limit } = await searchParamsCache.parse(searchParams);
   const { articles } = await getArticles(q, page, limit);
 
@@ -67,7 +66,7 @@ async function Articles({ searchParams }: ArticlesProps) {
             <Item
               render={
                 <Link
-                  href={`/u/${article.author?.username}/articles/${article.slug}`}
+                  href={`/@${article.author?.username}/articles/${article.slug}`}
                 />
               }
             >

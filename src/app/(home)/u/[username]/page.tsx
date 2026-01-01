@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import type { SearchParams } from 'nuqs';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { getAuthor, getUserArticles } from '@/app/(home)/_lib/data';
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,89 +16,82 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { auth } from '@/lib/auth';
-import { searchParamsCache } from '@/lib/search-params';
-import { StatusToggle } from '../_components/status-toggle';
-import { getCurrentUserArticles } from '../_lib/data';
+import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+type UserPageProps = {
+  params: Promise<{ username: string }>;
+  searchParams: Promise<SearchParams>;
+};
 
-  if (!session) {
+export async function generateMetadata({
+  params,
+}: UserPageProps): Promise<Metadata> {
+  const { username } = await params;
+  const { author } = await getAuthor(username);
+
+  if (!author) {
     return {};
   }
 
   return {
-    title: session.user.name,
+    title: `@${author.displayUsername}`,
+    alternates: {
+      canonical: `/@${username}`,
+    },
   };
 }
 
-export default function ProfilePage({ searchParams }: PageProps<'/profile'>) {
+export default function UserPage({ params, searchParams }: UserPageProps) {
   return (
     <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
       <Suspense fallback={<ProfileSkeleton />}>
-        <Profile />
-      </Suspense>
-      <Suspense
-        fallback={<Skeleton className="h-10 w-76.75 justify-self-center" />}
-      >
-        <StatusToggle className="justify-self-center" />
+        <Profile params={params} />
       </Suspense>
       <Suspense fallback={<Skeleton className="h-9 w-full" />}>
         <SearchInput placeholder="Search articles…" />
       </Suspense>
       <Suspense fallback={<ArticlesSkeleton />}>
-        <Articles searchParams={searchParams} />
+        <Articles params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );
 }
 
-async function Profile() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+async function Profile({ params }: Omit<UserPageProps, 'searchParams'>) {
+  const { username } = await params;
+  const { author, authorError } = await getAuthor(username);
 
-  if (!session) {
-    redirect('/sign-in');
+  if (authorError?.status === 404 || !author) {
+    notFound();
   }
 
   return (
     <div className="grid grid-rows-[auto_auto_auto]">
       <Avatar className="size-36 justify-self-center">
-        <AvatarImage src={session.user.image ?? ''} />
+        <AvatarImage src={author.image ?? ''} />
         <AvatarFallback className="text-6xl">
-          {session.user.name.charAt(0)}
+          {author.name.charAt(0)}
         </AvatarFallback>
       </Avatar>
       <div className="mt-4 space-y-2 text-center">
-        <Large className="font-display text-3xl">{session.user.name}</Large>
-        <Muted className="text-lg">@{session.user.displayUsername}</Muted>
+        <Large className="font-display text-3xl">{author.name}</Large>
+        <Muted className="text-lg">@{author.displayUsername}</Muted>
       </div>
     </div>
   );
 }
 
-type ArticlesProps = {
-  searchParams: Promise<SearchParams>;
-};
+async function Articles({ params, searchParams }: UserPageProps) {
+  const { username } = await params;
+  const { q, page, limit } = await searchParamsCache.parse(searchParams);
 
-async function Articles({ searchParams }: ArticlesProps) {
-  const { status, q, page, limit } =
-    await searchParamsCache.parse(searchParams);
+  const { author, authorError } = await getAuthor(username);
 
-  const { articles, error } = await getCurrentUserArticles(
-    status,
-    q,
-    page,
-    limit,
-  );
-
-  if (error?.status === 401) {
-    redirect('/sign-in');
+  if (authorError?.status === 404 || !author) {
+    notFound();
   }
+
+  const { articles } = await getUserArticles(username, q, page, limit);
 
   if (articles?.data.length === 0) {
     return (
@@ -118,16 +110,12 @@ async function Articles({ searchParams }: ArticlesProps) {
           <Item
             render={
               <Link
-                href={
-                  status !== 'published'
-                    ? `/editor/${article.publicId}`
-                    : `/@${article.author?.username}/articles/${article.slug} `
-                }
+                href={`/u/${article.author?.username}/articles/${article.publicId}`}
               />
             }
           >
             <ItemContent>
-              <ItemTitle>{article.title || 'Untitled Draft'}</ItemTitle>
+              <ItemTitle>{article.title}</ItemTitle>
               <ItemDescription>{article.excerpt}</ItemDescription>
             </ItemContent>
           </Item>

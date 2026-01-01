@@ -11,8 +11,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { getArticleBySlug } from '@/app/(home)/_lib/data';
 import { Spinner } from '@/components/ui/spinner';
-import { getArticleBySlug } from '../../../_lib/data';
 
 export async function generateMetadata({
   params,
@@ -27,6 +27,9 @@ export async function generateMetadata({
   return {
     title: article.title,
     description: article.excerpt,
+    alternates: {
+      canonical: `/@${username}/articles/${slug}`,
+    },
   };
 }
 

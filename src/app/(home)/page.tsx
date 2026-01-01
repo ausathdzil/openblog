@@ -42,7 +42,7 @@ async function Articles() {
           <Item
             render={
               <Link
-                href={`/u/${article.author?.username}/articles/${article.slug}`}
+                href={`/@${article.author?.username}/articles/${article.slug}`}
               />
             }
           >
