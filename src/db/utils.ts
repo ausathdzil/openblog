@@ -1,7 +1,7 @@
 /**
- * biome-ignore-all lint/suspicious/noExplicitAny: https://elysiajs.com/integrations/drizzle.html#utility
- * biome-ignore-all lint/suspicious/noImplicitAnyLet: https://elysiajs.com/integrations/drizzle.html#utility
- * biome-ignore-all lint/complexity/noBannedTypes: https://elysiajs.com/integrations/drizzle.html#utility
+ * biome-ignore-all lint/suspicious/noExplicitAny: @see https://elysiajs.com/integrations/drizzle.html#utility
+ * biome-ignore-all lint/suspicious/noImplicitAnyLet: @see https://elysiajs.com/integrations/drizzle.html#utility
+ * biome-ignore-all lint/complexity/noBannedTypes: @see https://elysiajs.com/integrations/drizzle.html#utility
  * @lastModified 2025-02-04
  * @see https://elysiajs.com/recipe/drizzle.html#utility
  */
@@ -79,6 +79,7 @@ export const spread = <
  *
  * If `mode` is 'insert', the schema will be refined for insert
  * If `mode` is 'select', the schema will be refined for select
+ * If `mode` is 'update', the schema will be refined for update
  * If `mode` is undefined, the schema will be spread as is, models will need to be refined manually
  */
 export const spreads = <

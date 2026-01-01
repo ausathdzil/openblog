@@ -50,21 +50,22 @@ const Slug = z.string().slugify();
 
 export async function slugify(
   input: string | null | undefined,
-  username: string | null | undefined,
+  authorId: string | null | undefined,
 ) {
-  if (!input || !username) {
+  if (!input || !authorId) {
     return null;
   }
 
   const base = Slug.parse(input);
   let slug = base;
-  let suffix = 1;
+  let suffix = 2;
 
   while (true) {
     const existing = await db
       .select()
       .from(articles)
-      .where(and(eq(articles.slug, slug), eq(articles.authorId, username)));
+      .where(and(eq(articles.slug, slug), eq(articles.authorId, authorId)));
+
     if (existing.length === 0) {
       return slug;
     }

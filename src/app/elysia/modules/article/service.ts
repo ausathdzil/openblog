@@ -22,7 +22,7 @@ export async function createArticle(
     .insert(articles)
     .values({
       title: title?.trim(),
-      slug: await slugify(title, author.username),
+      slug: await slugify(title, author.id),
       content: content?.trim(),
       excerpt: content?.substring(0, 255),
       status,
@@ -212,7 +212,7 @@ export async function updateArticle(
 
   if (title !== undefined && title !== article.title) {
     payload.title = title?.trim();
-    payload.slug = await slugify(title, author.username);
+    payload.slug = await slugify(title, author.id);
   }
 
   if (content !== undefined && content !== article.content) {

@@ -50,7 +50,7 @@ export async function createTestArticle(headers: HeadersInit) {
     .insert(articles)
     .values({
       title,
-      slug: await slugify(title, session.user.username),
+      slug: await slugify(title, session.user.id),
       content,
       excerpt: content,
       status,
