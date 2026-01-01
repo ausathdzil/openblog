@@ -4,7 +4,7 @@ import { useQueryStates } from 'nuqs';
 import { useTransition } from 'react';
 
 import { searchParamsParser } from '@/lib/search-params';
-import { cn } from '@/lib/utils';
+import { TopLoader } from './top-loader';
 import {
   Pagination,
   PaginationButton,
@@ -72,12 +72,7 @@ export function PaginationControl({
           </PaginationItem>
         </PaginationContent>
       </Pagination>
-      <div
-        className={cn(
-          'fixed top-0 right-0 left-0 z-50 h-0.5 origin-left bg-primary transition-transform duration-300',
-          isPending ? 'scale-x-100' : 'scale-x-0',
-        )}
-      />
+      <TopLoader isPending={isPending} />
     </>
   );
 }
