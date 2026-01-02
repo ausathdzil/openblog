@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Route } from 'next';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -119,9 +119,9 @@ async function Articles({ searchParams }: ArticlesProps) {
             render={
               <Link
                 href={
-                  status !== 'published'
+                  (status !== 'published'
                     ? `/editor/${article.publicId}`
-                    : `/@${article.author?.username}/articles/${article.slug} `
+                    : `/@${article.author?.username}/articles/${article.slug}`) as Route
                 }
               />
             }

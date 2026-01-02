@@ -19,8 +19,6 @@ export async function getAuthor(username: string) {
 }
 
 export async function getArticles(q?: string, page?: number, limit?: number) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
   const { data: articles } = await elysia.articles.get({
     query: { q, page, limit },
     fetch: {

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Route } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -38,8 +38,8 @@ export default function ExplorePage({ searchParams }: ExplorePageProps) {
 }
 
 async function Articles({ searchParams }: ExplorePageProps) {
-  const { q, page } = await searchParamsCache.parse(searchParams);
-  const { articles } = await getArticles(q, page, 1);
+  const { q, page, limit } = await searchParamsCache.parse(searchParams);
+  const { articles } = await getArticles(q, page, limit);
 
   if (articles?.data.length === 0) {
     return (
@@ -61,7 +61,9 @@ async function Articles({ searchParams }: ExplorePageProps) {
             <Item
               render={
                 <Link
-                  href={`/@${article.author?.username}/articles/${article.slug}`}
+                  href={
+                    `/@${article.author?.username}/articles/${article.slug}` as Route
+                  }
                 />
               }
             >

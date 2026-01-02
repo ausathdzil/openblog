@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -42,7 +43,9 @@ async function Articles() {
           <Item
             render={
               <Link
-                href={`/@${article.author?.username}/articles/${article.slug}`}
+                href={
+                  `/@${article.author?.username}/articles/${article.slug}` as Route
+                }
               />
             }
           >

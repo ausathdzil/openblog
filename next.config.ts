@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     typedEnv: true,
   },
   reactCompiler: true,
+  typedRoutes: true,
 
   async rewrites() {
     return {
