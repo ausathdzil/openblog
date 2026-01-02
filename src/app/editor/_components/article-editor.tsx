@@ -74,8 +74,8 @@ const titleSchema = z.object({
   title: z
     .string()
     .check(
-      z.maxLength(255, 'Title must be 255 characters or fewer.'),
       z.trim(),
+      z.maxLength(255, 'Title must be 255 characters or fewer.'),
     ),
 });
 

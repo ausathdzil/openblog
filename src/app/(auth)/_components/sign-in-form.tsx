@@ -37,9 +37,9 @@ const signInFormSchema = z.object({
   username: z
     .string()
     .check(
+      z.trim(),
       z.minLength(1, 'Username is required.'),
       z.maxLength(30, 'Username must be 30 characters or fewer.'),
-      z.trim(),
     ),
   password: z
     .string()
@@ -66,25 +66,34 @@ export function SignInForm({
     },
     validators: {
       onSubmit: signInFormSchema,
-      onSubmitAsync: async ({ value }) => {
-        const { error } = await authClient.signIn.username(value, {
-          onRequest: () => {
-            setLoading(true);
-          },
-          onResponse: () => {
-            setLoading(false);
-          },
-          onSuccess: () => {
-            router.push('/profile');
+    },
+    onSubmit: async ({ value, formApi }) => {
+      const { error } = await authClient.signIn.username(value, {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onResponse: () => {
+          setLoading(false);
+        },
+        onSuccess: () => {
+          router.push('/profile');
+        },
+      });
+
+      if (error) {
+        formApi.setErrorMap({
+          onSubmit: {
+            form: error.message || 'An unknown error occurred',
+            fields: {},
           },
         });
-
-        if (error) {
-          return error.message || 'An unknown error occurred';
-        }
-
-        return undefined;
-      },
+      }
+    },
+    onSubmitInvalid() {
+      const $invalidInput = document.querySelector(
+        '[aria-invalid="true"]',
+      ) as HTMLElement;
+      $invalidInput.focus();
     },
   });
 
@@ -133,6 +142,9 @@ export function SignInForm({
             );
           }}
           name="username"
+          validators={{
+            onBlur: signInFormSchema.shape.username,
+          }}
         />
         <form.Field
           children={(field) => {
@@ -182,6 +194,9 @@ export function SignInForm({
             );
           }}
           name="password"
+          validators={{
+            onBlur: signInFormSchema.shape.password,
+          }}
         />
         <form.Field
           children={(field) => {
@@ -206,6 +221,9 @@ export function SignInForm({
             );
           }}
           name="rememberMe"
+          validators={{
+            onBlur: signInFormSchema.shape.rememberMe,
+          }}
         />
         <Field>
           <Button disabled={loading} type="submit">

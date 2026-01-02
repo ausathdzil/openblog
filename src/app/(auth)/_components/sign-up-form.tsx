@@ -37,13 +37,14 @@ const signUpFormSchema = z.object({
   name: z
     .string()
     .check(
+      z.trim(),
       z.minLength(3, 'Name must be at least 3 characters long.'),
       z.maxLength(30, 'Name must be 30 characters or fewer.'),
-      z.trim(),
     ),
   username: z
     .string()
     .check(
+      z.trim(),
       z.minLength(3, 'Username must be at least 3 characters long.'),
       z.maxLength(30, 'Username must be 30 characters or fewer.'),
       z.regex(
@@ -56,13 +57,12 @@ const signUpFormSchema = z.object({
         'Username cannot start or end with a dot.',
       ),
       z.regex(/^(?!.*\.\.).*$/, 'Username cannot contain consecutive dots.'),
-      z.trim(),
     ),
   email: z
     .email('Please enter a valid email.')
     .check(
-      z.maxLength(255, 'Email must be 255 characters or fewer.'),
       z.trim(),
+      z.maxLength(255, 'Email must be 255 characters or fewer.'),
     ),
   password: z
     .string()
@@ -95,26 +95,36 @@ export function SignUpForm({
       password: '',
     },
     validators: {
-      onChange: signUpFormSchema,
-      onSubmitAsync: async ({ value }) => {
-        const { error } = await authClient.signUp.email(value, {
-          onRequest: () => {
-            setLoading(true);
-          },
-          onResponse: () => {
-            setLoading(false);
-          },
-          onSuccess: () => {
-            router.push('/profile');
+      onSubmit: signUpFormSchema,
+    },
+    onSubmit: async ({ value, formApi }) => {
+      const { error } = await authClient.signUp.email(value, {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onResponse: () => {
+          setLoading(false);
+        },
+        onSuccess: () => {
+          router.push('/profile');
+        },
+      });
+
+      if (error) {
+        formApi.setErrorMap({
+          onSubmit: {
+            form: error.message || 'An unknown error occurred',
+            fields: {},
           },
         });
+      }
+    },
+    onSubmitInvalid() {
+      const $invalidInput = document.querySelector('[aria-invalid="true"]');
 
-        if (error) {
-          return error.message || 'An unknown error occured, please try again.';
-        }
-
-        return undefined;
-      },
+      if ($invalidInput instanceof HTMLElement) {
+        $invalidInput.focus();
+      }
     },
   });
 
@@ -158,6 +168,9 @@ export function SignUpForm({
             );
           }}
           name="name"
+          validators={{
+            onBlur: signUpFormSchema.shape.name,
+          }}
         />
         <form.Field
           asyncDebounceMs={300}
@@ -200,7 +213,14 @@ export function SignUpForm({
           }}
           name="username"
           validators={{
+            onBlur: signUpFormSchema.shape.username,
             onChangeAsync: async ({ value }) => {
+              const parsed = signUpFormSchema.shape.username.safeParse(value);
+
+              if (!parsed.success) {
+                return undefined;
+              }
+
               if (!value || value.trim().length === 0) {
                 return undefined;
               }
@@ -256,6 +276,9 @@ export function SignUpForm({
             );
           }}
           name="email"
+          validators={{
+            onBlur: signUpFormSchema.shape.email,
+          }}
         />
         <form.Field
           children={(field) => {
@@ -304,6 +327,9 @@ export function SignUpForm({
             );
           }}
           name="password"
+          validators={{
+            onBlur: signUpFormSchema.shape.password,
+          }}
         />
         <Field>
           <Button disabled={loading} type="submit">
@@ -313,7 +339,7 @@ export function SignUpForm({
           <FieldDescription className="text-center">
             Already have an account? <Link href="/sign-in">Sign in</Link>
           </FieldDescription>
-          {formErrorMap.onSubmit ? (
+          {typeof formErrorMap.onSubmit === 'string' ? (
             <Alert variant="destructive">
               <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
               <AlertTitle>{formErrorMap.onSubmit}</AlertTitle>
