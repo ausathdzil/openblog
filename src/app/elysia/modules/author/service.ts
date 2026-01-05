@@ -17,7 +17,7 @@ export async function getAuthors() {
     .from(user)) satisfies Array<AuthorModel.AuthorResponse>;
 }
 
-export async function getAuthor(username: string) {
+export async function getAuthorByUsername(username: string) {
   const [author] = await db
     .select({
       id: user.id,

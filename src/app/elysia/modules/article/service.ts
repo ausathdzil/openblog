@@ -53,6 +53,10 @@ export async function getArticles(
 ) {
   const offset = (page - 1) * limit;
 
+  if (username) {
+    await AuthorService.getAuthorByUsername(username);
+  }
+
   const whereConditions = and(
     eq(articles.status, status ?? 'published'),
     username ? eq(user.username, username) : undefined,

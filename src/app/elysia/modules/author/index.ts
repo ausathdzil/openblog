@@ -32,7 +32,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .get(
     '/:username',
     async ({ params }) => {
-      return await AuthorService.getAuthor(params.username);
+      return await AuthorService.getAuthorByUsername(params.username);
     },
     {
       response: {

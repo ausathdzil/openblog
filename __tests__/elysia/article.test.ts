@@ -70,6 +70,7 @@ describe('Article', () => {
 
       expect(status).toBe(200);
       expect(articles).not.toBeNull();
+      expect(articles?.data).toBeArray();
 
       if (articles?.data.length === 0) {
         return;
