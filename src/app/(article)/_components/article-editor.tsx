@@ -9,7 +9,7 @@ import { Markdown } from '@tiptap/markdown';
 import { EditorContent, ReactNodeViewRenderer, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { common, createLowlight } from 'lowlight';
-import { useEffect, useRef, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -81,17 +81,27 @@ export function ArticleEditor({
     },
   });
 
-  const formState = form.state;
-
   return (
     <>
       <Header title={article.title || 'Untitled Draft'}>
-        {article.status === 'draft' ? (
-          <PublishButton
-            isValid={formState.isValid}
-            publicId={article.publicId}
-          />
-        ) : null}
+        <form.Subscribe
+          selector={(state) => ({
+            isValid: state.isValid,
+            title: state.values.title,
+            content: state.values.content,
+            status: state.values.status,
+          })}
+        >
+          {(formState) => (
+            <PublishButton
+              isContentEmpty={formState.content.trim().length === 0}
+              isTitleEmpty={formState.title.trim().length === 0}
+              isValid={formState.isValid}
+              publicId={article.publicId}
+              status={formState.status}
+            />
+          )}
+        </form.Subscribe>
       </Header>
       <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-8">
         {isPending && (
@@ -187,16 +197,45 @@ export function ArticleEditor({
 
 type PublishButtonProps = {
   isValid: boolean;
+  isTitleEmpty: boolean;
+  isContentEmpty: boolean;
+  status: string | null;
   publicId: string;
 } & React.ComponentProps<typeof Button>;
 
-function PublishButton({ isValid, publicId, ...props }: PublishButtonProps) {
+function PublishButton({
+  isValid,
+  isTitleEmpty,
+  isContentEmpty,
+  status,
+  publicId,
+  ...props
+}: PublishButtonProps) {
   const [isPending, startTransition] = useTransition();
+  const [isPublished, setIsPublished] = useState(false);
+
+  if (status !== 'draft') {
+    return null;
+  }
 
   const handlePublish = () => {
     if (!isValid) {
       toast.error('Please fix all errors before publishing', {
-        position: 'top-right',
+        position: 'top-center',
+      });
+      return;
+    }
+
+    if (isTitleEmpty) {
+      toast.error('Please enter a title before publishing', {
+        position: 'top-center',
+      });
+      return;
+    }
+
+    if (isContentEmpty) {
+      toast.error('Please enter some content before publishing', {
+        position: 'top-center',
       });
       return;
     }
@@ -207,20 +246,21 @@ function PublishButton({ isValid, publicId, ...props }: PublishButtonProps) {
       });
 
       if (res?.error) {
-        toast.error(res.error.message, { position: 'top-right' });
+        toast.error(res.error.message, { position: 'top-center' });
       }
+
+      setIsPublished(true);
     });
   };
 
   return (
     <Button
-      disabled={isPending}
+      disabled={isPending || isPublished}
       onClick={handlePublish}
       size="pill-sm"
-      variant="default"
       {...props}
     >
-      Publish
+      {isPublished ? 'Published' : 'Publish'}
     </Button>
   );
 }
