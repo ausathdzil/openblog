@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
+import { Header } from '../../_components/header';
 import { getAuthor, getUserArticles } from '../../_lib/data';
 
 type UserPageProps = {
@@ -43,17 +44,20 @@ export async function generateMetadata({
 
 export default function UserPage({ params, searchParams }: UserPageProps) {
   return (
-    <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
-      <Suspense fallback={<ProfileSkeleton />}>
-        <Profile params={params} />
-      </Suspense>
-      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-        <SearchInput placeholder="Search articles…" />
-      </Suspense>
-      <Suspense fallback={<ArticlesSkeleton />}>
-        <Articles params={params} searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
+        <Suspense fallback={<ProfileSkeleton />}>
+          <Profile params={params} />
+        </Suspense>
+        <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+          <SearchInput placeholder="Search articles…" />
+        </Suspense>
+        <Suspense fallback={<ArticlesSkeleton />}>
+          <Articles params={params} searchParams={searchParams} />
+        </Suspense>
+      </main>
+    </div>
   );
 }
 

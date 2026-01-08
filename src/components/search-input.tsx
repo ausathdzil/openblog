@@ -84,7 +84,7 @@ export function SearchInput({
         value={q}
         {...props}
       />
-      {!isFocused && !q ? (
+      {!isFocused ? (
         <InputGroupAddon align="inline-end">
           <Kbd>{isMac ? '⌘' : 'Ctrl'}&nbsp;+&nbsp;K</Kbd>
         </InputGroupAddon>

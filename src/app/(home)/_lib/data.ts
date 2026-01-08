@@ -17,6 +17,20 @@ export async function getArticles(q?: string, page?: number, limit?: number) {
   return { articles };
 }
 
+export async function getAuthors(q?: string, page?: number, limit?: number) {
+  const { data: authors } = await elysia.authors.get({
+    query: { q, page, limit },
+    fetch: {
+      cache: 'force-cache',
+      next: {
+        revalidate: 900,
+        tags: ['authors'],
+      },
+    },
+  });
+  return { authors };
+}
+
 export async function getCurrentUserArticles(
   status?: 'draft' | 'published' | 'archived' | null | undefined,
   q?: string | undefined,

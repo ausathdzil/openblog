@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type HeaderProps = {
-  title: string;
+  title?: string;
 } & React.ComponentProps<'header'>;
 
 export function Header({ title, className, children, ...props }: HeaderProps) {

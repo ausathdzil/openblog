@@ -23,6 +23,10 @@ export const searchParamsParser = {
   limit: parseAsInteger
     .withDefault(20)
     .withOptions({ shallow: false, history: 'push' }),
+
+  scope: parseAsStringLiteral(['articles', 'authors'])
+    .withDefault('articles')
+    .withOptions({ shallow: false, history: 'push' }),
 };
 
 export type SearchParams = inferParserType<typeof searchParamsParser>;
