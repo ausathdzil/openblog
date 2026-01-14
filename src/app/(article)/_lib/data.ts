@@ -1,19 +1,10 @@
-import { headers } from 'next/headers';
-
+import { cacheLife, cacheTag } from 'next/cache';
 import { elysia } from '@/lib/eden';
 
 export async function getAuthor(username: string) {
   const { data: author, error: authorError } = await elysia
     .authors({ username })
-    .get({
-      fetch: {
-        cache: 'force-cache',
-        next: {
-          revalidate: 900,
-          tags: [`author-${username}`],
-        },
-      },
-    });
+    .get();
 
   return { author, authorError };
 }
@@ -28,27 +19,22 @@ export async function getUserArticles(
     .authors({ username })
     .articles.get({
       query: { q, page, limit },
-      fetch: {
-        cache: 'force-cache',
-        next: {
-          revalidate: 900,
-          tags: [`articles-${username}`],
-        },
-      },
     });
 
   return { articles, articlesError };
 }
 
-export async function getArtcileByPublicId(publicId: string) {
+export async function getArtcileByPublicId(
+  headersRecord: Record<string, string>,
+  publicId: string,
+) {
+  'use cache';
+
+  cacheTag('article');
+  cacheLife('seconds');
+
   const { data: article, error } = await elysia.articles({ publicId }).get({
-    headers: await headers(),
-    fetch: {
-      cache: 'force-cache',
-      next: {
-        tags: [`article-${publicId}`],
-      },
-    },
+    headers: headersRecord,
   });
 
   return { article, error };
@@ -58,14 +44,7 @@ export async function getUserArticleBySlug(slug: string, username: string) {
   const { data: article, error } = await elysia
     .authors({ username })
     .articles({ slug })
-    .get({
-      fetch: {
-        cache: 'force-cache',
-        next: {
-          tags: [`article-${slug}`],
-        },
-      },
-    });
+    .get();
 
   return { article, error };
 }

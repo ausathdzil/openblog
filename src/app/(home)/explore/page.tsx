@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import type { Metadata, Route } from 'next';
+import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -61,6 +62,11 @@ type ResultsProps = {
 };
 
 async function ArticlesResults({ limit, page, q }: ResultsProps) {
+  'use cache';
+
+  cacheTag('articles');
+  cacheLife('minutes');
+
   const { articles } = await getArticles(q, page, limit);
 
   if (articles?.data.length === 0) {
@@ -108,6 +114,11 @@ async function ArticlesResults({ limit, page, q }: ResultsProps) {
 }
 
 async function AuthorsResults({ limit, page, q }: ResultsProps) {
+  'use cache';
+
+  cacheTag('authors');
+  cacheLife('minutes');
+
   const { authors } = await getAuthors(q, page, limit);
 
   if (authors?.data.length === 0) {

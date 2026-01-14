@@ -1,4 +1,5 @@
 import type { Route } from 'next';
+import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -24,6 +25,11 @@ export default function Home() {
 }
 
 async function Articles() {
+  'use cache';
+
+  cacheTag('articles');
+  cacheLife('minutes');
+
   const { articles } = await getArticles();
 
   if (articles?.data.length === 0) {

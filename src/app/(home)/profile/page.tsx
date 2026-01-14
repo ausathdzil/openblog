@@ -55,7 +55,7 @@ export default function ProfilePage({ searchParams }: ProfilePageProps) {
         <StatusToggle className="justify-self-center" />
       </Suspense>
       <Suspense fallback={<ArticlesSkeleton />}>
-        <Articles searchParams={searchParams} />
+        <ProfileResults searchParams={searchParams} />
       </Suspense>
     </main>
   );
@@ -87,11 +87,26 @@ async function Profile() {
   );
 }
 
-async function Articles({ searchParams }: ProfilePageProps) {
+async function ProfileResults({ searchParams }: ProfilePageProps) {
   const { status, q, page, limit } =
     await searchParamsCache.parse(searchParams);
 
+  return <Articles limit={limit} page={page} q={q} status={status} />;
+}
+
+type ArticlesProps = {
+  status: 'draft' | 'published' | 'archived' | null | undefined;
+  q: string;
+  page: number;
+  limit: number;
+};
+
+async function Articles({ status, q, page, limit }: ArticlesProps) {
+  const headersList = await headers();
+  const headersRecord = Object.fromEntries(headersList.entries());
+
   const { articles, error } = await getCurrentUserArticles(
+    headersRecord,
     status,
     q,
     page,
@@ -131,12 +146,13 @@ async function Articles({ searchParams }: ProfilePageProps) {
 
 function ProfileSkeleton() {
   return (
-    <div className="grid grid-rows-[auto_auto_auto]">
+    <div className="grid grid-rows-[auto_auto_auto] gap-4">
       <Skeleton className="size-36 animate-none justify-self-center rounded-full" />
-      <div className="mt-4 flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2">
         <Skeleton className="h-9 w-40" />
         <Skeleton className="h-7 w-36" />
       </div>
+      <Skeleton className="h-10 w-[117px] justify-self-center" />
     </div>
   );
 }

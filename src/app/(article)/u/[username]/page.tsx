@@ -1,4 +1,5 @@
-import type { Metadata } from 'next';
+import type { Metadata, Route } from 'next';
+import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -54,7 +55,7 @@ export default function UserPage({ params, searchParams }: UserPageProps) {
           <SearchInput placeholder="Search articles…" />
         </Suspense>
         <Suspense fallback={<ArticlesSkeleton />}>
-          <Articles params={params} searchParams={searchParams} />
+          <UserResults params={params} searchParams={searchParams} />
         </Suspense>
       </main>
     </div>
@@ -62,7 +63,13 @@ export default function UserPage({ params, searchParams }: UserPageProps) {
 }
 
 async function Profile({ params }: Omit<UserPageProps, 'searchParams'>) {
+  'use cache';
+
   const { username } = await params;
+
+  cacheTag(`author-${username}`);
+  cacheLife('minutes');
+
   const { author, authorError } = await getAuthor(username);
 
   if (authorError?.status === 404 || !author) {
@@ -85,15 +92,24 @@ async function Profile({ params }: Omit<UserPageProps, 'searchParams'>) {
   );
 }
 
-async function Articles({ params, searchParams }: UserPageProps) {
-  const { username } = await params;
+async function UserResults({ params, searchParams }: UserPageProps) {
   const { q, page, limit } = await searchParamsCache.parse(searchParams);
+  const { username } = await params;
 
-  const { author, authorError } = await getAuthor(username);
+  return <Articles limit={limit} page={page} q={q} username={username} />;
+}
 
-  if (authorError?.status === 404 || !author) {
-    notFound();
-  }
+type ArticlesProps = {
+  username: string;
+  q: string;
+  page: number;
+  limit: number;
+};
+
+async function Articles({ username, q, page, limit }: ArticlesProps) {
+  'use cache';
+
+  cacheTag(`articles-${username}`);
 
   const { articles } = await getUserArticles(username, q, page, limit);
 
@@ -114,7 +130,9 @@ async function Articles({ params, searchParams }: UserPageProps) {
           <Item
             render={
               <Link
-                href={`/u/${article.author?.username}/articles/${article.publicId}`}
+                href={
+                  `/@${article.author?.username}/articles/${article.slug}` as Route
+                }
               />
             }
           >

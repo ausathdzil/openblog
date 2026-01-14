@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { toHtml } from 'hast-util-to-html';
 import { common, createLowlight } from 'lowlight';
 import type { Metadata, Route } from 'next';
+import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -84,7 +85,13 @@ function highlightCode(code: string, language: string | null) {
 }
 
 async function Article({ params }: ArticleProps) {
+  'use cache';
+
   const { username, slug } = await params;
+
+  cacheTag(`article-${slug}`);
+  cacheLife('max');
+
   const { article, error } = await getUserArticleBySlug(slug, username);
 
   if (error?.status === 404 || !article) {
