@@ -2,7 +2,7 @@ import * as React from "react"
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01Icon, ArrowRight01Icon, MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons"
 
@@ -39,7 +39,6 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 }
 
 type PaginationLinkProps = {
-  disabled?: boolean;
   isActive?: boolean
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
   React.ComponentProps<typeof Link>
@@ -48,20 +47,22 @@ function PaginationLink({
   className,
   isActive,
   size = "icon",
-  disabled = false,
   ...props
 }: PaginationLinkProps) {
   return (
-    <Link
-      className={cn(
-        buttonVariants({ variant: isActive ? "outline" : "ghost", size }), 
-        disabled && "opacity-50 pointer-events-none", 
-        className
-      )}
-      aria-current={isActive ? "page" : undefined}
-      data-slot="pagination-link"
-      data-active={isActive}
-      {...props}
+    <Button
+      variant={isActive ? "outline" : "ghost"}
+      size={size}
+      className={cn(className)}
+      nativeButton={false}
+      render={
+        <Link
+          aria-current={isActive ? "page" : undefined}
+          data-slot="pagination-link"
+          data-active={isActive}
+          {...props}
+        />
+      }
     />
   )
 }
