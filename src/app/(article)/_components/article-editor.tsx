@@ -43,20 +43,12 @@ const articleSchema = z.object({
   ),
 });
 
-function BeforeUnloadGuard({ isDirty }: { isDirty: boolean }) {
-  useEffect(() => {
-    if (!isDirty) {
-      return;
-    }
-    const handle = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-    };
-    window.addEventListener('beforeunload', handle);
-    return () => {
-      window.removeEventListener('beforeunload', handle);
-    };
-  }, [isDirty]);
-  return null;
+function isContentEmpty(content: string): boolean {
+  const normalized = content
+    .replace(/\u00A0/g, '') // Remove the non-breaking space character
+    .replace(/&nbsp;/gi, '') // Remove the literal "&nbsp;" string
+    .trim();
+  return normalized.length === 0;
 }
 
 export function ArticleEditor({
@@ -136,7 +128,7 @@ export function ArticleEditor({
           {(formState) => (
             <>
               <PublishButton
-                isContentEmpty={formState.content.trim().length === 0}
+                isContentEmpty={isContentEmpty(formState.content)}
                 isTitleEmpty={formState.title.trim().length === 0}
                 isValid={formState.isValid}
                 publicId={article.publicId}
@@ -250,6 +242,22 @@ export function ArticleEditor({
       </main>
     </>
   );
+}
+
+function BeforeUnloadGuard({ isDirty }: { isDirty: boolean }) {
+  useEffect(() => {
+    if (!isDirty) {
+      return;
+    }
+    const handle = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handle);
+    return () => {
+      window.removeEventListener('beforeunload', handle);
+    };
+  }, [isDirty]);
+  return null;
 }
 
 type PublishButtonProps = {
