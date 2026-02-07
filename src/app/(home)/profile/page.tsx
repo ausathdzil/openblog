@@ -36,9 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type ProfilePageProps = {
+interface ProfilePageProps {
   searchParams: Promise<SearchParams>;
-};
+}
 
 export default function ProfilePage({ searchParams }: ProfilePageProps) {
   return (
@@ -94,12 +94,12 @@ async function ProfileResults({ searchParams }: ProfilePageProps) {
   return <Articles limit={limit} page={page} q={q} status={status} />;
 }
 
-type ArticlesProps = {
+interface ArticlesProps {
   status: 'draft' | 'published' | 'archived' | null | undefined;
   q: string;
   page: number;
   limit: number;
-};
+}
 
 async function Articles({ status, q, page, limit }: ArticlesProps) {
   const headersList = await headers();
@@ -110,7 +110,7 @@ async function Articles({ status, q, page, limit }: ArticlesProps) {
     status,
     q,
     page,
-    limit,
+    limit
   );
 
   if (error?.status === 401) {

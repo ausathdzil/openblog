@@ -49,9 +49,9 @@ export default function Page({
   );
 }
 
-type ArticleProps = {
+interface ArticleProps {
   params: Promise<{ username: string; slug: string }>;
-};
+}
 
 const lowlight = createLowlight(common);
 

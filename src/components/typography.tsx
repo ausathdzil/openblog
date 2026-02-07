@@ -5,7 +5,7 @@ export function Title({ className, ...props }: React.ComponentProps<'h1'>) {
     <h1
       className={cn(
         'scroll-m-20 text-balance text-center font-medium text-4xl tracking-tight',
-        className,
+        className
       )}
       {...props}
     />
@@ -17,7 +17,7 @@ export function Heading({ className, ...props }: React.ComponentProps<'h2'>) {
     <h2
       className={cn(
         'scroll-m-20 font-semibold text-3xl tracking-tight first:mt-0',
-        className,
+        className
       )}
       {...props}
     />
@@ -32,7 +32,7 @@ export function Subheading({
     <h3
       className={cn(
         'scroll-m-20 font-semibold text-2xl tracking-tight',
-        className,
+        className
       )}
       {...props}
     />

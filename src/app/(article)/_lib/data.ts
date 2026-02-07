@@ -13,7 +13,7 @@ export async function getUserArticles(
   username: string,
   q?: string,
   page?: number,
-  limit?: number,
+  limit?: number
 ) {
   const { data: articles, error: articlesError } = await elysia
     .authors({ username })
@@ -26,7 +26,7 @@ export async function getUserArticles(
 
 export async function getArtcileByPublicId(
   headersRecord: Record<string, string>,
-  publicId: string,
+  publicId: string
 ) {
   'use cache';
 

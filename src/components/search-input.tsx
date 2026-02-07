@@ -46,7 +46,7 @@ export function SearchInput({
         {
           limitUrlUpdates: term === '' ? undefined : debounce(300),
           startTransition,
-        },
+        }
       );
     });
   };
@@ -84,15 +84,17 @@ export function SearchInput({
         value={q}
         {...props}
       />
-      {!isFocused ? (
+      {isFocused ? (
+        q ? (
+          <InputGroupAddon align="inline-end">
+            <Kbd>Esc</Kbd>
+          </InputGroupAddon>
+        ) : null
+      ) : (
         <InputGroupAddon align="inline-end">
           <Kbd>{isMac ? '⌘' : 'Ctrl'}&nbsp;+&nbsp;K</Kbd>
         </InputGroupAddon>
-      ) : q ? (
-        <InputGroupAddon align="inline-end">
-          <Kbd>Esc</Kbd>
-        </InputGroupAddon>
-      ) : null}
+      )}
     </InputGroup>
   );
 }

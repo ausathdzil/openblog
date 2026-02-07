@@ -20,10 +20,10 @@ import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { Header } from '../../_components/header';
 import { getAuthor, getUserArticles } from '../../_lib/data';
 
-type UserPageProps = {
+interface UserPageProps {
   params: Promise<{ username: string }>;
   searchParams: Promise<SearchParams>;
-};
+}
 
 export async function generateMetadata({
   params,
@@ -99,12 +99,12 @@ async function UserResults({ params, searchParams }: UserPageProps) {
   return <Articles limit={limit} page={page} q={q} username={username} />;
 }
 
-type ArticlesProps = {
+interface ArticlesProps {
   username: string;
   q: string;
   page: number;
   limit: number;
-};
+}
 
 async function Articles({ username, q, page, limit }: ArticlesProps) {
   'use cache';

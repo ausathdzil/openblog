@@ -21,7 +21,7 @@ export async function getCurrentUserArticles(
   status?: 'draft' | 'published' | 'archived' | null | undefined,
   q?: string | undefined,
   page?: number,
-  limit?: number,
+  limit?: number
 ) {
   const { data: articles, error } = await elysia.me.articles.get({
     headers: headersRecord,

@@ -14,7 +14,7 @@ export async function updateArticle(
     excerpt,
     coverImage,
     status,
-  }: ArticleModel.UpdateArticleBody,
+  }: ArticleModel.UpdateArticleBody
 ) {
   const { data, error } = await elysia.articles({ publicId }).patch(
     {
@@ -26,7 +26,7 @@ export async function updateArticle(
     },
     {
       headers: await headers(),
-    },
+    }
   );
 
   if (error) {

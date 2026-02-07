@@ -22,7 +22,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
       response: {
         200: 'Authors',
       },
-    },
+    }
   )
   .onError(({ code, status, error }) => {
     switch (code) {
@@ -40,7 +40,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
         200: 'Author',
         404: AuthorModel.authorInvalid,
       },
-    },
+    }
   )
   .get(
     '/:username/articles',
@@ -53,14 +53,14 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
         200: 'Articles',
         404: AuthorModel.authorInvalid,
       },
-    },
+    }
   )
   .get(
     '/:username/articles/:slug',
     async ({ params }) => {
       return await ArticleService.getArticleBySlug(
         params.slug,
-        params.username,
+        params.username
       );
     },
     {
@@ -68,5 +68,5 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
         200: 'Article',
         404: ArticleModel.articleInvalid,
       },
-    },
+    }
   );

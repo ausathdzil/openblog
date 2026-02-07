@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 
+const macRegex = /Mac/;
+
 export function useMac() {
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setIsMac(/Mac/.test(window.navigator.userAgent));
+      setIsMac(macRegex.test(window.navigator.userAgent));
     }
   }, []);
 

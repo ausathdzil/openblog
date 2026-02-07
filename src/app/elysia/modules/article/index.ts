@@ -34,7 +34,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
         401: ArticleModel.articleInvalid,
         422: ArticleModel.articleInvalid,
       },
-    },
+    }
   )
   .get(
     '',
@@ -46,7 +46,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       response: {
         200: 'Articles',
       },
-    },
+    }
   )
   .onError(({ code, status, error }) => {
     switch (code) {
@@ -59,7 +59,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     async ({ params, user }) => {
       return await ArticleService.getArticleByPublicId(
         params.publicId,
-        user?.id,
+        user?.id
       );
     },
     {
@@ -69,7 +69,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
         403: ArticleModel.articleInvalid,
         404: ArticleModel.articleInvalid,
       },
-    },
+    }
   )
   .patch(
     '/:publicId',
@@ -77,7 +77,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       return await ArticleService.updateArticle(
         params.publicId,
         body,
-        user?.id,
+        user?.id
       );
     },
     {
@@ -89,7 +89,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
         403: ArticleModel.articleInvalid,
         404: ArticleModel.articleInvalid,
       },
-    },
+    }
   )
   .delete(
     '/:publicId',
@@ -104,5 +104,5 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
         403: ArticleModel.articleInvalid,
         404: ArticleModel.articleInvalid,
       },
-    },
+    }
   );

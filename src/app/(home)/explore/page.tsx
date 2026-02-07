@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   title: 'Explore',
 };
 
-type ExplorePageProps = {
+interface ExplorePageProps {
   searchParams: Promise<SearchParams>;
-};
+}
 
 export default function ExplorePage({ searchParams }: ExplorePageProps) {
   return (
@@ -55,11 +55,11 @@ async function ExploreResults({ searchParams }: ExplorePageProps) {
   return <ArticlesResults limit={limit} page={page} q={q} />;
 }
 
-type ResultsProps = {
+interface ResultsProps {
   limit: number;
   page: number;
   q: string;
-};
+}
 
 async function ArticlesResults({ limit, page, q }: ResultsProps) {
   'use cache';

@@ -39,7 +39,7 @@ const signUpFormSchema = z.object({
     .check(
       z.trim(),
       z.minLength(3, 'Name must be at least 3 characters long.'),
-      z.maxLength(30, 'Name must be 30 characters or fewer.'),
+      z.maxLength(30, 'Name must be 30 characters or fewer.')
     ),
   username: z
     .string()
@@ -49,20 +49,20 @@ const signUpFormSchema = z.object({
       z.maxLength(30, 'Username must be 30 characters or fewer.'),
       z.regex(
         /^[a-zA-Z0-9._]+$/,
-        'Username can only contain letters, numbers, underscores, and dots.',
+        'Username can only contain letters, numbers, underscores, and dots.'
       ),
       z.regex(/^[^0-9].*$/, 'Username cannot start with a number.'),
       z.regex(
         /^(?!\.)(?!.*\.$).+$/,
-        'Username cannot start or end with a dot.',
+        'Username cannot start or end with a dot.'
       ),
-      z.regex(/^(?!.*\.\.).*$/, 'Username cannot contain consecutive dots.'),
+      z.regex(/^(?!.*\.\.).*$/, 'Username cannot contain consecutive dots.')
     ),
   email: z
     .email('Please enter a valid email.')
     .check(
       z.trim(),
-      z.maxLength(255, 'Email must be 255 characters or fewer.'),
+      z.maxLength(255, 'Email must be 255 characters or fewer.')
     ),
   password: z
     .string()
@@ -73,8 +73,8 @@ const signUpFormSchema = z.object({
       z.regex(/[0-9]/, 'Password must contain at least one number.'),
       z.regex(
         /[^a-zA-Z0-9]/,
-        'Password must contain at least one special character.',
-      ),
+        'Password must contain at least one special character.'
+      )
     ),
 });
 
@@ -236,7 +236,7 @@ export function SignUpForm({
                   onResponse: () => {
                     setIsCheckingUsername(false);
                   },
-                },
+                }
               );
 
               if (error) {

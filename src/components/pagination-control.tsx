@@ -62,7 +62,7 @@ export function PaginationControl({
                   {p}
                 </PaginationButton>
               </PaginationItem>
-            ) : null,
+            ) : null
           )}
           <PaginationItem>
             <PaginationNextButton

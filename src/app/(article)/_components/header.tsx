@@ -51,7 +51,7 @@ export function Header({ title, className, children, ...props }: HeaderProps) {
           aria-hidden={!showTitle}
           className={cn(
             'absolute left-1/2 -translate-x-1/2 transition-opacity',
-            showTitle ? 'opacity-100' : 'opacity-0',
+            showTitle ? 'opacity-100' : 'opacity-0'
           )}
         >
           {title}

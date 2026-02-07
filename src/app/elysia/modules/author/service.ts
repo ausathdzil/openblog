@@ -16,7 +16,7 @@ export async function getAuthors({
     ? or(
         ilike(user.name, `%${q}%`),
         ilike(user.username, `%${q}%`),
-        ilike(user.displayUsername, `%${q}%`),
+        ilike(user.displayUsername, `%${q}%`)
       )
     : undefined;
 

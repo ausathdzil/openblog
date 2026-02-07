@@ -26,18 +26,18 @@ const articleSchema = z.object({
     .string()
     .check(
       z.trim(),
-      z.maxLength(255, 'Title must be 255 characters or fewer.'),
+      z.maxLength(255, 'Title must be 255 characters or fewer.')
     ),
   content: z.string().check(z.trim()),
   excerpt: z
     .string()
     .check(
       z.trim(),
-      z.maxLength(255, 'Excerpt must be 255 characters or fewer.'),
+      z.maxLength(255, 'Excerpt must be 255 characters or fewer.')
     ),
   status: z.literal(
     ['draft', 'published', 'archived'],
-    'Status must be either draft, published, or archived.',
+    'Status must be either draft, published, or archived.'
   ),
 });
 
@@ -108,7 +108,7 @@ export function ArticleEditor({
           className={cn(
             buttonVariants({ size: 'lg', variant: 'ghost' }),
             'pointer-events-none fixed right-4 bottom-4 z-20 opacity-50',
-            isPending && 'animate-pulse',
+            isPending && 'animate-pulse'
           )}
         >
           {isPending ? (
@@ -308,7 +308,7 @@ function ResizableTextarea({
       <textarea
         className={cn(
           'w-full resize-none overflow-hidden focus:outline-none',
-          className,
+          className
         )}
         onChange={handleChange}
         ref={textareaRef}
@@ -323,11 +323,11 @@ function ResizableTextarea({
 
 const lowlight = createLowlight(common);
 
-type ContentEditorProps = {
+interface ContentEditorProps {
   onBlur: () => void;
   onChange: (value: string) => void;
   value: string;
-};
+}
 
 function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
   const editor = useEditor({

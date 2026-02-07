@@ -11,7 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
 export function SignOutButton(
-  props: React.ComponentProps<typeof DropdownMenuItem>,
+  props: React.ComponentProps<typeof DropdownMenuItem>
 ) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();

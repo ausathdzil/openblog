@@ -16,7 +16,7 @@ export async function createArticle(
     excerpt,
     coverImage,
   }: ArticleModel.CreateArticleBody,
-  userId: string | undefined,
+  userId: string | undefined
 ) {
   if (!userId) {
     throw new AuthError('You are not allowed to perform this action.');
@@ -55,7 +55,7 @@ export async function createArticle(
 
 export async function getArticles(
   { status, q, page = 1, limit = 20 }: ArticleModel.ArticlesQuery,
-  username?: string | null | undefined,
+  username?: string | null | undefined
 ) {
   const offset = (page - 1) * limit;
 
@@ -66,7 +66,7 @@ export async function getArticles(
   const whereConditions = and(
     eq(articles.status, status ?? 'published'),
     username ? eq(user.username, username) : undefined,
-    q ? ilike(articles.title, `%${q}%`) : undefined,
+    q ? ilike(articles.title, `%${q}%`) : undefined
   );
 
   const dataQuery = db
@@ -124,7 +124,7 @@ export async function getArticles(
 
 export async function getArticleByPublicId(
   publicId: string,
-  userId: string | undefined,
+  userId: string | undefined
 ) {
   const [article] = await db
     .select({
@@ -189,8 +189,8 @@ export async function getArticleBySlug(slug: string, username: string) {
       and(
         eq(articles.status, 'published'),
         eq(articles.slug, slug),
-        username ? eq(user.username, username) : undefined,
-      ),
+        username ? eq(user.username, username) : undefined
+      )
     )
     .limit(1);
 
@@ -210,7 +210,7 @@ export async function updateArticle(
     status: articleStatus,
     coverImage,
   }: ArticleModel.UpdateArticleBody,
-  userId: string | undefined,
+  userId: string | undefined
 ) {
   if (!userId) {
     throw new AuthError('You are not allowed to perform this action.');
@@ -270,7 +270,7 @@ export async function updateArticle(
 
 export async function deleteArticle(
   publicId: string,
-  userId: string | undefined,
+  userId: string | undefined
 ) {
   if (!userId) {
     throw new AuthError('You are not allowed to perform this action.');

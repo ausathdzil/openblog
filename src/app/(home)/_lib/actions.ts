@@ -15,7 +15,7 @@ export async function createDraft() {
       content: '',
       status: 'draft',
     },
-    { headers: await headers() },
+    { headers: await headers() }
   );
 
   if (error) {
@@ -73,7 +73,7 @@ export async function deleteArticle(publicId: string, username: string) {
 
 export async function updateProfile(
   image: string | null | undefined,
-  name: string,
+  name: string
 ) {
   try {
     await auth.api.updateUser({

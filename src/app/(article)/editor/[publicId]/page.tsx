@@ -16,7 +16,7 @@ export async function generateMetadata({
   const { publicId } = await params;
   const { article, error } = await getArtcileByPublicId(
     headersRecord,
-    publicId,
+    publicId
   );
 
   if (error?.status === 404 || !article) {
@@ -48,7 +48,7 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   const { publicId } = await params;
   const { article, error } = await getArtcileByPublicId(
     headersRecord,
-    publicId,
+    publicId
   );
 
   if (error?.status === 404 || !article) {

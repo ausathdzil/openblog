@@ -16,7 +16,7 @@ export const app = new Elysia({ prefix: '/elysia' })
         },
       },
       references: fromTypes('src/app/elysia/[[...slugs]]/route.ts'),
-    }),
+    })
   )
   .use(auth)
   .use(article)

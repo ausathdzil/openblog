@@ -35,5 +35,5 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
         200: 'Articles',
         401: ArticleModel.articleInvalid,
       },
-    },
+    }
   );

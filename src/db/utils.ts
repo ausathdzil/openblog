@@ -2,6 +2,7 @@
  * biome-ignore-all lint/suspicious/noExplicitAny: @see https://elysiajs.com/integrations/drizzle.html#utility
  * biome-ignore-all lint/suspicious/noImplicitAnyLet: @see https://elysiajs.com/integrations/drizzle.html#utility
  * biome-ignore-all lint/complexity/noBannedTypes: @see https://elysiajs.com/integrations/drizzle.html#utility
+ * biome-ignore-all lint/suspicious/noEvolvingTypes: @see https://elysiajs.com/integrations/drizzle.html#utility
  * @lastModified 2025-02-04
  * @see https://elysiajs.com/recipe/drizzle.html#utility
  */
@@ -18,20 +19,19 @@ import {
 type Spread<
   T extends TObject | Table,
   Mode extends 'select' | 'insert' | 'update' | undefined,
-> =
-  T extends TObject<infer Fields>
-    ? {
-        [K in keyof Fields]: Fields[K];
-      }
-    : T extends Table
-      ? Mode extends 'select'
-        ? BuildSchema<'select', T['_']['columns'], undefined>['properties']
-        : Mode extends 'insert'
-          ? BuildSchema<'insert', T['_']['columns'], undefined>['properties']
-          : Mode extends 'update'
-            ? BuildSchema<'update', T['_']['columns'], undefined>['properties']
-            : {}
-      : {};
+> = T extends TObject<infer Fields>
+  ? {
+      [K in keyof Fields]: Fields[K];
+    }
+  : T extends Table
+    ? Mode extends 'select'
+      ? BuildSchema<'select', T['_']['columns'], undefined>['properties']
+      : Mode extends 'insert'
+        ? BuildSchema<'insert', T['_']['columns'], undefined>['properties']
+        : Mode extends 'update'
+          ? BuildSchema<'update', T['_']['columns'], undefined>['properties']
+          : {}
+    : {};
 
 /**
  * Spread a Drizzle schema into a plain object
@@ -41,7 +41,7 @@ export const spread = <
   Mode extends 'select' | 'insert' | 'update' | undefined,
 >(
   schema: T,
-  mode?: Mode,
+  mode?: Mode
 ): Spread<T, Mode> => {
   const newSchema: Record<string, unknown> = {};
   let table;
@@ -65,12 +65,15 @@ export const spread = <
       break;
 
     default:
-      if (!(Kind in schema)) throw new Error('Expect a schema');
+      if (!(Kind in schema)) {
+        throw new Error('Expect a schema');
+      }
       table = schema;
   }
 
-  for (const key of Object.keys(table.properties))
+  for (const key of Object.keys(table.properties)) {
     newSchema[key] = table.properties[key];
+  }
 
   return newSchema as any;
 };
@@ -88,14 +91,16 @@ export const spreads = <
   Mode extends 'select' | 'insert' | 'update' | undefined,
 >(
   models: T,
-  mode?: Mode,
+  mode?: Mode
 ): {
   [K in keyof T]: Spread<T[K], Mode>;
 } => {
   const newSchema: Record<string, unknown> = {};
   const keys = Object.keys(models);
 
-  for (const key of keys) newSchema[key] = spread(models[key], mode);
+  for (const key of keys) {
+    newSchema[key] = spread(models[key], mode);
+  }
 
   return newSchema as any;
 };

@@ -14,15 +14,15 @@ export const db = {
             t.String({
               maxLength: 255,
               error: 'Excerpt must be 255 characters or fewer.',
-            }),
-          ),
+            })
+          )
         ),
         status: t.UnionEnum(['draft', 'published', 'archived'], {
           error: 'Status must be either draft, published, or archived.',
         }),
       }),
     },
-    'insert',
+    'insert'
   ),
   update: spreads(
     {
@@ -32,17 +32,17 @@ export const db = {
             t.String({
               maxLength: 255,
               error: 'Excerpt must be 255 characters or fewer.',
-            }),
-          ),
+            })
+          )
         ),
         status: t.Optional(
           t.UnionEnum(['draft', 'published', 'archived'], {
             error: 'Status must be either draft, published, or archived.',
             default: undefined,
-          }),
+          })
         ),
       }),
     },
-    'update',
+    'update'
   ),
 } as const;

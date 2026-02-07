@@ -27,7 +27,7 @@ export const user = pgTable(
     username: text('username').unique(),
     displayUsername: text('display_username'),
   },
-  (table) => [index('user_email_idx').on(table.email)],
+  (table) => [index('user_email_idx').on(table.email)]
 );
 
 export const session = pgTable(
@@ -49,7 +49,7 @@ export const session = pgTable(
   (table) => [
     index('session_userId_idx').on(table.userId),
     index('sessopm_token_idx').on(table.token),
-  ],
+  ]
 );
 
 export const account = pgTable(
@@ -73,7 +73,7 @@ export const account = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index('account_userId_idx').on(table.userId)],
+  (table) => [index('account_userId_idx').on(table.userId)]
 );
 
 export const verification = pgTable(
@@ -89,7 +89,7 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index('verification_identifier_idx').on(table.identifier)],
+  (table) => [index('verification_identifier_idx').on(table.identifier)]
 );
 
 export const articleStatus = pgEnum('article_status', [
@@ -124,7 +124,7 @@ export const articles = pgTable(
   (table) => [
     index('article_title_idx').on(table.title),
     index('article_excerpt_idx').on(table.excerpt),
-  ],
+  ]
 );
 
 export const userRelations = relations(user, ({ many }) => ({

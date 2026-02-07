@@ -46,16 +46,15 @@ export function ArticleActions({
     startTransition(async () => {
       const res = await deleteArticle(
         article.publicId,
-        article.author?.username ?? '',
+        article.author?.username ?? ''
       );
 
       if (res.error) {
         toast.error(res.error.message);
         return;
-      } else {
-        toast.success(res.message);
-        setDeleteDialogOpen(false);
       }
+      toast.success(res.message);
+      setDeleteDialogOpen(false);
     });
   };
 

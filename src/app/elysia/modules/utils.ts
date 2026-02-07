@@ -8,9 +8,9 @@ const Slug = z.string().slugify();
 
 export async function slugify(
   input: string | null | undefined,
-  authorId: string | null | undefined,
+  authorId: string | null | undefined
 ) {
-  if (!input || !authorId) {
+  if (!(input && authorId)) {
     return null;
   }
 

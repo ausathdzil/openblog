@@ -55,7 +55,7 @@ describe('Article', () => {
           coverImage: 'https://example.com',
           status: 'draft',
         },
-        { headers: testUser.headers },
+        { headers: testUser.headers }
       );
 
       expect(status).toBe(201);
@@ -77,7 +77,7 @@ describe('Article', () => {
       }
 
       expect(
-        articles?.data.every((article) => article.status === 'published'),
+        articles?.data.every((article) => article.status === 'published')
       ).toBe(true);
     });
   });

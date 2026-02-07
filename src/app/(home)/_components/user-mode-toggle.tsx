@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function UserModeToggle(
-  props: React.ComponentProps<typeof DropdownMenuSub>,
+  props: React.ComponentProps<typeof DropdownMenuSub>
 ) {
   const { setTheme } = useTheme();
 

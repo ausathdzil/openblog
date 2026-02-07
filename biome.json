@@ -1,55 +1,31 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/next"
+  ],
   "files": {
-    "ignoreUnknown": true,
-    "includes": [
-      "**",
-      "!node_modules",
-      "!.next",
-      "!dist",
-      "!build",
-      "!drizzle",
-      "!src/components/ui/*"
-    ]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2
+    "includes": ["!drizzle", "!src/components/ui/*"]
   },
   "linter": {
     "rules": {
       "correctness": {
         "noChildrenProp": "off"
       },
-      "nursery": {
-        "useSortedClasses": "on"
+      "performance": {
+        "noNamespaceImport": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNamespace": "off",
+        "noNonNullAssertion": "off",
+        "noNestedTernary": "off",
+        "useDefaultSwitchClause": "off"
       }
     },
     "domains": {
       "next": "recommended",
       "react": "recommended"
-    }
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on",
-        "useSortedAttributes": "on"
-      }
-    }
-  },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
     }
   },
   "javascript": {

@@ -5,11 +5,9 @@ import { auth as betterAuth } from '@/lib/auth';
 export class AuthError extends Error {
   status: number;
 
-  constructor(
-    public message: string,
-    status = 401,
-  ) {
+  constructor(message: string, status = 401) {
     super(message);
+    this.message = message;
     this.status = status;
   }
 }

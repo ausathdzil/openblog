@@ -89,7 +89,7 @@ describe('Author', () => {
       }
 
       expect(
-        articles?.data.every((article) => article.status === 'published'),
+        articles?.data.every((article) => article.status === 'published')
       ).toBe(true);
     });
   });

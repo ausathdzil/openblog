@@ -28,9 +28,9 @@ import { Spinner } from '@/components/ui/spinner';
 import type { auth } from '@/lib/auth';
 import { updateProfile } from '../_lib/actions';
 
-type EditProfileDialogProps = {
+interface EditProfileDialogProps {
   user: (typeof auth.$Infer.Session)['user'];
-};
+}
 
 const editProfileSchema = z.object({
   image: z.nullable(z.url()),
@@ -38,7 +38,7 @@ const editProfileSchema = z.object({
     .string()
     .check(
       z.minLength(3, 'Name must be at least 3 characters long.'),
-      z.maxLength(30, 'Name must be 30 characters or fewer.'),
+      z.maxLength(30, 'Name must be 30 characters or fewer.')
     ),
 });
 
@@ -53,7 +53,7 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
     validators: {
       onSubmit: editProfileSchema,
     },
-    onSubmit: async ({ value, formApi }) => {
+    onSubmit: ({ value, formApi }) => {
       startTransition(async () => {
         const { error, message } = await updateProfile(value.image, value.name);
 

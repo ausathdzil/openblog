@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { createDraft } from '../_lib/actions';
 
 export function CreateArticleButton(
-  props: React.ComponentProps<typeof Button>,
+  props: React.ComponentProps<typeof Button>
 ) {
   const [isPending, startTransition] = useTransition();
 
