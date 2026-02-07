@@ -8,7 +8,9 @@ import { Placeholder } from '@tiptap/extensions';
 import { Markdown } from '@tiptap/markdown';
 import { EditorContent, ReactNodeViewRenderer, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { format } from 'date-fns';
 import { common, createLowlight } from 'lowlight';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
@@ -41,11 +43,28 @@ const articleSchema = z.object({
   ),
 });
 
+function BeforeUnloadGuard({ isDirty }: { isDirty: boolean }) {
+  useEffect(() => {
+    if (!isDirty) {
+      return;
+    }
+    const handle = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handle);
+    return () => {
+      window.removeEventListener('beforeunload', handle);
+    };
+  }, [isDirty]);
+  return null;
+}
+
 export function ArticleEditor({
   article,
 }: {
   article: ArticleModel.ArticleResponse;
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm({
@@ -61,7 +80,10 @@ export function ArticleEditor({
     listeners: {
       onChangeDebounceMs: 1000,
       onChange: ({ formApi }) => {
-        if (formApi.state.isValid) {
+        if (
+          formApi.state.isValid &&
+          formApi.state.values.status !== 'published'
+        ) {
           formApi.handleSubmit();
         }
       },
@@ -76,14 +98,33 @@ export function ArticleEditor({
 
         if (res?.error) {
           toast.error(res.error.message, { position: 'top-center' });
+        } else {
+          form.reset(value);
         }
       });
     },
   });
 
+  const handleBack = () => {
+    if (form.state.isDirty) {
+      // biome-ignore lint/suspicious/noAlert: native confirm for unsaved-changes (AGENTS.md)
+      const leave = window.confirm('You have unsaved changes. Leave anyway?');
+      if (!leave) {
+        return;
+      }
+    }
+    router.back();
+  };
+
   return (
     <>
-      <Header title={article.title || 'Untitled Draft'}>
+      <form.Subscribe selector={(state) => state.isDirty}>
+        {(isDirty) => <BeforeUnloadGuard isDirty={isDirty} />}
+      </form.Subscribe>
+      <Header
+        onBackClick={handleBack}
+        title={article.title || 'Untitled Draft'}
+      >
         <form.Subscribe
           selector={(state) => ({
             isValid: state.isValid,
@@ -93,13 +134,25 @@ export function ArticleEditor({
           })}
         >
           {(formState) => (
-            <PublishButton
-              isContentEmpty={formState.content.trim().length === 0}
-              isTitleEmpty={formState.title.trim().length === 0}
-              isValid={formState.isValid}
-              publicId={article.publicId}
-              status={formState.status}
-            />
+            <>
+              <PublishButton
+                isContentEmpty={formState.content.trim().length === 0}
+                isTitleEmpty={formState.title.trim().length === 0}
+                isValid={formState.isValid}
+                publicId={article.publicId}
+                status={formState.status}
+              />
+              {formState.status === 'published' && (
+                <Button
+                  disabled={isPending}
+                  form="article-editor-form"
+                  size="pill-sm"
+                  type="submit"
+                >
+                  {isPending ? 'Saving…' : 'Save'}
+                </Button>
+              )}
+            </>
           )}
         </form.Subscribe>
       </Header>
@@ -117,10 +170,11 @@ export function ArticleEditor({
               Saving…
             </>
           ) : (
-            'Saved'
+            `Last saved on ${format(article.updatedAt, 'MMM d, yyyy h:mm a')}`
           )}
         </div>
         <form
+          id="article-editor-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();

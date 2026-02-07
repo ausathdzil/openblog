@@ -11,11 +11,26 @@ import { cn } from '@/lib/utils';
 
 type HeaderProps = {
   title?: string;
+  onBackClick?: () => void;
 } & React.ComponentProps<'header'>;
 
-export function Header({ title, className, children, ...props }: HeaderProps) {
+export function Header({
+  title,
+  onBackClick,
+  className,
+  children,
+  ...props
+}: HeaderProps) {
   const [showTitle, setShowTitle] = useState(false);
   const router = useRouter();
+
+  const handleBack = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      router.back();
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,7 +58,7 @@ export function Header({ title, className, children, ...props }: HeaderProps) {
       {...props}
     >
       <div className="relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 p-4">
-        <Button onClick={() => router.back()} size="sm" variant="ghost">
+        <Button onClick={handleBack} size="sm" variant="ghost">
           <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
           Back
         </Button>

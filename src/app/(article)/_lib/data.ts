@@ -30,7 +30,7 @@ export async function getArtcileByPublicId(
 ) {
   'use cache';
 
-  cacheTag('article');
+  cacheTag(`article-${publicId}`);
   cacheLife('seconds');
 
   const { data: article, error } = await elysia.articles({ publicId }).get({
