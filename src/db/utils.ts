@@ -19,19 +19,20 @@ import {
 type Spread<
   T extends TObject | Table,
   Mode extends 'select' | 'insert' | 'update' | undefined,
-> = T extends TObject<infer Fields>
-  ? {
-      [K in keyof Fields]: Fields[K];
-    }
-  : T extends Table
-    ? Mode extends 'select'
-      ? BuildSchema<'select', T['_']['columns'], undefined>['properties']
-      : Mode extends 'insert'
-        ? BuildSchema<'insert', T['_']['columns'], undefined>['properties']
-        : Mode extends 'update'
-          ? BuildSchema<'update', T['_']['columns'], undefined>['properties']
-          : {}
-    : {};
+> =
+  T extends TObject<infer Fields>
+    ? {
+        [K in keyof Fields]: Fields[K];
+      }
+    : T extends Table
+      ? Mode extends 'select'
+        ? BuildSchema<'select', T['_']['columns'], undefined>['properties']
+        : Mode extends 'insert'
+          ? BuildSchema<'insert', T['_']['columns'], undefined>['properties']
+          : Mode extends 'update'
+            ? BuildSchema<'update', T['_']['columns'], undefined>['properties']
+            : {}
+      : {};
 
 /**
  * Spread a Drizzle schema into a plain object
