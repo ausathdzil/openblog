@@ -1,11 +1,8 @@
 'use client';
 
 import {
-  Archive03Icon,
-  Delete01Icon,
   Edit01Icon,
   MoreHorizontalIcon,
-  QuillWrite01Icon,
   ViewIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -16,6 +13,7 @@ import { toast } from 'sonner';
 
 import type { ArticleModel } from '@/app/elysia/modules/article/model';
 import { ArchiveArticleDialog } from '@/components/archive-article-dialog';
+import { ArticleStatusActionsMenu } from '@/components/article-status-actions-menu';
 import { DeleteArticleDialog } from '@/components/delete-article-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -95,7 +93,7 @@ export function ArticleActions({
         <DropdownMenuTrigger render={<Button size="icon" variant="ghost" />}>
           <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" className="min-w-56">
+        <DropdownMenuContent align="center" className="w-fit">
           <DropdownMenuGroup>
             <DropdownMenuItem
               render={
@@ -128,37 +126,12 @@ export function ArticleActions({
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            {article.status !== 'draft' ? (
-              <DropdownMenuItem onClick={handleMoveToDraft}>
-                Move to draft
-                <HugeiconsIcon
-                  className="ml-auto"
-                  icon={QuillWrite01Icon}
-                  strokeWidth={2}
-                />
-              </DropdownMenuItem>
-            ) : null}
-            {article.status !== 'archived' ? (
-              <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)}>
-                Archive
-                <HugeiconsIcon
-                  className="ml-auto"
-                  icon={Archive03Icon}
-                  strokeWidth={2}
-                />
-              </DropdownMenuItem>
-            ) : null}
-            <DropdownMenuItem
-              onClick={() => setDeleteDialogOpen(true)}
-              variant="destructive"
-            >
-              Delete
-              <HugeiconsIcon
-                className="ml-auto"
-                icon={Delete01Icon}
-                strokeWidth={2}
-              />
-            </DropdownMenuItem>
+            <ArticleStatusActionsMenu
+              onArchive={() => setArchiveDialogOpen(true)}
+              onDelete={() => setDeleteDialogOpen(true)}
+              onMoveToDraft={handleMoveToDraft}
+              status={article.status}
+            />
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

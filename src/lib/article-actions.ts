@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 
 import { elysia } from '@/lib/eden';
@@ -55,6 +55,7 @@ export async function archiveArticle(publicId: string, username: string) {
     revalidateTag(`articles-${username}`, 'max');
     revalidateTag(`article-${data.slug}`, 'max');
     revalidateTag('drafts', 'max');
+    revalidatePath('/editor/[publicId]', 'page');
     return { message: 'Article archived successfully' };
   }
 
@@ -86,6 +87,7 @@ export async function moveArticleToDraft(publicId: string, username: string) {
     revalidateTag(`articles-${username}`, 'max');
     revalidateTag(`article-${data.slug}`, 'max');
     revalidateTag('drafts', 'max');
+    revalidatePath('/editor/[publicId]', 'page');
     return { message: 'Article moved to draft successfully' };
   }
 
