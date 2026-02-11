@@ -13,16 +13,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
 import type { ArticleModel } from '@/app/elysia/modules/article/model';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { DeleteArticleDialog } from '@/components/delete-article-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -31,7 +22,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ItemActions } from '@/components/ui/item';
-import { Spinner } from '@/components/ui/spinner';
 import { deleteArticle } from '../_lib/actions';
 
 export function ArticleActions({
@@ -106,33 +96,12 @@ export function ArticleActions({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Article</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this article? This action cannot
-              be undone. This will permanently delete the article and its
-              content.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel variant="secondary">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={isPending}
-              onClick={handleDelete}
-              variant="destructive"
-            >
-              {isPending ? (
-                <Spinner />
-              ) : (
-                <HugeiconsIcon icon={Delete01Icon} strokeWidth={2} />
-              )}
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteArticleDialog
+        isPending={isPending}
+        onConfirm={handleDelete}
+        onOpenChange={setDeleteDialogOpen}
+        open={deleteDialogOpen}
+      />
     </ItemActions>
   );
 }
