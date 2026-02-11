@@ -9,8 +9,9 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { deleteArticle } from '@/app/(home)/_lib/actions';
+
 import type { ArticleModel } from '@/app/elysia/modules/article/model';
+import { ArchiveArticleDialog } from '@/components/archive-article-dialog';
 import { DeleteArticleDialog } from '@/components/delete-article-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { archiveArticle, deleteArticle } from '@/lib/article-actions';
 
 export function EditorActions({
   article,
@@ -26,8 +28,26 @@ export function EditorActions({
   article: ArticleModel.ArticleResponse;
 }) {
   const router = useRouter();
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const handleArchive = () => {
+    startTransition(async () => {
+      const res = await archiveArticle(
+        article.publicId,
+        article.author?.username ?? ''
+      );
+
+      if (res.error) {
+        toast.error(res.error.message);
+        return;
+      }
+      toast.success(res.message);
+      setArchiveDialogOpen(false);
+      router.refresh();
+    });
+  };
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -57,14 +77,16 @@ export function EditorActions({
           <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center">
-          <DropdownMenuItem disabled>
-            Archive
-            <HugeiconsIcon
-              className="ml-auto"
-              icon={Archive03Icon}
-              strokeWidth={2}
-            />
-          </DropdownMenuItem>
+          {article.status !== 'archived' ? (
+            <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)}>
+              Archive
+              <HugeiconsIcon
+                className="ml-auto"
+                icon={Archive03Icon}
+                strokeWidth={2}
+              />
+            </DropdownMenuItem>
+          ) : null}
           <DropdownMenuItem
             onClick={() => setDeleteDialogOpen(true)}
             variant="destructive"
@@ -78,6 +100,12 @@ export function EditorActions({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <ArchiveArticleDialog
+        isPending={isPending}
+        onConfirm={handleArchive}
+        onOpenChange={setArchiveDialogOpen}
+        open={archiveDialogOpen}
+      />
       <DeleteArticleDialog
         isPending={isPending}
         onConfirm={handleDelete}
