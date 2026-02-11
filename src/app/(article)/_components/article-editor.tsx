@@ -124,7 +124,7 @@ export function ArticleEditor({
         >
           {(formState) => (
             <div className="flex items-center gap-2">
-              <EditorActions />
+              <EditorActions article={article} />
               {formState.status === 'published' ? (
                 <Button
                   disabled={isPending}
