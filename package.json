@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "analyze": "next experimental-analyze",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
+    "check": "bun x ultracite check",
+    "fix": "bun x ultracite fix",
     "prepare": "husky"
   },
   "dependencies": {
@@ -25,7 +25,6 @@
     "@tiptap/react": "^3.19.0",
     "@tiptap/starter-kit": "^3.19.0",
     "@tiptap/static-renderer": "^3.19.0",
-    "@vercel/analytics": "^1.6.1",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
