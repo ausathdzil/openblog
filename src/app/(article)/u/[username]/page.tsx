@@ -100,10 +100,10 @@ async function UserResults({ params, searchParams }: UserPageProps) {
 }
 
 interface ArticlesProps {
-  username: string;
-  q: string;
-  page: number;
   limit: number;
+  page: number;
+  q: string;
+  username: string;
 }
 
 async function Articles({ username, q, page, limit }: ArticlesProps) {

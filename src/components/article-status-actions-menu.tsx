@@ -11,10 +11,10 @@ import type { ArticleModel } from '@/app/elysia/modules/article/model';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 interface ArticleStatusActionsMenuProps {
-  status: ArticleModel.ArticleResponse['status'];
-  onMoveToDraft: () => void;
   onArchive: () => void;
   onDelete: () => void;
+  onMoveToDraft: () => void;
+  status: ArticleModel.ArticleResponse['status'];
 }
 
 export function ArticleStatusActionsMenu({

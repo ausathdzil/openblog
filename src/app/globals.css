@@ -120,11 +120,11 @@
 
 .tiptap {
   *.is-empty::before {
-    color: var(--muted-foreground);
-    content: attr(data-placeholder);
     float: left;
     height: 0;
+    color: var(--muted-foreground);
     pointer-events: none;
+    content: attr(data-placeholder);
   }
 
   ul.is-empty::before {
@@ -139,8 +139,8 @@
 .prose {
   blockquote {
     font-family: var(--font-serif);
-    font-style: var(--font-weight-normal);
     font-size: var(--text-lg);
+    font-style: var(--font-weight-normal);
     line-height: var(--text-lg--line-height);
 
     p:first-of-type::before {
@@ -153,7 +153,7 @@
   }
 
   pre {
-    background: #1e1e1e;
     color: #dcdcdc;
+    background: #1e1e1e;
   }
 }

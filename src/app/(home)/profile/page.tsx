@@ -95,10 +95,10 @@ async function ProfileResults({ searchParams }: ProfilePageProps) {
 }
 
 interface ArticlesProps {
-  status: 'draft' | 'published' | 'archived' | null | undefined;
-  q: string;
-  page: number;
   limit: number;
+  page: number;
+  q: string;
+  status: 'draft' | 'published' | 'archived' | null | undefined;
 }
 
 async function Articles({ status, q, page, limit }: ArticlesProps) {

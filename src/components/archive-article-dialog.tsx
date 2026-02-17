@@ -16,10 +16,10 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 
 interface ArchiveArticleDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   isPending: boolean;
   onConfirm: () => void;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
 }
 
 export function ArchiveArticleDialog({
