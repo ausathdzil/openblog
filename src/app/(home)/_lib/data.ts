@@ -18,7 +18,7 @@ export async function getAuthors(q?: string, page?: number, limit = 9) {
 
 export async function getCurrentUserArticles(
   headersRecord: Record<string, string>,
-  status?: 'draft' | 'published' | 'archived' | null | undefined,
+  status?: 'draft' | 'published' | 'archived' | undefined,
   q?: string | undefined,
   page?: number,
   limit?: number

@@ -98,7 +98,7 @@ interface ArticlesProps {
   limit: number;
   page: number;
   q: string;
-  status: 'draft' | 'published' | 'archived' | null | undefined;
+  status: 'draft' | 'published' | 'archived' | undefined;
 }
 
 async function Articles({ status, q, page, limit }: ArticlesProps) {
