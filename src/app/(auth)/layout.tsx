@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import openblog from '@/../public/openblog.png';
 import { Button } from '@/components/ui/button';
-import pereure from '../../../public/peruere.png';
 
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
@@ -17,13 +17,13 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
             variant="ghost"
           >
             <Image
-              alt="Peruere"
+              alt="OpenBlog"
               className="dark:invert"
               height={12}
-              src={pereure}
+              src={openblog}
               width={12}
             />
-            Peruere
+            OpenBlog
           </Button>
         </div>
         <div className="flex flex-1 items-center justify-center">

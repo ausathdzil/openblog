@@ -1,6 +1,6 @@
 ---
 name: MVP release readiness
-overview: Assess whether Peruere is close to MVP and define a minimal set of release blockers to address before shipping.
+overview: Assess whether OpenBlog is close to MVP and define a minimal set of release blockers to address before shipping.
 todos:
   - id: error-safety
     content: Update global error UX for production-safe messaging and include reset flow.
@@ -19,7 +19,7 @@ isProject: false
 
 # MVP Release Readiness Check
 
-Peruere appears **close to MVP**: core auth, authoring, publish/archive/delete, profile, home feed, and explore/search are implemented. The main risk is not core feature completeness, but release hardening.
+OpenBlog appears **close to MVP**: core auth, authoring, publish/archive/delete, profile, home feed, and explore/search are implemented. The main risk is not core feature completeness, but release hardening.
 
 ## Current Verdict
 

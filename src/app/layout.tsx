@@ -10,10 +10,10 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Peruere',
-    template: '%s | Peruere',
+    default: 'OpenBlog',
+    template: '%s | OpenBlog',
   },
-  description: 'A new world to share your thoughts.',
+  description: 'Open source blogging platform.',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

@@ -1,6 +1,6 @@
-# Peruere
+# OpenBlog
 
-Peruere (this name is not final) is a simple blogging platform.
+OpenBlog is a simple blogging platform.
 
 ## Getting Started
 

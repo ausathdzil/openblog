@@ -11,7 +11,7 @@ export const app = new Elysia({ prefix: '/elysia' })
     openapi({
       documentation: {
         info: {
-          title: 'Peruere API',
+          title: 'OpenBlog API',
           version: '1.0.0',
         },
       },

@@ -2,9 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import openblog from '@/../public/openblog.png';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import pereure from '../../../public/peruere.png';
 import { UserButton } from './_components/user-button';
 
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
@@ -29,13 +29,13 @@ function Header() {
             variant="ghost"
           >
             <Image
-              alt="Peruere"
+              alt="OpenBlog"
               className="dark:invert"
               height={12}
-              src={pereure}
+              src={openblog}
               width={12}
             />
-            Peruere
+            OpenBlog
           </Button>
           <Button
             nativeButton={false}
