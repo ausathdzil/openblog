@@ -22,6 +22,13 @@
       "when": 1764694408887,
       "tag": "0002_worried_raza",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1771559096178,
+      "tag": "0003_wealthy_paladin",
+      "breakpoints": true
     }
   ]
 }

@@ -1,12 +1,13 @@
 import { relations } from 'drizzle-orm';
 import {
-  bigserial,
+  bigint,
   boolean,
   index,
   pgEnum,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
@@ -101,7 +102,9 @@ export const articleStatus = pgEnum('article_status', [
 export const articles = pgTable(
   'articles',
   {
-    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    id: bigint('id', { mode: 'number' })
+      .generatedAlwaysAsIdentity()
+      .primaryKey(),
     publicId: varchar('public_id', { length: 12 })
       .$defaultFn(() => nanoid(12))
       .notNull()
@@ -110,7 +113,7 @@ export const articles = pgTable(
     slug: varchar('slug', { length: 255 }),
     content: text('content'),
     excerpt: varchar('excerpt', { length: 255 }),
-    status: articleStatus('status').default('draft'),
+    status: articleStatus('status').default('draft').notNull(),
     coverImage: text('cover_image'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
@@ -122,8 +125,16 @@ export const articles = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
   },
   (table) => [
-    index('article_title_idx').on(table.title),
-    index('article_excerpt_idx').on(table.excerpt),
+    uniqueIndex('article_author_slug_unique_idx').on(
+      table.authorId,
+      table.slug
+    ),
+    index('article_status_created_at_idx').on(table.status, table.createdAt),
+    index('article_author_status_created_at_idx').on(
+      table.authorId,
+      table.status,
+      table.createdAt
+    ),
   ]
 );
 
