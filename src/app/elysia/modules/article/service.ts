@@ -58,14 +58,13 @@ export async function getArticles(
   username?: string | null | undefined
 ) {
   const offset = (page - 1) * limit;
-
-  if (username) {
-    await AuthorService.getAuthorByUsername(username);
-  }
+  const author = username
+    ? await AuthorService.getAuthorByUsername(username)
+    : null;
 
   const whereConditions = and(
     eq(articles.status, status ?? 'published'),
-    username ? eq(user.username, username) : undefined,
+    author ? eq(articles.authorId, author.id) : undefined,
     q ? ilike(articles.title, `%${q}%`) : undefined
   );
 
@@ -74,7 +73,6 @@ export async function getArticles(
       publicId: articles.publicId,
       title: articles.title,
       slug: articles.slug,
-      content: articles.content,
       excerpt: articles.excerpt,
       status: articles.status,
       coverImage: articles.coverImage,
@@ -95,14 +93,10 @@ export async function getArticles(
     .limit(limit)
     .offset(offset);
 
-  const baseCountQuery = db
+  const countQuery = db
     .select({ count: count() })
     .from(articles)
     .where(whereConditions);
-
-  const countQuery = username
-    ? baseCountQuery.leftJoin(user, eq(articles.authorId, user.id))
-    : baseCountQuery;
 
   const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
 
@@ -163,6 +157,8 @@ export async function getArticleByPublicId(
 }
 
 export async function getArticleBySlug(slug: string, username: string) {
+  const author = await AuthorService.getAuthorByUsername(username);
+
   const [article] = await db
     .select({
       publicId: articles.publicId,
@@ -175,21 +171,13 @@ export async function getArticleBySlug(slug: string, username: string) {
       createdAt: articles.createdAt,
       updatedAt: articles.updatedAt,
       authorId: articles.authorId,
-      author: {
-        name: user.name,
-        image: user.image,
-        createdAt: user.createdAt,
-        username: user.username,
-        displayUsername: user.displayUsername,
-      },
     })
     .from(articles)
-    .leftJoin(user, eq(articles.authorId, user.id))
     .where(
       and(
         eq(articles.status, 'published'),
         eq(articles.slug, slug),
-        username ? eq(user.username, username) : undefined
+        eq(articles.authorId, author.id)
       )
     )
     .limit(1);
@@ -198,7 +186,10 @@ export async function getArticleBySlug(slug: string, username: string) {
     throw new NotFoundError('Article not found.');
   }
 
-  return article satisfies ArticleModel.ArticleResponse;
+  return {
+    ...article,
+    author,
+  } satisfies ArticleModel.ArticleResponse;
 }
 
 export async function updateArticle(

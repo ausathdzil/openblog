@@ -34,7 +34,7 @@ import {
 export function ArticleActions({
   article,
 }: {
-  article: ArticleModel.ArticleResponse;
+  article: ArticleModel.ArticleListResponse;
 }) {
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

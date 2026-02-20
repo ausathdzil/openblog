@@ -42,6 +42,20 @@ export namespace ArticleModel {
 
   export type ArticleResponse = typeof articleResponse.static;
 
+  export const articleListResponse = t.Object({
+    publicId: articles.publicId,
+    title: articles.title,
+    slug: articles.slug,
+    excerpt: articles.excerpt,
+    status: articles.status,
+    coverImage: articles.coverImage,
+    createdAt: articles.createdAt,
+    updatedAt: articles.updatedAt,
+    author: t.Nullable(AuthorModel.authorResponse),
+  });
+
+  export type ArticleListResponse = typeof articleListResponse.static;
+
   export const paginationMetaResponse = t.Object({
     page: t.Number(),
     limit: t.Number(),
@@ -54,7 +68,7 @@ export namespace ArticleModel {
   export type PaginationMetaResponse = typeof paginationMetaResponse.static;
 
   export const articlesResposnse = t.Object({
-    data: t.Array(articleResponse),
+    data: t.Array(articleListResponse),
     pagination: paginationMetaResponse,
   });
 

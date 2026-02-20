@@ -19,12 +19,13 @@ export async function slugify(
   let suffix = 2;
 
   while (true) {
-    const existing = await db
-      .select()
+    const [existing] = await db
+      .select({ id: articles.id })
       .from(articles)
-      .where(and(eq(articles.slug, slug), eq(articles.authorId, authorId)));
+      .where(and(eq(articles.slug, slug), eq(articles.authorId, authorId)))
+      .limit(1);
 
-    if (existing.length === 0) {
+    if (!existing) {
       return slug;
     }
 
