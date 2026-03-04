@@ -102,7 +102,7 @@ export const articleStatus = pgEnum('article_status', [
 ]);
 
 export const article = pgTable(
-  'articles',
+  'article',
   {
     id: bigint('id', { mode: 'number' })
       .generatedAlwaysAsIdentity()
