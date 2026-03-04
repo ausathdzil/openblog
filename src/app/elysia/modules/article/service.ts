@@ -2,7 +2,7 @@ import { and, count, desc, eq, ilike } from 'drizzle-orm';
 import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
-import { articles, user } from '@/db/schema';
+import { article, user } from '@/db/schema';
 import { AuthError } from '../auth';
 import * as AuthorService from '../author/service';
 import { slugify } from '../utils';
@@ -24,8 +24,8 @@ export async function createArticle(
 
   const author = await AuthorService.getAuthorById(userId);
 
-  const [article] = await db
-    .insert(articles)
+  const [articleData] = await db
+    .insert(article)
     .values({
       title: title?.trim(),
       slug: await slugify(title, author.id),
@@ -36,19 +36,19 @@ export async function createArticle(
       authorId: author.id,
     })
     .returning({
-      publicId: articles.publicId,
-      title: articles.title,
-      slug: articles.slug,
-      content: articles.content,
-      excerpt: articles.excerpt,
-      status: articles.status,
-      coverImage: articles.coverImage,
-      createdAt: articles.createdAt,
-      updatedAt: articles.updatedAt,
+      publicId: article.publicId,
+      title: article.title,
+      slug: article.slug,
+      content: article.content,
+      excerpt: article.excerpt,
+      status: article.status,
+      coverImage: article.coverImage,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
 
   return {
-    ...article,
+    ...articleData,
     author,
   } satisfies ArticleModel.ArticleResponse;
 }
@@ -63,21 +63,21 @@ export async function getArticles(
     : null;
 
   const whereConditions = and(
-    eq(articles.status, status ?? 'published'),
-    author ? eq(articles.authorId, author.id) : undefined,
-    q ? ilike(articles.title, `%${q}%`) : undefined
+    eq(article.status, status ?? 'published'),
+    author ? eq(article.authorId, author.id) : undefined,
+    q ? ilike(article.title, `%${q}%`) : undefined
   );
 
   const dataQuery = db
     .select({
-      publicId: articles.publicId,
-      title: articles.title,
-      slug: articles.slug,
-      excerpt: articles.excerpt,
-      status: articles.status,
-      coverImage: articles.coverImage,
-      createdAt: articles.createdAt,
-      updatedAt: articles.updatedAt,
+      publicId: article.publicId,
+      title: article.title,
+      slug: article.slug,
+      excerpt: article.excerpt,
+      status: article.status,
+      coverImage: article.coverImage,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
       author: {
         name: user.name,
         image: user.image,
@@ -86,16 +86,16 @@ export async function getArticles(
         displayUsername: user.displayUsername,
       },
     })
-    .from(articles)
-    .leftJoin(user, eq(articles.authorId, user.id))
+    .from(article)
+    .leftJoin(user, eq(article.authorId, user.id))
     .where(whereConditions)
-    .orderBy(desc(articles.createdAt))
+    .orderBy(desc(article.createdAt))
     .limit(limit)
     .offset(offset);
 
   const countQuery = db
     .select({ count: count() })
-    .from(articles)
+    .from(article)
     .where(whereConditions);
 
   const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
@@ -120,18 +120,18 @@ export async function getArticleByPublicId(
   publicId: string,
   userId: string | undefined
 ) {
-  const [article] = await db
+  const [articleData] = await db
     .select({
-      publicId: articles.publicId,
-      title: articles.title,
-      slug: articles.slug,
-      content: articles.content,
-      excerpt: articles.excerpt,
-      status: articles.status,
-      coverImage: articles.coverImage,
-      createdAt: articles.createdAt,
-      updatedAt: articles.updatedAt,
-      authorId: articles.authorId,
+      publicId: article.publicId,
+      title: article.title,
+      slug: article.slug,
+      content: article.content,
+      excerpt: article.excerpt,
+      status: article.status,
+      coverImage: article.coverImage,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
+      authorId: article.authorId,
       author: {
         name: user.name,
         image: user.image,
@@ -140,54 +140,54 @@ export async function getArticleByPublicId(
         displayUsername: user.displayUsername,
       },
     })
-    .from(articles)
-    .leftJoin(user, eq(articles.authorId, user.id))
-    .where(eq(articles.publicId, publicId))
+    .from(article)
+    .leftJoin(user, eq(article.authorId, user.id))
+    .where(eq(article.publicId, publicId))
     .limit(1);
 
-  if (!article) {
+  if (!articleData) {
     throw new NotFoundError('Article not found.');
   }
 
-  if (article.status !== 'published' && article.authorId !== userId) {
+  if (articleData.status !== 'published' && articleData.authorId !== userId) {
     throw new AuthError('You are not allowed to access this resource.', 403);
   }
 
-  return article satisfies ArticleModel.ArticleResponse;
+  return articleData satisfies ArticleModel.ArticleResponse;
 }
 
 export async function getArticleBySlug(slug: string, username: string) {
   const author = await AuthorService.getAuthorByUsername(username);
 
-  const [article] = await db
+  const [articleData] = await db
     .select({
-      publicId: articles.publicId,
-      title: articles.title,
-      slug: articles.slug,
-      content: articles.content,
-      excerpt: articles.excerpt,
-      status: articles.status,
-      coverImage: articles.coverImage,
-      createdAt: articles.createdAt,
-      updatedAt: articles.updatedAt,
-      authorId: articles.authorId,
+      publicId: article.publicId,
+      title: article.title,
+      slug: article.slug,
+      content: article.content,
+      excerpt: article.excerpt,
+      status: article.status,
+      coverImage: article.coverImage,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
+      authorId: article.authorId,
     })
-    .from(articles)
+    .from(article)
     .where(
       and(
-        eq(articles.status, 'published'),
-        eq(articles.slug, slug),
-        eq(articles.authorId, author.id)
+        eq(article.status, 'published'),
+        eq(article.slug, slug),
+        eq(article.authorId, author.id)
       )
     )
     .limit(1);
 
-  if (!article) {
+  if (!articleData) {
     throw new NotFoundError('Article not found.');
   }
 
   return {
-    ...article,
+    ...articleData,
     author,
   } satisfies ArticleModel.ArticleResponse;
 }
@@ -207,50 +207,50 @@ export async function updateArticle(
     throw new AuthError('You are not allowed to perform this action.');
   }
 
-  const article = await getArticleByPublicId(publicId, userId);
-  const author = await AuthorService.getAuthorById(article.authorId);
+  const articleData = await getArticleByPublicId(publicId, userId);
+  const author = await AuthorService.getAuthorById(articleData.authorId);
 
   const payload: Partial<ArticleModel.UpdateArticleBody> = {};
 
-  if (title !== undefined && title !== article.title) {
+  if (title !== undefined && title !== articleData.title) {
     payload.title = title?.trim();
     payload.slug = await slugify(title, author.id);
   }
 
-  if (content !== undefined && content !== article.content) {
+  if (content !== undefined && content !== articleData.content) {
     payload.content = content?.trim();
   }
 
-  if (excerpt !== undefined && excerpt !== article.excerpt) {
+  if (excerpt !== undefined && excerpt !== articleData.excerpt) {
     payload.excerpt = excerpt?.trim();
   }
 
-  if (articleStatus !== undefined && articleStatus !== article.status) {
+  if (articleStatus !== undefined && articleStatus !== articleData.status) {
     payload.status = articleStatus;
   }
 
-  if (coverImage !== undefined && coverImage !== article.coverImage) {
+  if (coverImage !== undefined && coverImage !== articleData.coverImage) {
     payload.coverImage = coverImage;
   }
 
   if (Object.keys(payload).length === 0) {
-    return article satisfies ArticleModel.ArticleResponse;
+    return articleData satisfies ArticleModel.ArticleResponse;
   }
 
   const [updatedData] = await db
-    .update(articles)
+    .update(article)
     .set({ ...payload })
-    .where(eq(articles.publicId, publicId))
+    .where(eq(article.publicId, publicId))
     .returning({
-      publicId: articles.publicId,
-      title: articles.title,
-      slug: articles.slug,
-      content: articles.content,
-      excerpt: articles.excerpt,
-      status: articles.status,
-      coverImage: articles.coverImage,
-      createdAt: articles.createdAt,
-      updatedAt: articles.updatedAt,
+      publicId: article.publicId,
+      title: article.title,
+      slug: article.slug,
+      content: article.content,
+      excerpt: article.excerpt,
+      status: article.status,
+      coverImage: article.coverImage,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
     });
 
   return {
@@ -267,9 +267,9 @@ export async function deleteArticle(
     throw new AuthError('You are not allowed to perform this action.');
   }
 
-  const article = await getArticleByPublicId(publicId, userId);
+  const articleData = await getArticleByPublicId(publicId, userId);
 
-  await db.delete(articles).where(eq(articles.publicId, article.publicId));
+  await db.delete(article).where(eq(article.publicId, articleData.publicId));
 
   return { message: 'Article deleted successfully' };
 }

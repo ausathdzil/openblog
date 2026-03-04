@@ -1,14 +1,14 @@
 import { createInsertSchema, createUpdateSchema } from 'drizzle-typebox';
 import { t } from 'elysia';
 
-import { articles, user } from './schema';
+import { article, user } from './schema';
 import { spreads } from './utils';
 
 export const db = {
-  select: spreads({ articles, user }, 'select'),
+  select: spreads({ articles: article, user }, 'select'),
   insert: spreads(
     {
-      createArticle: createInsertSchema(articles, {
+      createArticle: createInsertSchema(article, {
         excerpt: t.Optional(
           t.Nullable(
             t.String({
@@ -26,7 +26,7 @@ export const db = {
   ),
   update: spreads(
     {
-      updateArticle: createUpdateSchema(articles, {
+      updateArticle: createUpdateSchema(article, {
         excerpt: t.Optional(
           t.Nullable(
             t.String({

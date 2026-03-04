@@ -101,7 +101,7 @@ export const articleStatus = pgEnum('article_status', [
   'archived',
 ]);
 
-export const articles = pgTable(
+export const article = pgTable(
   'articles',
   {
     id: bigint('id', { mode: 'number' })
@@ -143,7 +143,7 @@ export const articles = pgTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
-  articles: many(articles),
+  articles: many(article),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -160,9 +160,9 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-export const articleRelations = relations(articles, ({ one }) => ({
+export const articleRelations = relations(article, ({ one }) => ({
   author: one(user, {
-    fields: [articles.authorId],
+    fields: [article.authorId],
     references: [user.id],
   }),
 }));

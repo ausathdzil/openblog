@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 
 import { slugify } from '@/app/elysia/modules/utils';
 import { db } from '@/db';
-import { articles, user } from '@/db/schema';
+import { article, user } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
 function generateUniqueId(): string {
@@ -46,8 +46,8 @@ export async function createTestArticle(headers: HeadersInit) {
   const status = 'published';
   const coverImage = 'https://example.com';
 
-  const [article] = await db
-    .insert(articles)
+  const [articleData] = await db
+    .insert(article)
     .values({
       title,
       slug: await slugify(title, session.user.id),
@@ -59,7 +59,7 @@ export async function createTestArticle(headers: HeadersInit) {
     })
     .returning();
 
-  return article;
+  return articleData;
 }
 
 export async function cleanupTestUser(username: string) {
@@ -67,5 +67,5 @@ export async function cleanupTestUser(username: string) {
 }
 
 export async function cleanupTestArticle(publicId: string) {
-  await db.delete(articles).where(eq(articles.publicId, publicId));
+  await db.delete(article).where(eq(article.publicId, publicId));
 }
