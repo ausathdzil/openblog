@@ -95,24 +95,24 @@ export function ArticleActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" className="w-fit">
           <DropdownMenuGroup>
-            <DropdownMenuItem
-              render={
-                <Link
-                  href={
-                    article.status === 'published'
-                      ? (`/@${article.author?.username}/articles/${article.slug}` as Route)
-                      : `/editor/${article.publicId}`
-                  }
+            {article.status === 'published' ? (
+              <DropdownMenuItem
+                render={
+                  <Link
+                    href={
+                      `/@${article.author?.username}/articles/${article.slug}` as Route
+                    }
+                  />
+                }
+              >
+                View
+                <HugeiconsIcon
+                  className="ml-auto"
+                  icon={ViewIcon}
+                  strokeWidth={2}
                 />
-              }
-            >
-              View
-              <HugeiconsIcon
-                className="ml-auto"
-                icon={ViewIcon}
-                strokeWidth={2}
-              />
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuItem
               render={<Link href={`/editor/${article.publicId}`} />}
             >
