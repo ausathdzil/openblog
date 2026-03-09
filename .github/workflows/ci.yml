@@ -83,7 +83,7 @@ jobs:
 
   deploy-preview:
     name: Deploy preview
-    if: ${{ github.event_name == 'pull_request' && needs.verify.result == 'success' && secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+    if: ${{ github.event_name == 'pull_request' && needs.verify.result == 'success' }}
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -120,7 +120,7 @@ jobs:
 
   deploy-production:
     name: Deploy production
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.verify.result == 'success' && secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.verify.result == 'success' }}
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 15
