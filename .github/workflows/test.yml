@@ -1,5 +1,8 @@
 name: Run Lint, Type Check, and Test
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
 on:
   push:
     branches:
@@ -9,7 +12,7 @@ on:
       - main
 
 jobs:
-  test:
+  Run-Tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
