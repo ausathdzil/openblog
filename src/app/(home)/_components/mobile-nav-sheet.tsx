@@ -98,9 +98,7 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
       >
         <SheetHeader className="border-b p-4 pr-14">
           <SheetTitle>Menu</SheetTitle>
-          <SheetDescription className="sr-only">
-            Browse pages and account actions.
-          </SheetDescription>
+          <SheetDescription>Browse pages and account actions.</SheetDescription>
         </SheetHeader>
         <nav className="flex flex-col gap-2 p-4">
           {(isSignedIn ? userLinks : guestLinks).map((link) => (

@@ -65,8 +65,7 @@ export function Header({
           variant="ghost"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
-          <span className="hidden sm:inline">Back</span>
-          <span className="sr-only sm:hidden">Back</span>
+          Back
         </Button>
         <Large
           aria-hidden={!showTitle}
