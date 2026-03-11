@@ -48,6 +48,13 @@ function isContentEmpty(content: string): boolean {
   return normalized.length === 0;
 }
 
+interface HeaderFormSelection {
+  content: string;
+  isValid: boolean;
+  status: 'archived' | 'draft' | 'published';
+  title: string;
+}
+
 export function ArticleEditor({
   article,
 }: {
@@ -101,20 +108,21 @@ export function ArticleEditor({
       if (!leave) {
         return;
       }
+      form.reset();
     }
     router.back();
   };
 
   return (
     <>
-      <form.Subscribe selector={(state) => state.isDirty}>
+      <form.Subscribe<boolean> selector={(state) => state.isDirty}>
         {(isDirty) => <BeforeUnloadGuard isDirty={isDirty} />}
       </form.Subscribe>
       <Header
         onBackClick={handleBack}
         title={article.title || 'Untitled Draft'}
       >
-        <form.Subscribe
+        <form.Subscribe<HeaderFormSelection>
           selector={(state) => ({
             isValid: state.isValid,
             title: state.values.title,
@@ -139,6 +147,12 @@ export function ArticleEditor({
                   isContentEmpty={isContentEmpty(formState.content)}
                   isTitleEmpty={formState.title.trim().length === 0}
                   isValid={formState.isValid}
+                  onPublished={() => {
+                    form.reset({
+                      ...form.state.values,
+                      status: 'published',
+                    });
+                  }}
                   publicId={article.publicId}
                   status={formState.status}
                 />
