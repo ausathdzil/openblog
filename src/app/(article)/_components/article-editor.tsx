@@ -127,6 +127,7 @@ export function ArticleEditor({
               <EditorActions article={article} />
               {formState.status === 'published' ? (
                 <Button
+                  className="h-11 sm:h-8"
                   disabled={isPending}
                   form="article-editor-form"
                   size="pill-sm"
@@ -136,6 +137,7 @@ export function ArticleEditor({
                 </Button>
               ) : (
                 <PublishButton
+                  className="h-11 sm:h-8"
                   isContentEmpty={isContentEmpty(formState.content)}
                   isTitleEmpty={formState.title.trim().length === 0}
                   isValid={formState.isValid}
@@ -147,11 +149,11 @@ export function ArticleEditor({
           )}
         </form.Subscribe>
       </Header>
-      <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-8">
+      <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-4 sm:p-8">
         <div
           className={cn(
             buttonVariants({ size: 'lg', variant: 'ghost' }),
-            'pointer-events-none fixed right-4 bottom-4 z-20 opacity-50',
+            'pointer-events-none fixed right-4 bottom-4 z-20 hidden opacity-50 sm:inline-flex',
             isPending && 'animate-pulse'
           )}
         >

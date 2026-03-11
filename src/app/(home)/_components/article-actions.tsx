@@ -90,7 +90,13 @@ export function ArticleActions({
   return (
     <ItemActions>
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Button size="icon" variant="ghost" />}>
+        <DropdownMenuTrigger
+          aria-label="Article actions"
+          render={
+            <Button className="size-11 sm:size-9" size="icon" variant="ghost" />
+          }
+          title="Article actions"
+        >
           <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" className="w-fit">

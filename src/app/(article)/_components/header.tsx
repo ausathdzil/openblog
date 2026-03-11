@@ -58,14 +58,20 @@ export function Header({
       {...props}
     >
       <div className="relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 p-4">
-        <Button onClick={handleBack} size="sm" variant="ghost">
+        <Button
+          className="h-11 px-3 sm:h-8 sm:px-2.5"
+          onClick={handleBack}
+          size="sm"
+          variant="ghost"
+        >
           <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
-          Back
+          <span className="hidden sm:inline">Back</span>
+          <span className="sr-only sm:hidden">Back</span>
         </Button>
         <Large
           aria-hidden={!showTitle}
           className={cn(
-            'absolute left-1/2 -translate-x-1/2 transition-opacity',
+            'absolute left-1/2 hidden -translate-x-1/2 transition-opacity sm:block',
             showTitle ? 'opacity-100' : 'opacity-0'
           )}
         >

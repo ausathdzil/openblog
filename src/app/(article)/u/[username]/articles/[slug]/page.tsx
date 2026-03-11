@@ -112,7 +112,7 @@ async function Article({ params }: ArticleProps) {
     <>
       <Header title={article.title || 'Untitled Draft'} />
       <main className="grid min-h-screen">
-        <article className="prose prose-neutral dark:prose-invert mx-auto size-full p-8">
+        <article className="prose prose-neutral dark:prose-invert mx-auto size-full p-4 sm:p-8">
           <h1>{article.title}</h1>
           <p className="font-semibold text-2xl">{article.excerpt}</p>
           <div className="not-prose flex items-center gap-1">

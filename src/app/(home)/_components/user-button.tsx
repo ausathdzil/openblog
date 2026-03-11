@@ -48,17 +48,22 @@ const authNav: NavItem<Route>[] = [
 
 export async function UserButton({
   className,
+  session,
   ...props
-}: React.ComponentProps<'div'>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+}: React.ComponentProps<'div'> & {
+  session?: typeof auth.$Infer.Session | null;
+}) {
+  const resolvedSession =
+    session ??
+    (await auth.api.getSession({
+      headers: await headers(),
+    }));
 
   return (
     <div className={cn('flex items-center gap-4', className)} {...props}>
-      {session ? <CreateArticleButton /> : null}
-      {session?.user ? (
-        <UserDropdown user={session.user} />
+      {resolvedSession ? <CreateArticleButton /> : null}
+      {resolvedSession?.user ? (
+        <UserDropdown user={resolvedSession.user} />
       ) : (
         <>
           {authNav.map((item) => (
