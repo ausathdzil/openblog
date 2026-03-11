@@ -12,6 +12,7 @@ type PublishButtonProps = {
   isContentEmpty: boolean;
   status: string | null;
   publicId: string;
+  onPublished: () => void;
 } & ComponentProps<typeof Button>;
 
 export function PublishButton({
@@ -20,6 +21,7 @@ export function PublishButton({
   isContentEmpty,
   status,
   publicId,
+  onPublished,
   ...props
 }: PublishButtonProps) {
   const [isPending, startTransition] = useTransition();
@@ -58,9 +60,11 @@ export function PublishButton({
 
       if (res?.error) {
         toast.error(res.error.message, { position: 'top-center' });
+        return;
       }
 
       setIsPublished(true);
+      onPublished();
     });
   };
 
