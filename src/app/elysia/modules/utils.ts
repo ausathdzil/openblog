@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import * as z from 'zod';
 
 import { db } from '@/db';
-import { articles } from '@/db/schema';
+import { article } from '@/db/schema';
 
 const Slug = z.string().slugify();
 
@@ -20,9 +20,9 @@ export async function slugify(
 
   while (true) {
     const [existing] = await db
-      .select({ id: articles.id })
-      .from(articles)
-      .where(and(eq(articles.slug, slug), eq(articles.authorId, authorId)))
+      .select({ id: article.id })
+      .from(article)
+      .where(and(eq(article.slug, slug), eq(article.authorId, authorId)))
       .limit(1);
 
     if (!existing) {
