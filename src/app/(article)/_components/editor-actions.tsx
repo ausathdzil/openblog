@@ -87,7 +87,9 @@ export function EditorActions({
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label="Actions"
-          render={<Button size="icon" variant="ghost" />}
+          render={
+            <Button className="size-11 sm:size-9" size="icon" variant="ghost" />
+          }
           title="Actions"
         >
           <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />

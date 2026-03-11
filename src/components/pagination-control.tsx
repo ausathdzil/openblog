@@ -48,13 +48,15 @@ export function PaginationControl({
               onClick={() => handlePageChange(page - 1)}
             />
           </PaginationItem>
-          {allPages.map((p) =>
+          {allPages.map((p, index) =>
             p === '…' ? (
-              <PaginationItem key={p}>
+              <PaginationItem
+                key={`ellipsis-${allPages[index - 1]}-${allPages[index + 1]}`}
+              >
                 <PaginationEllipsis />
               </PaginationItem>
             ) : typeof p === 'number' ? (
-              <PaginationItem key={p}>
+              <PaginationItem key={`page-${p}`}>
                 <PaginationButton
                   isActive={p === page}
                   onClick={() => handlePageChange(p)}

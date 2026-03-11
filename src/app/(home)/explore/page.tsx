@@ -135,10 +135,11 @@ async function AuthorsResults({ limit, page, q }: ResultsProps) {
 
   return (
     <>
-      <ItemGroup className="grid list-none grid-cols-2 gap-4">
+      <ItemGroup className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2">
         {authors?.data.map((author) => (
-          <li key={author.username}>
+          <li className="min-w-0" key={author.username}>
             <Item
+              className="h-full"
               render={<Link href={`/@${author.username}` as Route} />}
               variant="outline"
             >
@@ -148,8 +149,10 @@ async function AuthorsResults({ limit, page, q }: ResultsProps) {
                   <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </ItemMedia>
-              <ItemContent>
-                <ItemTitle>@{author.displayUsername}</ItemTitle>
+              <ItemContent className="min-w-0">
+                <ItemTitle className="w-full truncate">
+                  @{author.displayUsername}
+                </ItemTitle>
                 <ItemDescription>
                   Joined at {format(author.createdAt, 'MMM d, yyyy')}
                 </ItemDescription>

@@ -33,45 +33,44 @@ type NavItem<T extends string = string> = {
   icon?: React.ReactNode;
 } & VariantProps<typeof buttonVariants>;
 
-const authNav: NavItem<Route>[] = [
-  {
-    href: '/sign-in',
-    label: 'Sign In',
-    variant: 'secondary',
-  },
-  {
-    href: '/sign-up',
-    label: 'Get Started',
-    variant: 'default',
-  },
-];
-
 export async function UserButton({
   className,
+  session,
   ...props
-}: React.ComponentProps<'div'>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+}: React.ComponentProps<'div'> & {
+  session?: typeof auth.$Infer.Session | null;
+}) {
+  let resolvedSession = session;
+  if (session === undefined) {
+    resolvedSession = await auth.api.getSession({
+      headers: await headers(),
+    });
+  }
+  const hasUser = Boolean(resolvedSession?.user);
 
   return (
     <div className={cn('flex items-center gap-4', className)} {...props}>
-      {session ? <CreateArticleButton /> : null}
-      {session?.user ? (
-        <UserDropdown user={session.user} />
+      {hasUser ? <CreateArticleButton /> : null}
+      {resolvedSession?.user ? (
+        <UserDropdown user={resolvedSession.user} />
       ) : (
         <>
-          {authNav.map((item) => (
-            <Button
-              key={item.href}
-              nativeButton={false}
-              render={<Link href={item.href} />}
-              size="pill-sm"
-              variant={item.variant}
-            >
-              {item.label}
-            </Button>
-          ))}
+          <Button
+            nativeButton={false}
+            render={<Link href="/sign-in" />}
+            size="pill-sm"
+            variant="secondary"
+          >
+            Sign In
+          </Button>
+          <Button
+            nativeButton={false}
+            render={<Link href="/sign-up" />}
+            size="pill-sm"
+            variant="default"
+          >
+            Get Started
+          </Button>
           <ModeToggle />
         </>
       )}

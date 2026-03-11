@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/security/noDangerouslySetInnerHtml: Sanitized HTML generated from trusted markdown pipeline. */
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Markdown, MarkdownManager } from '@tiptap/markdown';
 import StarterKit from '@tiptap/starter-kit';
@@ -107,12 +108,18 @@ async function Article({ params }: ArticleProps) {
       },
     },
   });
+  const renderedArticleBody = (
+    <div
+      className="[&_pre]:max-w-full [&_pre]:overflow-x-auto"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
 
   return (
     <>
       <Header title={article.title || 'Untitled Draft'} />
       <main className="grid min-h-screen">
-        <article className="prose prose-neutral dark:prose-invert mx-auto size-full p-8">
+        <article className="prose prose-neutral dark:prose-invert mx-auto size-full min-w-0 p-4 sm:p-8">
           <h1>{article.title}</h1>
           <p className="font-semibold text-2xl">{article.excerpt}</p>
           <div className="not-prose flex items-center gap-1">
@@ -124,8 +131,7 @@ async function Article({ params }: ArticleProps) {
               {format(article.createdAt, 'MMMM d, yyyy')}
             </time>
           </div>
-          {/** biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized HTML */}
-          <div dangerouslySetInnerHTML={{ __html: html }} />
+          {renderedArticleBody}
         </article>
       </main>
     </>
