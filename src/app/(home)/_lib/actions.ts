@@ -1,11 +1,9 @@
 'use server';
 
-import { APIError } from 'better-auth';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { auth } from '@/lib/auth';
 import { elysia } from '@/lib/eden';
 
 export async function createDraft() {
@@ -39,35 +37,4 @@ export async function createDraft() {
       message: 'Unable to create draft, please try again',
     },
   };
-}
-
-export async function updateProfile(
-  image: string | null | undefined,
-  name: string
-) {
-  try {
-    await auth.api.updateUser({
-      body: { image, name },
-      headers: await headers(),
-    });
-  } catch (error) {
-    if (error instanceof APIError) {
-      return {
-        error: {
-          message: error.message,
-          status: error.status,
-        },
-      };
-    }
-    return {
-      error: {
-        status: 500,
-        message: 'An unknown error occurred, please try again',
-      },
-    };
-  }
-
-  revalidatePath('/profile');
-
-  return { message: 'Profile updated' };
 }
