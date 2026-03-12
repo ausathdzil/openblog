@@ -1,6 +1,10 @@
 'use client';
 
-import { AlertCircleIcon } from '@hugeicons/core-free-icons';
+import {
+  AlertCircleIcon,
+  ViewIcon,
+  ViewOffSlashIcon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useId, useState } from 'react';
@@ -16,7 +20,12 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
@@ -46,6 +55,8 @@ const CURRENT_PASSWORD_ERROR_PATTERN =
 
 export function UpdatePasswordForm() {
   const [loading, setLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [serverCurrentPasswordError, setServerCurrentPasswordError] = useState<
     string | null
@@ -125,27 +136,58 @@ export function UpdatePasswordForm() {
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
-                <Input
-                  aria-describedby={
-                    isInvalid ? currentPasswordErrorId : undefined
-                  }
-                  aria-invalid={isInvalid}
-                  autoComplete="current-password"
-                  id={field.name}
-                  maxLength={128}
-                  minLength={1}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    setServerCurrentPasswordError(null);
-                    setFormError(null);
-                    field.handleChange(e.target.value);
-                  }}
-                  required
-                  spellCheck="false"
-                  type="password"
-                  value={field.state.value}
-                />
+                <InputGroup aria-invalid={isInvalid}>
+                  <InputGroupInput
+                    aria-describedby={
+                      isInvalid ? currentPasswordErrorId : undefined
+                    }
+                    aria-invalid={isInvalid}
+                    autoComplete="current-password"
+                    id={field.name}
+                    maxLength={128}
+                    minLength={1}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      setServerCurrentPasswordError(null);
+                      setFormError(null);
+                      field.handleChange(e.target.value);
+                    }}
+                    required
+                    spellCheck="false"
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    value={field.state.value}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      aria-label={
+                        showCurrentPassword
+                          ? 'Hide current password'
+                          : 'Show current password'
+                      }
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
+                      size="icon-xs"
+                      title={
+                        showCurrentPassword
+                          ? 'Hide current password'
+                          : 'Show current password'
+                      }
+                      type="button"
+                      variant="ghost"
+                    >
+                      {showCurrentPassword ? (
+                        <HugeiconsIcon
+                          icon={ViewOffSlashIcon}
+                          strokeWidth={2}
+                        />
+                      ) : (
+                        <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
+                      )}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
                 {hasClientError ? (
                   <FieldError
                     errors={field.state.meta.errors}
@@ -173,24 +215,53 @@ export function UpdatePasswordForm() {
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
-                <Input
-                  aria-describedby={describedBy}
-                  aria-invalid={isInvalid}
-                  autoComplete="new-password"
-                  id={field.name}
-                  maxLength={128}
-                  minLength={8}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    setFormError(null);
-                    field.handleChange(e.target.value);
-                  }}
-                  required
-                  spellCheck="false"
-                  type="password"
-                  value={field.state.value}
-                />
+                <InputGroup aria-invalid={isInvalid}>
+                  <InputGroupInput
+                    aria-describedby={describedBy}
+                    aria-invalid={isInvalid}
+                    autoComplete="new-password"
+                    id={field.name}
+                    maxLength={128}
+                    minLength={8}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      setFormError(null);
+                      field.handleChange(e.target.value);
+                    }}
+                    required
+                    spellCheck="false"
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={field.state.value}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      aria-label={
+                        showNewPassword
+                          ? 'Hide new password'
+                          : 'Show new password'
+                      }
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      size="icon-xs"
+                      title={
+                        showNewPassword
+                          ? 'Hide new password'
+                          : 'Show new password'
+                      }
+                      type="button"
+                      variant="ghost"
+                    >
+                      {showNewPassword ? (
+                        <HugeiconsIcon
+                          icon={ViewOffSlashIcon}
+                          strokeWidth={2}
+                        />
+                      ) : (
+                        <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
+                      )}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
                 <FieldDescription id={newPasswordDescriptionId}>
                   Use 8-128 characters with at least one letter, one number, and
                   one special character.

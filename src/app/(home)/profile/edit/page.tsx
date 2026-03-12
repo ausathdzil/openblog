@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
+import { ProfileSignOutButton } from './_components/profile-sign-out-button';
 import { UpdateNameForm } from './_components/update-name-form';
 import { UpdatePasswordForm } from './_components/update-password-form';
 
@@ -71,14 +72,17 @@ async function EditProfileContent() {
           </ItemContent>
         </Item>
       </ItemGroup>
-      <Button
-        className="justify-self-start"
-        nativeButton={false}
-        render={<Link href="/profile" />}
-        variant="ghost"
-      >
-        Back to profile
-      </Button>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button
+          className="justify-self-start"
+          nativeButton={false}
+          render={<Link href="/profile" />}
+          variant="ghost"
+        >
+          Back to profile
+        </Button>
+        <ProfileSignOutButton />
+      </div>
     </main>
   );
 }
