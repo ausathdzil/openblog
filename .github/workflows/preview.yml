@@ -9,6 +9,20 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "src/**"
+      - "public/**"
+      - "drizzle/**"
+      - "package.json"
+      - "bun.lock"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "postcss.config.mjs"
+      - "drizzle.config.ts"
+      - "components.json"
+      - "biome.json"
+      - "vercel.json"
+      - ".github/workflows/preview.yml"
 
 permissions:
   contents: read

@@ -7,9 +7,35 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "src/**"
+      - "__tests__/**"
+      - "drizzle/**"
+      - "package.json"
+      - "bun.lock"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "postcss.config.mjs"
+      - "drizzle.config.ts"
+      - "components.json"
+      - "biome.json"
+      - ".github/workflows/test.yml"
   pull_request:
     branches:
       - main
+    paths:
+      - "src/**"
+      - "__tests__/**"
+      - "drizzle/**"
+      - "package.json"
+      - "bun.lock"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "postcss.config.mjs"
+      - "drizzle.config.ts"
+      - "components.json"
+      - "biome.json"
+      - ".github/workflows/test.yml"
 
 permissions:
   contents: read
