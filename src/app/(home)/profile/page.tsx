@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
   Item,
@@ -18,7 +20,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ArticleActions } from '../_components/article-actions';
-import { EditProfileDialog } from '../_components/edit-profile-dialog';
 import { StatusToggle } from '../_components/status-toggle';
 import { getCurrentUserArticles } from '../_lib/data';
 
@@ -82,7 +83,15 @@ async function Profile() {
         <Large className="font-display text-3xl">{session.user.name}</Large>
         <Muted className="text-lg">@{session.user.displayUsername}</Muted>
       </div>
-      <EditProfileDialog user={session.user} />
+      <Button
+        className="justify-self-center"
+        nativeButton={false}
+        render={<Link href="/profile/edit" />}
+        size="lg"
+        variant="secondary"
+      >
+        Edit Profile
+      </Button>
     </div>
   );
 }

@@ -1,0 +1,74 @@
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+import { Muted, Title } from '@/components/typography';
+import { Button } from '@/components/ui/button';
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemTitle,
+} from '@/components/ui/item';
+import { auth } from '@/lib/auth';
+import { UpdateNameForm } from './_components/update-name-form';
+import { UpdatePasswordForm } from './_components/update-password-form';
+
+export const metadata: Metadata = {
+  title: 'Edit profile',
+};
+
+export default async function EditProfilePage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect('/sign-in');
+  }
+
+  return (
+    <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
+      <div className="space-y-2">
+        <Title>Edit profile</Title>
+        <Muted className="text-center">
+          Manage your account settings and security details.
+        </Muted>
+      </div>
+      <ItemGroup>
+        <Item variant="outline">
+          <ItemContent className="gap-6">
+            <div className="space-y-1">
+              <ItemTitle>Update Name</ItemTitle>
+              <ItemDescription>
+                This updates the name shown on your profile.
+              </ItemDescription>
+            </div>
+            <UpdateNameForm currentName={session.user.name} />
+          </ItemContent>
+        </Item>
+        <Item variant="outline">
+          <ItemContent className="gap-6">
+            <div className="space-y-1">
+              <ItemTitle>Update Password</ItemTitle>
+              <ItemDescription>
+                Change your password to keep your account secure.
+              </ItemDescription>
+            </div>
+            <UpdatePasswordForm />
+          </ItemContent>
+        </Item>
+      </ItemGroup>
+      <Button
+        className="justify-self-start"
+        nativeButton={false}
+        render={<Link href="/profile" />}
+        variant="ghost"
+      >
+        Back to profile
+      </Button>
+    </main>
+  );
+}
