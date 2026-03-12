@@ -7,7 +7,7 @@ import {
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -54,6 +54,7 @@ const CURRENT_PASSWORD_ERROR_PATTERN =
   /current password|invalid password|incorrect password/i;
 
 export function UpdatePasswordForm() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -103,13 +104,19 @@ export function UpdatePasswordForm() {
           },
           onSuccess: () => {
             toast.success('Password updated.');
+            setShowCurrentPassword(false);
+            setShowNewPassword(false);
+            setFormError(null);
+            setServerCurrentPasswordError(null);
             form.reset();
           },
         }
       );
     },
     onSubmitInvalid() {
-      const $invalidInput = document.querySelector('[aria-invalid="true"]');
+      const $invalidInput = formRef.current?.querySelector(
+        '[aria-invalid="true"]'
+      );
 
       if ($invalidInput instanceof HTMLElement) {
         $invalidInput.focus();
@@ -124,6 +131,7 @@ export function UpdatePasswordForm() {
         e.preventDefault();
         form.handleSubmit();
       }}
+      ref={formRef}
     >
       <FieldGroup>
         <form.Field

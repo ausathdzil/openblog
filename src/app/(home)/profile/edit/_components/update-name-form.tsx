@@ -2,7 +2,7 @@
 
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -33,6 +33,7 @@ interface UpdateNameFormProps {
 }
 
 export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [serverNameError, setServerNameError] = useState<string | null>(null);
   const router = useRouter();
@@ -73,7 +74,9 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
       );
     },
     onSubmitInvalid() {
-      const $invalidInput = document.querySelector('[aria-invalid="true"]');
+      const $invalidInput = formRef.current?.querySelector(
+        '[aria-invalid="true"]'
+      );
 
       if ($invalidInput instanceof HTMLElement) {
         $invalidInput.focus();
@@ -88,6 +91,7 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
         e.preventDefault();
         form.handleSubmit();
       }}
+      ref={formRef}
     >
       <FieldGroup>
         <form.Field

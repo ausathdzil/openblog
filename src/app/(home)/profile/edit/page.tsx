@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
-import { ProfileSignOutButton } from './_components/profile-sign-out-button';
+import { MobileSignOutButton } from '../../_components/mobile-sign-out-button';
 import { UpdateNameForm } from './_components/update-name-form';
 import { UpdatePasswordForm } from './_components/update-password-form';
 
@@ -81,7 +81,7 @@ async function EditProfileContent() {
         >
           Back to profile
         </Button>
-        <ProfileSignOutButton />
+        <MobileSignOutButton />
       </div>
     </main>
   );
