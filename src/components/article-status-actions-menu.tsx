@@ -25,7 +25,7 @@ export function ArticleStatusActionsMenu({
 }: ArticleStatusActionsMenuProps) {
   return (
     <>
-      {status !== 'draft' ? (
+      {status === 'draft' ? null : (
         <DropdownMenuItem onClick={onMoveToDraft}>
           Move to draft
           <HugeiconsIcon
@@ -34,8 +34,8 @@ export function ArticleStatusActionsMenu({
             strokeWidth={2}
           />
         </DropdownMenuItem>
-      ) : null}
-      {status !== 'archived' ? (
+      )}
+      {status === 'archived' ? null : (
         <DropdownMenuItem onClick={onArchive}>
           Archive
           <HugeiconsIcon
@@ -44,7 +44,7 @@ export function ArticleStatusActionsMenu({
             strokeWidth={2}
           />
         </DropdownMenuItem>
-      ) : null}
+      )}
       <DropdownMenuItem onClick={onDelete} variant="destructive">
         Delete
         <HugeiconsIcon
