@@ -32,6 +32,5 @@
     "*.css": "tailwindcss"
   },
   "tailwindCSS.classFunctions": ["cn"],
-  "typescript.experimental.useTsgo": true,
   "typescript.tsdk": "node_modules/typescript/lib"
 }
