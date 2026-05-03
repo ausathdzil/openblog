@@ -9,7 +9,7 @@ import { useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
-import type { ArticleModel } from '@/app/elysia/modules/article/model';
+import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { updateArticle } from '../_lib/actions';
@@ -55,11 +55,7 @@ interface HeaderFormSelection {
   title: string;
 }
 
-export function ArticleEditor({
-  article,
-}: {
-  article: ArticleModel.ArticleResponse;
-}) {
+export function ArticleEditor({ article }: { article: ArticleResponse }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 

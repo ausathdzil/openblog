@@ -6,16 +6,16 @@ import { article, user } from '@/db/schema';
 import { AuthError } from '../auth';
 import * as AuthorService from '../author/service';
 import { slugify } from '../utils';
-import type { ArticleModel } from './model';
+import type {
+  ArticleResponse,
+  ArticlesQuery,
+  ArticlesResponse,
+  CreateArticleBody,
+  UpdateArticleBody,
+} from './model';
 
 export async function createArticle(
-  {
-    title,
-    content,
-    status,
-    excerpt,
-    coverImage,
-  }: ArticleModel.CreateArticleBody,
+  { title, content, status, excerpt, coverImage }: CreateArticleBody,
   userId: string | undefined
 ) {
   if (!userId) {
@@ -50,11 +50,11 @@ export async function createArticle(
   return {
     ...articleData,
     author,
-  } satisfies ArticleModel.ArticleResponse;
+  } satisfies ArticleResponse;
 }
 
 export async function getArticles(
-  { status, q, page = 1, limit = 20 }: ArticleModel.ArticlesQuery,
+  { status, q, page = 1, limit = 20 }: ArticlesQuery,
   username?: string | null | undefined
 ) {
   const offset = (page - 1) * limit;
@@ -113,7 +113,7 @@ export async function getArticles(
       hasNext: page < totalPages,
       hasPrev: page > 1,
     },
-  } satisfies ArticleModel.ArticlesResponse;
+  } satisfies ArticlesResponse;
 }
 
 export async function getArticleByPublicId(
@@ -153,7 +153,7 @@ export async function getArticleByPublicId(
     throw new AuthError('You are not allowed to access this resource.', 403);
   }
 
-  return articleData satisfies ArticleModel.ArticleResponse;
+  return articleData satisfies ArticleResponse;
 }
 
 export async function getArticleBySlug(slug: string, username: string) {
@@ -189,7 +189,7 @@ export async function getArticleBySlug(slug: string, username: string) {
   return {
     ...articleData,
     author,
-  } satisfies ArticleModel.ArticleResponse;
+  } satisfies ArticleResponse;
 }
 
 export async function updateArticle(
@@ -200,7 +200,7 @@ export async function updateArticle(
     excerpt,
     status: articleStatus,
     coverImage,
-  }: ArticleModel.UpdateArticleBody,
+  }: UpdateArticleBody,
   userId: string | undefined
 ) {
   if (!userId) {
@@ -210,7 +210,7 @@ export async function updateArticle(
   const articleData = await getArticleByPublicId(publicId, userId);
   const author = await AuthorService.getAuthorById(articleData.authorId);
 
-  const payload: Partial<ArticleModel.UpdateArticleBody> = {};
+  const payload: Partial<UpdateArticleBody> = {};
 
   if (title !== undefined && title !== articleData.title) {
     payload.title = title?.trim();
@@ -234,7 +234,7 @@ export async function updateArticle(
   }
 
   if (Object.keys(payload).length === 0) {
-    return articleData satisfies ArticleModel.ArticleResponse;
+    return articleData satisfies ArticleResponse;
   }
 
   const [updatedData] = await db
@@ -256,7 +256,7 @@ export async function updateArticle(
   return {
     ...updatedData,
     author,
-  } satisfies ArticleModel.ArticleResponse;
+  } satisfies ArticleResponse;
 }
 
 export async function deleteArticle(

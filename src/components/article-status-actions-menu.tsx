@@ -7,14 +7,14 @@ import {
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 
-import type { ArticleModel } from '@/app/elysia/modules/article/model';
+import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 interface ArticleStatusActionsMenuProps {
   onArchive: () => void;
   onDelete: () => void;
   onMoveToDraft: () => void;
-  status: ArticleModel.ArticleResponse['status'];
+  status: ArticleResponse['status'];
 }
 
 export function ArticleStatusActionsMenu({

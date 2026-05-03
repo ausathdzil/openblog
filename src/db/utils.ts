@@ -1,10 +1,6 @@
-/**
- * biome-ignore-all lint/suspicious/noExplicitAny: @see https://elysiajs.com/integrations/drizzle.html#utility
- * biome-ignore-all lint/suspicious/noImplicitAnyLet: @see https://elysiajs.com/integrations/drizzle.html#utility
- * biome-ignore-all lint/complexity/noBannedTypes: @see https://elysiajs.com/integrations/drizzle.html#utility
- * biome-ignore-all lint/suspicious/noEvolvingTypes: @see https://elysiajs.com/integrations/drizzle.html#utility
- * @lastModified 2025-02-04
- * @see https://elysiajs.com/recipe/drizzle.html#utility
+/** Elysia Drizzle spread helpers (+ `update`). Lint exceptions: `biome.json` `overrides` for this file.
+ * @lastModified 2026-05-03
+ * @see https://elysiajs.com/integrations/drizzle.html#utility
  */
 
 import { Kind, type TObject } from '@sinclair/typebox';

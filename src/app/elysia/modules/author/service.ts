@@ -3,13 +3,9 @@ import { NotFoundError } from 'elysia';
 
 import { db } from '@/db';
 import { user } from '@/db/schema';
-import type { AuthorModel } from './model';
+import type { AuthorResponse, AuthorsQuery, AuthorsResponse } from './model';
 
-export async function getAuthors({
-  q,
-  page = 1,
-  limit = 20,
-}: AuthorModel.AuthorsQuery) {
+export async function getAuthors({ q, page = 1, limit = 20 }: AuthorsQuery) {
   const offset = (page - 1) * limit;
 
   const whereConditions = q
@@ -54,7 +50,7 @@ export async function getAuthors({
       hasNext: page < totalPages,
       hasPrev: page > 1,
     },
-  } satisfies AuthorModel.AuthorsResponse;
+  } satisfies AuthorsResponse;
 }
 
 export async function getAuthorByUsername(username: string) {
@@ -75,7 +71,7 @@ export async function getAuthorByUsername(username: string) {
     throw new NotFoundError('Author not found.');
   }
 
-  return author satisfies AuthorModel.AuthorResponse;
+  return author satisfies AuthorResponse;
 }
 
 export async function getAuthorById(id: string) {
@@ -96,5 +92,5 @@ export async function getAuthorById(id: string) {
     throw new NotFoundError('Author not found.');
   }
 
-  return author satisfies AuthorModel.AuthorResponse;
+  return author satisfies AuthorResponse;
 }

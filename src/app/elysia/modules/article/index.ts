@@ -1,14 +1,21 @@
 import Elysia, { t } from 'elysia';
 
 import { AuthError, auth } from '../auth';
-import { ArticleModel } from './model';
+import {
+  articleInvalid,
+  articleResponse,
+  articlesQuery,
+  articlesResposnse,
+  createArticleBody,
+  updateArticleBody,
+} from './model';
 import * as ArticleService from './service';
 
 export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .use(auth)
   .model({
-    Article: ArticleModel.articleResponse,
-    Articles: ArticleModel.articlesResposnse,
+    Article: articleResponse,
+    Articles: articlesResposnse,
   })
   .error({
     AuthError,
@@ -28,16 +35,16 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     },
     {
       auth: true,
-      body: ArticleModel.createArticleBody,
+      body: createArticleBody,
       response: {
         201: 'Article',
-        401: ArticleModel.articleInvalid,
-        422: ArticleModel.articleInvalid,
+        401: articleInvalid,
+        422: articleInvalid,
       },
     }
   )
   .get('', async ({ query }) => await ArticleService.getArticles(query), {
-    query: t.Omit(ArticleModel.articlesQuery, ['status']),
+    query: t.Omit(articlesQuery, ['status']),
     response: {
       200: 'Articles',
     },
@@ -56,8 +63,8 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       auth: true,
       response: {
         200: 'Article',
-        403: ArticleModel.articleInvalid,
-        404: ArticleModel.articleInvalid,
+        403: articleInvalid,
+        404: articleInvalid,
       },
     }
   )
@@ -67,12 +74,12 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       await ArticleService.updateArticle(params.publicId, body, user?.id),
     {
       auth: true,
-      body: t.Omit(ArticleModel.updateArticleBody, ['slug']),
+      body: t.Omit(updateArticleBody, ['slug']),
       response: {
         200: 'Article',
-        401: ArticleModel.articleInvalid,
-        403: ArticleModel.articleInvalid,
-        404: ArticleModel.articleInvalid,
+        401: articleInvalid,
+        403: articleInvalid,
+        404: articleInvalid,
       },
     }
   )
@@ -83,10 +90,10 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     {
       auth: true,
       response: {
-        200: ArticleModel.articleInvalid,
-        401: ArticleModel.articleInvalid,
-        403: ArticleModel.articleInvalid,
-        404: ArticleModel.articleInvalid,
+        200: articleInvalid,
+        401: articleInvalid,
+        403: articleInvalid,
+        404: articleInvalid,
       },
     }
   );

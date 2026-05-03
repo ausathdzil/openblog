@@ -1,19 +1,28 @@
 import Elysia, { t } from 'elysia';
-
-import { ArticleModel } from '../article/model';
+import {
+  articleInvalid,
+  articleResponse,
+  articlesQuery,
+  articlesResposnse,
+} from '../article/model';
 import * as ArticleService from '../article/service';
-import { AuthorModel } from './model';
+import {
+  authorInvalid,
+  authorResponse,
+  authorsQuery,
+  authorsResponse,
+} from './model';
 import * as AuthorService from './service';
 
 export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .model({
-    Author: AuthorModel.authorResponse,
-    Authors: AuthorModel.authorsResponse,
-    Article: ArticleModel.articleResponse,
-    Articles: ArticleModel.articlesResposnse,
+    Author: authorResponse,
+    Authors: authorsResponse,
+    Article: articleResponse,
+    Articles: articlesResposnse,
   })
   .get('', async ({ query }) => await AuthorService.getAuthors(query), {
-    query: AuthorModel.authorsQuery,
+    query: authorsQuery,
     response: {
       200: 'Authors',
     },
@@ -31,7 +40,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     {
       response: {
         200: 'Author',
-        404: AuthorModel.authorInvalid,
+        404: authorInvalid,
       },
     }
   )
@@ -40,10 +49,10 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     async ({ params, query }) =>
       await ArticleService.getArticles(query, params.username),
     {
-      query: t.Omit(ArticleModel.articlesQuery, ['status']),
+      query: t.Omit(articlesQuery, ['status']),
       response: {
         200: 'Articles',
-        404: AuthorModel.authorInvalid,
+        404: authorInvalid,
       },
     }
   )
@@ -54,7 +63,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     {
       response: {
         200: 'Article',
-        404: ArticleModel.articleInvalid,
+        404: articleInvalid,
       },
     }
   );

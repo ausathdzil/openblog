@@ -17,7 +17,6 @@
         "noNamespaceImport": "off"
       },
       "style": {
-        "noNamespace": "off",
         "noNonNullAssertion": "off",
         "noNestedTernary": "off",
         "useDefaultSwitchClause": "off"
@@ -32,5 +31,22 @@
     "formatter": {
       "quoteStyle": "single"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/db/utils.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noBannedTypes": "off"
+          },
+          "suspicious": {
+            "noEvolvingTypes": "off",
+            "noExplicitAny": "off",
+            "noImplicitAnyLet": "off"
+          }
+        }
+      }
+    }
+  ]
 }

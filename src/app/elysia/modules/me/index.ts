@@ -1,14 +1,19 @@
 import Elysia from 'elysia';
 
-import { ArticleModel } from '../article/model';
+import {
+  articleInvalid,
+  articleResponse,
+  articlesQuery,
+  articlesResposnse,
+} from '../article/model';
 import * as ArticleService from '../article/service';
 import { AuthError, auth } from '../auth';
 
 export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
   .use(auth)
   .model({
-    Article: ArticleModel.articleResponse,
-    Articles: ArticleModel.articlesResposnse,
+    Article: articleResponse,
+    Articles: articlesResposnse,
   })
   .error({
     AuthError,
@@ -30,10 +35,10 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
     },
     {
       auth: true,
-      query: ArticleModel.articlesQuery,
+      query: articlesQuery,
       response: {
         200: 'Articles',
-        401: ArticleModel.articleInvalid,
+        401: articleInvalid,
       },
     }
   );

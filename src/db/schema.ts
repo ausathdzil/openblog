@@ -51,7 +51,7 @@ export const session = pgTable(
   },
   (table) => [
     index('session_userId_idx').on(table.userId),
-    index('sessopm_token_idx').on(table.token),
+    index('session_token_idx').on(table.token),
   ]
 );
 

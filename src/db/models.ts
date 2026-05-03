@@ -4,7 +4,8 @@ import { t } from 'elysia';
 import { article, user } from './schema';
 import { spreads } from './utils';
 
-export const db = {
+/** Drizzle→TypeBox field fragments for Elysia `t.Object` / OpenAPI (not the SQL client; see `@/db`). */
+export const validation = {
   select: spreads({ articles: article, user }, 'select'),
   insert: spreads(
     {

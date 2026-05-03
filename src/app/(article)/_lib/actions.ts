@@ -3,18 +3,12 @@
 import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 
-import type { ArticleModel } from '@/app/elysia/modules/article/model';
+import type { UpdateArticleBody } from '@/app/elysia/modules/article/model';
 import { elysia } from '@/lib/eden';
 
 export async function updateArticle(
   publicId: string,
-  {
-    title,
-    content,
-    excerpt,
-    coverImage,
-    status,
-  }: ArticleModel.UpdateArticleBody
+  { title, content, excerpt, coverImage, status }: UpdateArticleBody
 ) {
   const { data, error } = await elysia.articles({ publicId }).patch(
     {
