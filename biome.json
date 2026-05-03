@@ -27,6 +27,23 @@
       "react": "recommended"
     }
   },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":BUN:", ":NODE:"],
+              ":PACKAGE:",
+              ":BLANK_LINE:",
+              [":ALIAS:", ":PATH:"]
+            ]
+          }
+        }
+      }
+    }
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single"

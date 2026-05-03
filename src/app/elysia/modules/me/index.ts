@@ -6,7 +6,7 @@ import {
   articlesQuery,
   articlesResposnse,
 } from '../article/model';
-import * as ArticleService from '../article/service';
+import { getArticles } from '../article/service';
 import { AuthError, auth } from '../auth';
 
 export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
@@ -31,7 +31,7 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
         throw new AuthError('You are not allowed to access this resource.');
       }
 
-      return await ArticleService.getArticles(query, user.username);
+      return await getArticles(query, user.username);
     },
     {
       auth: true,

@@ -4,7 +4,7 @@ import { NotFoundError } from 'elysia';
 import { db } from '@/db';
 import { article, user } from '@/db/schema';
 import { AuthError } from '../auth';
-import * as AuthorService from '../author/service';
+import { getAuthorById, getAuthorByUsername } from '../author/service';
 import { slugify } from '../utils';
 import type {
   ArticleResponse,
@@ -22,7 +22,7 @@ export async function createArticle(
     throw new AuthError('You are not allowed to perform this action.');
   }
 
-  const author = await AuthorService.getAuthorById(userId);
+  const author = await getAuthorById(userId);
 
   const [articleData] = await db
     .insert(article)
@@ -58,9 +58,7 @@ export async function getArticles(
   username?: string | null | undefined
 ) {
   const offset = (page - 1) * limit;
-  const author = username
-    ? await AuthorService.getAuthorByUsername(username)
-    : null;
+  const author = username ? await getAuthorByUsername(username) : null;
 
   const whereConditions = and(
     eq(article.status, status ?? 'published'),
@@ -157,7 +155,7 @@ export async function getArticleByPublicId(
 }
 
 export async function getArticleBySlug(slug: string, username: string) {
-  const author = await AuthorService.getAuthorByUsername(username);
+  const author = await getAuthorByUsername(username);
 
   const [articleData] = await db
     .select({
@@ -208,7 +206,7 @@ export async function updateArticle(
   }
 
   const articleData = await getArticleByPublicId(publicId, userId);
-  const author = await AuthorService.getAuthorById(articleData.authorId);
+  const author = await getAuthorById(articleData.authorId);
 
   const payload: Partial<UpdateArticleBody> = {};
 

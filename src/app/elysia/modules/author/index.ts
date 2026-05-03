@@ -1,18 +1,19 @@
 import Elysia, { t } from 'elysia';
+
 import {
   articleInvalid,
   articleResponse,
   articlesQuery,
   articlesResposnse,
 } from '../article/model';
-import * as ArticleService from '../article/service';
+import { getArticleBySlug, getArticles } from '../article/service';
 import {
   authorInvalid,
   authorResponse,
   authorsQuery,
   authorsResponse,
 } from './model';
-import * as AuthorService from './service';
+import { getAuthorByUsername, getAuthors } from './service';
 
 export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   .model({
@@ -21,7 +22,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     Article: articleResponse,
     Articles: articlesResposnse,
   })
-  .get('', async ({ query }) => await AuthorService.getAuthors(query), {
+  .get('', async ({ query }) => await getAuthors(query), {
     query: authorsQuery,
     response: {
       200: 'Authors',
@@ -35,8 +36,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   })
   .get(
     '/:username',
-    async ({ params }) =>
-      await AuthorService.getAuthorByUsername(params.username),
+    async ({ params }) => await getAuthorByUsername(params.username),
     {
       response: {
         200: 'Author',
@@ -46,8 +46,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   )
   .get(
     '/:username/articles',
-    async ({ params, query }) =>
-      await ArticleService.getArticles(query, params.username),
+    async ({ params, query }) => await getArticles(query, params.username),
     {
       query: t.Omit(articlesQuery, ['status']),
       response: {
@@ -58,8 +57,7 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   )
   .get(
     '/:username/articles/:slug',
-    async ({ params }) =>
-      await ArticleService.getArticleBySlug(params.slug, params.username),
+    async ({ params }) => await getArticleBySlug(params.slug, params.username),
     {
       response: {
         200: 'Article',

@@ -9,7 +9,13 @@ import {
   createArticleBody,
   updateArticleBody,
 } from './model';
-import * as ArticleService from './service';
+import {
+  createArticle,
+  deleteArticle,
+  getArticleByPublicId,
+  getArticles,
+  updateArticle,
+} from './service';
 
 export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .use(auth)
@@ -29,7 +35,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .post(
     '',
     async ({ body, set, user }) => {
-      const article = await ArticleService.createArticle(body, user?.id);
+      const article = await createArticle(body, user?.id);
       set.status = 201;
       return article;
     },
@@ -43,7 +49,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       },
     }
   )
-  .get('', async ({ query }) => await ArticleService.getArticles(query), {
+  .get('', async ({ query }) => await getArticles(query), {
     query: t.Omit(articlesQuery, ['status']),
     response: {
       200: 'Articles',
@@ -58,7 +64,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .get(
     '/:publicId',
     async ({ params, user }) =>
-      await ArticleService.getArticleByPublicId(params.publicId, user?.id),
+      await getArticleByPublicId(params.publicId, user?.id),
     {
       auth: true,
       response: {
@@ -71,7 +77,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   .patch(
     '/:publicId',
     async ({ params, body, user }) =>
-      await ArticleService.updateArticle(params.publicId, body, user?.id),
+      await updateArticle(params.publicId, body, user?.id),
     {
       auth: true,
       body: t.Omit(updateArticleBody, ['slug']),
@@ -85,8 +91,7 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   )
   .delete(
     '/:publicId',
-    async ({ params, user }) =>
-      await ArticleService.deleteArticle(params.publicId, user?.id),
+    async ({ params, user }) => await deleteArticle(params.publicId, user?.id),
     {
       auth: true,
       response: {
