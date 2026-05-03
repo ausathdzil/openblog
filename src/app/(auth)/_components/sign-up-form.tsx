@@ -7,7 +7,7 @@ import {
   ViewOffSlashIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useForm, useStore } from '@tanstack/react-form';
+import { useForm } from '@tanstack/react-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -85,6 +85,7 @@ export function SignUpForm({
   const [loading, setLoading] = useState(false);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm({
@@ -97,26 +98,22 @@ export function SignUpForm({
     validators: {
       onSubmit: signUpFormSchema,
     },
-    onSubmit: async ({ value, formApi }) => {
+    onSubmit: async ({ value }) => {
       const { error } = await authClient.signUp.email(value, {
         onRequest: () => {
           setLoading(true);
         },
-        onResponse: () => {
-          setLoading(false);
-        },
         onSuccess: () => {
+          setLoading(false);
           router.push('/profile');
+        },
+        onError: () => {
+          setLoading(false);
         },
       });
 
       if (error) {
-        formApi.setErrorMap({
-          onSubmit: {
-            form: error.message || 'An unknown error occurred',
-            fields: {},
-          },
-        });
+        setFormError(error.message || 'An unexpected error occurred');
       }
     },
     onSubmitInvalid() {
@@ -127,8 +124,6 @@ export function SignUpForm({
       }
     },
   });
-
-  const formErrorMap = useStore(form.store, (state) => state.errorMap);
 
   return (
     <form
@@ -339,10 +334,10 @@ export function SignUpForm({
           <FieldDescription className="text-center">
             Already have an account? <Link href="/sign-in">Sign in</Link>
           </FieldDescription>
-          {typeof formErrorMap.onSubmit === 'string' ? (
+          {formError ? (
             <Alert variant="destructive">
               <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
-              <AlertTitle>{formErrorMap.onSubmit}</AlertTitle>
+              <AlertTitle>{formError}</AlertTitle>
             </Alert>
           ) : null}
         </Field>
