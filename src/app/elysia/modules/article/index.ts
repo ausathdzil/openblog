@@ -36,18 +36,12 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       },
     }
   )
-  .get(
-    '',
-    async ({ query }) => {
-      return await ArticleService.getArticles(query);
+  .get('', async ({ query }) => await ArticleService.getArticles(query), {
+    query: t.Omit(ArticleModel.articlesQuery, ['status']),
+    response: {
+      200: 'Articles',
     },
-    {
-      query: t.Omit(ArticleModel.articlesQuery, ['status']),
-      response: {
-        200: 'Articles',
-      },
-    }
-  )
+  })
   .onError(({ code, status, error }) => {
     switch (code) {
       case 'NOT_FOUND':
@@ -56,12 +50,8 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   })
   .get(
     '/:publicId',
-    async ({ params, user }) => {
-      return await ArticleService.getArticleByPublicId(
-        params.publicId,
-        user?.id
-      );
-    },
+    async ({ params, user }) =>
+      await ArticleService.getArticleByPublicId(params.publicId, user?.id),
     {
       auth: true,
       response: {
@@ -73,13 +63,8 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   )
   .patch(
     '/:publicId',
-    async ({ params, body, user }) => {
-      return await ArticleService.updateArticle(
-        params.publicId,
-        body,
-        user?.id
-      );
-    },
+    async ({ params, body, user }) =>
+      await ArticleService.updateArticle(params.publicId, body, user?.id),
     {
       auth: true,
       body: t.Omit(ArticleModel.updateArticleBody, ['slug']),
@@ -93,9 +78,8 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
   )
   .delete(
     '/:publicId',
-    async ({ params, user }) => {
-      return await ArticleService.deleteArticle(params.publicId, user?.id);
-    },
+    async ({ params, user }) =>
+      await ArticleService.deleteArticle(params.publicId, user?.id),
     {
       auth: true,
       response: {

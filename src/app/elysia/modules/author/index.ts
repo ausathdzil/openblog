@@ -12,18 +12,12 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     Article: ArticleModel.articleResponse,
     Articles: ArticleModel.articlesResposnse,
   })
-  .get(
-    '',
-    async ({ query }) => {
-      return await AuthorService.getAuthors(query);
+  .get('', async ({ query }) => await AuthorService.getAuthors(query), {
+    query: AuthorModel.authorsQuery,
+    response: {
+      200: 'Authors',
     },
-    {
-      query: AuthorModel.authorsQuery,
-      response: {
-        200: 'Authors',
-      },
-    }
-  )
+  })
   .onError(({ code, status, error }) => {
     switch (code) {
       case 'NOT_FOUND':
@@ -32,9 +26,8 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   })
   .get(
     '/:username',
-    async ({ params }) => {
-      return await AuthorService.getAuthorByUsername(params.username);
-    },
+    async ({ params }) =>
+      await AuthorService.getAuthorByUsername(params.username),
     {
       response: {
         200: 'Author',
@@ -44,9 +37,8 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   )
   .get(
     '/:username/articles',
-    async ({ params, query }) => {
-      return await ArticleService.getArticles(query, params.username);
-    },
+    async ({ params, query }) =>
+      await ArticleService.getArticles(query, params.username),
     {
       query: t.Omit(ArticleModel.articlesQuery, ['status']),
       response: {
@@ -57,12 +49,8 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
   )
   .get(
     '/:username/articles/:slug',
-    async ({ params }) => {
-      return await ArticleService.getArticleBySlug(
-        params.slug,
-        params.username
-      );
-    },
+    async ({ params }) =>
+      await ArticleService.getArticleBySlug(params.slug, params.username),
     {
       response: {
         200: 'Article',

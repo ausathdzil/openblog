@@ -218,11 +218,11 @@ export function SignUpForm({
               const parsed = signUpFormSchema.shape.username.safeParse(value);
 
               if (!parsed.success) {
-                return undefined;
+                return;
               }
 
               if (!value || value.trim().length === 0) {
-                return undefined;
+                return;
               }
 
               const { data, error } = await authClient.isUsernameAvailable(
@@ -240,14 +240,14 @@ export function SignUpForm({
               );
 
               if (error) {
-                return undefined;
+                return;
               }
 
               if (!data?.available) {
                 return { message: 'Username is not available.' };
               }
 
-              return undefined;
+              return;
             },
           }}
         />
