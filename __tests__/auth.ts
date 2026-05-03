@@ -1,7 +1,10 @@
+/**
+ * Duplicated from `src/lib/auth.ts` with `testUtils()` for integration tests only.
+ * @see https://better-auth.com/docs/plugins/test-utils
+ */
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
-import { nextCookies } from 'better-auth/next-js';
-import { openAPI, username } from 'better-auth/plugins';
+import { testUtils, username } from 'better-auth/plugins';
 
 import { db } from '@/db';
 import * as schema from '@/db/schema';
@@ -24,16 +27,9 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [
-    openAPI(),
     username({
       usernameValidator: (username) => usernameRegex.test(username),
     }),
-    nextCookies(),
+    testUtils(),
   ],
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60,
-    },
-  },
 });

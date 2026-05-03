@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
-import type { ArticleResponse } from '@/app/elysia/modules/article/model';
+import type { ArticleListResponse } from '@/app/elysia/modules/article/model';
 import { ArchiveArticleDialog } from '@/components/archive-article-dialog';
 import { ArticleStatusActionsMenu } from '@/components/article-status-actions-menu';
 import { DeleteArticleDialog } from '@/components/delete-article-dialog';
@@ -31,7 +31,7 @@ import {
   moveArticleToDraft,
 } from '@/lib/article-actions';
 
-export function ArticleActions({ article }: { article: ArticleResponse }) {
+export function ArticleActions({ article }: { article: ArticleListResponse }) {
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();

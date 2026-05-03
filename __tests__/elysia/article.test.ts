@@ -23,7 +23,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanupTestUser(testUser.data.username);
+  if (testUser?.userId) {
+    await cleanupTestUser(testUser.userId);
+  }
 });
 
 describe('Article', () => {

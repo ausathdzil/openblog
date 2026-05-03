@@ -1,9 +1,19 @@
+import type { TestHelpers } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
 
 import { slugify } from '@/app/elysia/modules/utils';
 import { db } from '@/db';
-import { article, user } from '@/db/schema';
-import { auth } from '@/lib/auth';
+import { article } from '@/db/schema';
+import { auth } from './auth';
+
+let testHelpersPromise: Promise<TestHelpers> | null = null;
+
+function getTestHelpers(): Promise<TestHelpers> {
+  if (!testHelpersPromise) {
+    testHelpersPromise = auth.$context.then((ctx) => ctx.test);
+  }
+  return testHelpersPromise;
+}
 
 function generateUniqueId(): string {
   const bytes = new Uint8Array(10);
@@ -11,26 +21,41 @@ function generateUniqueId(): string {
   return Buffer.from(bytes).toString('hex');
 }
 
+/**
+ * Narrow `saveUser` result for stable field access (username plugin fields are not inferred on `TestHelpers` yet).
+ * Revisit after a Better Auth release improves `ctx.test` typing.
+ */
+interface TestSavedUserShape {
+  email: string;
+  id: string;
+  name: string;
+  username: string | null;
+}
+
 export async function createTestUser() {
   const uniqueId = generateUniqueId();
+  const test = await getTestHelpers();
 
-  const userData = {
+  const draft = test.createUser({
     name: 'Test User',
     username: `test_${uniqueId}`,
     email: `test_${uniqueId}@example.com`,
+  });
+
+  const user = (await test.saveUser(draft)) as unknown as TestSavedUserShape;
+  const headers = await test.getAuthHeaders({ userId: user.id });
+
+  const userData = {
+    name: user.name,
+    username: user.username ?? `test_${uniqueId}`,
+    email: user.email,
     password: 'Test_Password_123!',
   };
 
-  const res = await auth.api.signUpEmail({
-    body: userData,
-    asResponse: true,
-  });
-
   return {
     data: userData,
-    headers: {
-      cookie: res.headers.getSetCookie().join('; '),
-    },
+    userId: user.id,
+    headers,
   };
 }
 
@@ -62,8 +87,9 @@ export async function createTestArticle(headers: HeadersInit) {
   return articleData;
 }
 
-export async function cleanupTestUser(username: string) {
-  await db.delete(user).where(eq(user.username, username));
+export async function cleanupTestUser(userId: string) {
+  const test = await getTestHelpers();
+  await test.deleteUser(userId);
 }
 
 export async function cleanupTestArticle(publicId: string) {
