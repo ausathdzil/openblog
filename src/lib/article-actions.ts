@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { headers } from 'next/headers';
 
 import { elysia } from '@/lib/eden';
@@ -21,9 +21,8 @@ export async function deleteArticle(publicId: string, username: string) {
   }
 
   if (data) {
-    revalidateTag('articles', 'max');
-    revalidateTag(`articles-${username}`, 'max');
-    revalidateTag('drafts', 'max');
+    updateTag('articles');
+    updateTag(`articles-${username}`);
     return { message: data.message };
   }
 
@@ -51,11 +50,9 @@ export async function archiveArticle(publicId: string, username: string) {
   }
 
   if (data) {
-    revalidateTag('articles', 'max');
-    revalidateTag(`articles-${username}`, 'max');
-    revalidateTag(`article-${data.slug}`, 'max');
-    revalidateTag('drafts', 'max');
-    revalidatePath('/editor/[publicId]', 'page');
+    updateTag('articles');
+    updateTag(`articles-${username}`);
+    updateTag(`article-${data.slug}`);
     return { message: 'Article archived successfully' };
   }
 
@@ -83,11 +80,9 @@ export async function moveArticleToDraft(publicId: string, username: string) {
   }
 
   if (data) {
-    revalidateTag('articles', 'max');
-    revalidateTag(`articles-${username}`, 'max');
-    revalidateTag(`article-${data.slug}`, 'max');
-    revalidateTag('drafts', 'max');
-    revalidatePath('/editor/[publicId]', 'page');
+    updateTag('articles');
+    updateTag(`articles-${username}`);
+    updateTag(`article-${data.slug}`);
     return { message: 'Article moved to draft successfully' };
   }
 

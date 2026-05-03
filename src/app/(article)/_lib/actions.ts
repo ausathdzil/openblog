@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { headers } from 'next/headers';
 
 import type { UpdateArticleBody } from '@/app/elysia/modules/article/model';
@@ -34,9 +34,8 @@ export async function updateArticle(
   }
 
   if (data) {
-    revalidateTag('articles', 'max');
-    revalidateTag(`articles-${data.author?.username}`, 'max');
-    revalidateTag(`article-${data.slug}`, 'max');
-    revalidateTag('drafts', 'max');
+    updateTag('articles');
+    updateTag(`articles-${data.author?.username}`);
+    updateTag(`article-${data.slug}`);
   }
 }

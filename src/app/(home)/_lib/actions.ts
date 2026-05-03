@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -27,7 +27,9 @@ export async function createDraft() {
   }
 
   if (data.author?.username) {
-    revalidateTag('drafts', 'max');
+    updateTag('articles');
+    updateTag(`articles-${data.author.username}`);
+    updateTag(`article-${data.slug}`);
     redirect(`/editor/${data.publicId}`);
   }
 
