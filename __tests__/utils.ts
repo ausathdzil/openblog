@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { slugify } from '@/app/elysia/modules/utils';
 import { db } from '@/db';
-import { article } from '@/db/schema';
+import { article, user } from '@/db/schema';
 import { auth } from './auth';
 
 let testHelpersPromise: Promise<TestHelpers> | null = null;
@@ -90,6 +90,7 @@ export async function createTestArticle(headers: HeadersInit) {
 export async function cleanupTestUser(userId: string) {
   const test = await getTestHelpers();
   await test.deleteUser(userId);
+  await db.delete(user).where(eq(user.id, userId));
 }
 
 export async function cleanupTestArticle(publicId: string) {
