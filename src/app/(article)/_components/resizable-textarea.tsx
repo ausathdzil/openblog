@@ -38,7 +38,7 @@ export function ResizableTextarea({
     el.style.height = `${el.scrollHeight}px`;
   }, [value]);
 
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleResize = (e: ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.currentTarget.value);
     const el = e.currentTarget;
     el.style.height = '0px';
@@ -52,7 +52,7 @@ export function ResizableTextarea({
           'w-full resize-none overflow-hidden focus:outline-none',
           className
         )}
-        onChange={handleChange}
+        onChange={handleResize}
         ref={textareaRef}
         rows={1}
         value={value}
