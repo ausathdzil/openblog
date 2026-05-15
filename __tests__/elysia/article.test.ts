@@ -29,9 +29,9 @@ describe('Article', () => {
     const createdArticles: string[] = [];
 
     afterEach(async () => {
-      for (const publicId of createdArticles) {
-        await cleanupTestArticle(publicId);
-      }
+      await Promise.all(
+        createdArticles.map((publicId) => cleanupTestArticle(publicId))
+      );
       createdArticles.length = 0;
     });
 
