@@ -55,7 +55,7 @@ export const articleListResponse = t.Object({
 
 export type ArticleListResponse = typeof articleListResponse.static;
 
-export const paginationMetaResponse = t.Object({
+const paginationMetaResponse = t.Object({
   page: t.Number(),
   limit: t.Number(),
   total: t.Number(),
@@ -83,5 +83,3 @@ export const updateArticleBody = t.Object({
 export type UpdateArticleBody = typeof updateArticleBody.static;
 
 export const articleInvalid = t.Object({ message: t.String() });
-
-export type ArticleInvalid = typeof articleInvalid.static;
