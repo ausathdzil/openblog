@@ -14,7 +14,7 @@ export function CreateArticleButton(
 ) {
   const [isPending, startTransition] = useTransition();
 
-  const handleClick = () => {
+  const handleCreateArticle = () => {
     startTransition(async () => {
       const { error } = await createDraft();
 
@@ -28,7 +28,7 @@ export function CreateArticleButton(
   return (
     <Button
       disabled={isPending}
-      onClick={handleClick}
+      onClick={handleCreateArticle}
       size="sm"
       variant="ghost"
       {...props}

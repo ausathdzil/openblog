@@ -56,7 +56,7 @@ interface HeaderFormSelection {
 }
 
 export function ArticleEditor({ article }: { article: ArticleResponse }) {
-  const router = useRouter();
+  const { back } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm({
@@ -106,7 +106,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       }
       form.reset();
     }
-    router.back();
+    back();
   };
 
   return (
@@ -193,6 +193,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   aria-label={field.name}
                   autoCapitalize="words"
                   autoCorrect="on"
+                  autoFocus
                   className="font-extrabold text-(--tw-prose-headings) text-4xl leading-[1.11111]"
                   errors={field.state.meta.errors}
                   isInvalid={isInvalid}

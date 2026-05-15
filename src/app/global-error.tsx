@@ -18,13 +18,12 @@ import {
 import { cn } from '@/lib/utils';
 import './globals.css';
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
+interface GlobalErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+export default function GlobalError({ error, reset }: GlobalErrorProps) {
   return (
     <html lang="en">
       <body

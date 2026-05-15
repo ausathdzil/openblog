@@ -1,7 +1,5 @@
 import {
-  createLoader,
   createSearchParamsCache,
-  createSerializer,
   type inferParserType,
   parseAsInteger,
   parseAsString,
@@ -31,6 +29,4 @@ export const searchParamsParser = {
 
 export type SearchParams = inferParserType<typeof searchParamsParser>;
 
-export const loadSearchParams = createLoader(searchParamsParser);
 export const searchParamsCache = createSearchParamsCache(searchParamsParser);
-export const serializeSearchParams = createSerializer(searchParamsParser);

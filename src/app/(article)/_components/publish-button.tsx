@@ -1,19 +1,19 @@
 'use client';
 
-import { type ComponentProps, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { updateArticle } from '../_lib/actions';
 
-type PublishButtonProps = {
-  isValid: boolean;
-  isTitleEmpty: boolean;
+interface PublishButtonProps extends React.ComponentProps<typeof Button> {
   isContentEmpty: boolean;
-  status: string | null;
-  publicId: string;
+  isTitleEmpty: boolean;
+  isValid: boolean;
   onPublished: () => void;
-} & ComponentProps<typeof Button>;
+  publicId: string;
+  status: string | null;
+}
 
 export function PublishButton({
   isValid,

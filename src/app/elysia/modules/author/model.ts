@@ -22,7 +22,7 @@ export const authorsQuery = t.Object({
 
 export type AuthorsQuery = typeof authorsQuery.static;
 
-export const paginationMetaResponse = t.Object({
+const paginationMetaResponse = t.Object({
   page: t.Number(),
   limit: t.Number(),
   total: t.Number(),
@@ -30,8 +30,6 @@ export const paginationMetaResponse = t.Object({
   hasNext: t.Boolean(),
   hasPrev: t.Boolean(),
 });
-
-export type PaginationMetaResponse = typeof paginationMetaResponse.static;
 
 export const authorsResponse = t.Object({
   data: t.Array(authorResponse),
@@ -41,5 +39,3 @@ export const authorsResponse = t.Object({
 export type AuthorsResponse = typeof authorsResponse.static;
 
 export const authorInvalid = t.Object({ message: t.String() });
-
-export type AuthorInvalid = typeof authorInvalid.static;

@@ -23,7 +23,7 @@ import {
 } from '@/lib/article-actions';
 
 export function EditorActions({ article }: { article: ArticleResponse }) {
-  const router = useRouter();
+  const { refresh, push } = useRouter();
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -41,7 +41,7 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
       }
       toast.success(res.message);
       setArchiveDialogOpen(false);
-      router.refresh();
+      refresh();
     });
   };
 
@@ -58,7 +58,7 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
       }
       toast.success(res.message);
       setDeleteDialogOpen(false);
-      router.push('/profile');
+      push('/profile');
     });
   };
 
@@ -74,7 +74,7 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
         return;
       }
       toast.success(res.message);
-      router.refresh();
+      refresh();
     });
   };
 

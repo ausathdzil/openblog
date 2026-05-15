@@ -93,8 +93,10 @@ async function Profile({ params }: Omit<UserPageProps, 'searchParams'>) {
 }
 
 async function UserResults({ params, searchParams }: UserPageProps) {
-  const { q, page, limit } = await searchParamsCache.parse(searchParams);
-  const { username } = await params;
+  const [{ q, page, limit }, { username }] = await Promise.all([
+    searchParamsCache.parse(searchParams),
+    params,
+  ]);
 
   return <Articles limit={limit} page={page} q={q} username={username} />;
 }
