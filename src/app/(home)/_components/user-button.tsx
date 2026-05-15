@@ -27,19 +27,15 @@ import { CreateArticleButton } from './create-article-button';
 import { SignOutButton } from './sign-out-button';
 import { UserModeToggle } from './user-mode-toggle';
 
-type NavItem<T extends string = string> = {
-  href: T;
-  label: string;
-  icon?: React.ReactNode;
-} & VariantProps<typeof buttonVariants>;
+interface UserButtonProps extends React.ComponentProps<'div'> {
+  session?: typeof auth.$Infer.Session | null;
+}
 
 export async function UserButton({
   className,
   session,
   ...props
-}: React.ComponentProps<'div'> & {
-  session?: typeof auth.$Infer.Session | null;
-}) {
+}: UserButtonProps) {
   let resolvedSession = session;
   if (session === undefined) {
     resolvedSession = await auth.api.getSession({
@@ -76,6 +72,13 @@ export async function UserButton({
       )}
     </div>
   );
+}
+
+interface NavItem<T extends string = string>
+  extends VariantProps<typeof buttonVariants> {
+  href: T;
+  icon?: React.ReactNode;
+  label: string;
 }
 
 const dropdownItems: NavItem<Route>[] = [

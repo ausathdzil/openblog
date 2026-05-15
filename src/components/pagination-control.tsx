@@ -15,11 +15,12 @@ import {
   PaginationPreviousButton,
 } from './ui/pagination';
 
-type PaginationControlProps = {
-  pathname: string;
+interface PaginationControlProps
+  extends React.ComponentProps<typeof Pagination> {
   currentPage: number;
+  pathname: string;
   totalPages: number;
-} & React.ComponentProps<typeof Pagination>;
+}
 
 export function PaginationControl({
   pathname,

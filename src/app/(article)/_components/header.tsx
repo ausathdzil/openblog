@@ -9,10 +9,10 @@ import { Large } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-type HeaderProps = {
-  title?: string;
+interface HeaderProps extends React.ComponentProps<'header'> {
   onBackClick?: () => void;
-} & React.ComponentProps<'header'>;
+  title?: string;
+}
 
 export function Header({
   title,

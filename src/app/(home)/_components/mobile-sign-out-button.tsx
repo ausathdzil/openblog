@@ -10,9 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
-type MobileSignOutButtonProps = React.ComponentProps<typeof Button> & {
+interface MobileSignOutButtonProps extends React.ComponentProps<typeof Button> {
   onSignedOut?: () => void;
-};
+}
 
 export function MobileSignOutButton({
   onSignedOut,
