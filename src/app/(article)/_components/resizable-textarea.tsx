@@ -30,14 +30,18 @@ export function ResizableTextarea({
     }
 
     el.value = value;
-    resize(el);
-  }, [value]);
-
-  const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.currentTarget.value);
-    const el = e.currentTarget;
     el.style.height = '0px';
     el.style.height = `${el.scrollHeight}px`;
+  }, [value]);
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const resize = (el: HTMLTextAreaElement) => {
+      el.style.height = '0px';
+      el.style.height = `${el.scrollHeight}px`;
+    };
+
+    onChange(e.currentTarget.value);
+    resize(e.currentTarget);
   };
 
   return (
@@ -47,7 +51,7 @@ export function ResizableTextarea({
           'w-full resize-none overflow-hidden focus:outline-none',
           className
         )}
-        onChange={handleResize}
+        onChange={handleValueChange}
         ref={textareaRef}
         rows={1}
         value={value}
@@ -56,9 +60,4 @@ export function ResizableTextarea({
       {isInvalid && <FieldError errors={errors} />}
     </div>
   );
-}
-
-function resize(el: HTMLTextAreaElement) {
-  el.style.height = '0px';
-  el.style.height = `${el.scrollHeight}px`;
 }
