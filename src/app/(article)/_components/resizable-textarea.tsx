@@ -1,21 +1,17 @@
 'use client';
 
-import {
-  type ChangeEvent,
-  type ComponentProps,
-  useEffect,
-  useRef,
-} from 'react';
+import { useEffect, useRef } from 'react';
 
 import { FieldError } from '@/components/ui/field';
 import { cn } from '@/lib/utils';
 
-type ResizableTextareaProps = {
+interface ResizableTextareaProps
+  extends Omit<React.ComponentProps<'textarea'>, 'onChange' | 'value'> {
   errors: Array<{ message?: string } | undefined>;
   isInvalid: boolean;
   onChange: (value: string) => void;
   value: string;
-} & Omit<ComponentProps<'textarea'>, 'onChange' | 'value'>;
+}
 
 export function ResizableTextarea({
   errors,
@@ -34,11 +30,10 @@ export function ResizableTextarea({
     }
 
     el.value = value;
-    el.style.height = '0px';
-    el.style.height = `${el.scrollHeight}px`;
+    resize(el);
   }, [value]);
 
-  const handleResize = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.currentTarget.value);
     const el = e.currentTarget;
     el.style.height = '0px';
@@ -61,4 +56,9 @@ export function ResizableTextarea({
       {isInvalid && <FieldError errors={errors} />}
     </div>
   );
+}
+
+function resize(el: HTMLTextAreaElement) {
+  el.style.height = '0px';
+  el.style.height = `${el.scrollHeight}px`;
 }
