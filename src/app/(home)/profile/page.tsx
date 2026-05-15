@@ -161,7 +161,7 @@ function ProfileSkeleton() {
         <Skeleton className="h-9 w-40" />
         <Skeleton className="h-7 w-36" />
       </div>
-      <Skeleton className="h-10 w-[117px] justify-self-center" />
+      <Skeleton className="h-10 w-29.25 justify-self-center" />
     </div>
   );
 }

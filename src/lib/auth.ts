@@ -12,7 +12,8 @@ import * as schema from '@/db/schema';
  * can't start or end with a dot,
  * and can't contain consecutive dots.
  */
-export const usernameRegex = /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/;
+export const usernameRegex =
+  /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/;
 
 export const auth = betterAuth({
   basePath: '/api',

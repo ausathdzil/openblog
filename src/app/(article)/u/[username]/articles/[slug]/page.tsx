@@ -1,4 +1,3 @@
-/* biome-ignore-all lint/security/noDangerouslySetInnerHtml: Sanitized HTML generated from trusted markdown pipeline. */
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Markdown, MarkdownManager } from '@tiptap/markdown';
 import StarterKit from '@tiptap/starter-kit';
@@ -111,6 +110,7 @@ async function Article({ params }: ArticleProps) {
   const renderedArticleBody = (
     <div
       className="[&_pre]:max-w-full [&_pre]:overflow-x-auto"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized HTML generated from trusted markdown pipeline.
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

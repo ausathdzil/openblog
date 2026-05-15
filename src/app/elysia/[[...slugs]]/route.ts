@@ -1,4 +1,4 @@
-import { fromTypes, openapi } from '@elysiajs/openapi';
+import { openapi } from '@elysiajs/openapi';
 import Elysia from 'elysia';
 
 import { article } from '../modules/article';
@@ -15,7 +15,6 @@ export const app = new Elysia({ prefix: '/elysia' })
           version: '1.0.0',
         },
       },
-      references: fromTypes('src/app/elysia/[[...slugs]]/route.ts'),
     })
   )
   .use(auth)

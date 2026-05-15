@@ -89,9 +89,9 @@ async function HeaderActions() {
 function HeaderActionsFallback() {
   return (
     <>
-      <Skeleton className="hidden h-8 w-[204px] rounded-full sm:block" />
+      <Skeleton className="hidden h-8 w-51 rounded-full sm:block" />
       <div className="flex items-center gap-2 sm:hidden">
-        <Skeleton className="h-11 w-[108px] rounded-full" />
+        <Skeleton className="h-11 w-27 rounded-full" />
         <Skeleton className="size-11 rounded-md" />
       </div>
     </>

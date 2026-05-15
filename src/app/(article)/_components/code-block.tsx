@@ -1,11 +1,10 @@
-/**
- * biome-ignore-all lint/suspicious/noExplicitAny: Tiptap example uses JS, NodeView props are complex to type
- * @see https://tiptap.dev/docs/examples/advanced/syntax-highlighting
- */
-
 'use client';
 
-import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
+import {
+  NodeViewContent,
+  NodeViewWrapper,
+  type ReactNodeViewProps,
+} from '@tiptap/react';
 
 import {
   NativeSelect,
@@ -18,7 +17,7 @@ export function CodeBlock({
   },
   updateAttributes,
   extension,
-}: any) {
+}: ReactNodeViewProps) {
   return (
     <NodeViewWrapper className="relative">
       <NativeSelect
@@ -30,7 +29,7 @@ export function CodeBlock({
         size="sm"
       >
         <NativeSelectOption value="null">Auto</NativeSelectOption>
-        {extension.options.lowlight.listLanguages().map((lang: any) => (
+        {extension.options.lowlight.listLanguages().map((lang: string) => (
           <NativeSelectOption key={lang} value={lang}>
             {lang}
           </NativeSelectOption>
