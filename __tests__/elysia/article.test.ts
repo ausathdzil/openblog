@@ -2,30 +2,26 @@ import {
   afterAll,
   afterEach,
   beforeAll,
-  beforeEach,
   describe,
   expect,
   test,
 } from 'bun:test';
+import type { TestHelpers } from 'better-auth/plugins';
 
 import { elysia } from '@/lib/eden';
-import {
-  cleanupTestArticle,
-  cleanupTestUser,
-  createTestArticle,
-  createTestUser,
-} from '../utils';
+import { createTestUser, getTestHelpers } from '../test-setup';
+import { cleanupTestArticle, setupTestArticle } from './articles.utils';
 
+let testHelpers: TestHelpers;
 let testUser: Awaited<ReturnType<typeof createTestUser>>;
 
 beforeAll(async () => {
-  testUser = await createTestUser();
+  testHelpers = await getTestHelpers();
+  testUser = await createTestUser(testHelpers);
 });
 
 afterAll(async () => {
-  if (testUser?.userId) {
-    await cleanupTestUser(testUser.userId);
-  }
+  await testHelpers.deleteUser(testUser.id);
 });
 
 describe('Article', () => {
@@ -50,6 +46,10 @@ describe('Article', () => {
     });
 
     test('return 201 and create an article', async () => {
+      const headers = await testHelpers.getAuthHeaders({
+        userId: testUser.id,
+      });
+
       const { data, status } = await elysia.articles.post(
         {
           title: 'Test article',
@@ -57,7 +57,7 @@ describe('Article', () => {
           coverImage: 'https://example.com',
           status: 'draft',
         },
-        { headers: testUser.headers }
+        { headers }
       );
 
       expect(status).toBe(201);
@@ -85,15 +85,7 @@ describe('Article', () => {
   });
 
   describe('Get article by publicId', () => {
-    let testArticle: Awaited<ReturnType<typeof createTestArticle>>;
-
-    beforeEach(async () => {
-      testArticle = await createTestArticle(testUser.headers);
-    });
-
-    afterEach(async () => {
-      await cleanupTestArticle(testArticle.publicId);
-    });
+    const ctx = setupTestArticle(() => testUser.id);
 
     test('return 404 if article not found', async () => {
       const { status } = await elysia
@@ -104,8 +96,10 @@ describe('Article', () => {
     });
 
     test('return 200 and the article', async () => {
+      const article = ctx.article;
+
       const { data, status } = await elysia
-        .articles({ publicId: testArticle.publicId })
+        .articles({ publicId: article.publicId })
         .get();
 
       expect(status).toBe(200);
@@ -114,27 +108,25 @@ describe('Article', () => {
   });
 
   describe('Update article', () => {
-    let testArticle: Awaited<ReturnType<typeof createTestArticle>>;
-
-    beforeEach(async () => {
-      testArticle = await createTestArticle(testUser.headers);
-    });
-
-    afterEach(async () => {
-      await cleanupTestArticle(testArticle.publicId);
-    });
+    const ctx = setupTestArticle(() => testUser.id);
 
     test('return 404 if article does not exist', async () => {
+      const headers = await testHelpers.getAuthHeaders({
+        userId: testUser.id,
+      });
+
       const { status } = await elysia
         .articles({ publicId: 'non-existent' })
-        .patch({ title: 'Test article' }, { headers: testUser.headers });
+        .patch({ title: 'Test article' }, { headers });
 
       expect(status).toBe(404);
     });
 
     test('return 401 if not authenticated', async () => {
+      const article = ctx.article;
+
       const { status } = await elysia
-        .articles({ publicId: testArticle.publicId })
+        .articles({ publicId: article.publicId })
         .patch({ title: 'Test article' });
 
       expect(status).toBe(401);
@@ -148,9 +140,15 @@ describe('Article', () => {
         status: 'draft' as 'draft' | 'published' | 'archived' | undefined,
       };
 
+      const article = ctx.article;
+
+      const headers = await testHelpers.getAuthHeaders({
+        userId: testUser.id,
+      });
+
       const { data, status } = await elysia
-        .articles({ publicId: testArticle.publicId })
-        .patch(body, { headers: testUser.headers });
+        .articles({ publicId: article.publicId })
+        .patch(body, { headers });
 
       expect(status).toBe(200);
       expect(data).toMatchObject(body);
@@ -158,41 +156,44 @@ describe('Article', () => {
   });
 
   describe('Delete article', () => {
-    let testArticle: Awaited<ReturnType<typeof createTestArticle>>;
-
-    beforeEach(async () => {
-      testArticle = await createTestArticle(testUser.headers);
-    });
-
-    afterEach(async () => {
-      await cleanupTestArticle(testArticle.publicId);
-    });
+    const ctx = setupTestArticle(() => testUser.id);
 
     test('return 404 if article does not exist', async () => {
+      const headers = await testHelpers.getAuthHeaders({
+        userId: testUser.id,
+      });
+
       const { status } = await elysia
         .articles({ publicId: 'non-existent' })
-        .delete({}, { headers: testUser.headers });
+        .delete({}, { headers });
 
       expect(status).toBe(404);
     });
 
     test('return 401 if not authenticated', async () => {
+      const article = ctx.article;
+
       const { status } = await elysia
-        .articles({ publicId: testArticle.publicId })
+        .articles({ publicId: article.publicId })
         .delete();
 
       expect(status).toBe(401);
     });
 
     test('return 200 and verify that the article is deleted', async () => {
+      const article = ctx.article;
+      const headers = await testHelpers.getAuthHeaders({
+        userId: testUser.id,
+      });
+
       const { status: deleteStatus } = await elysia
-        .articles({ publicId: testArticle.publicId })
-        .delete({}, { headers: testUser.headers });
+        .articles({ publicId: article.publicId })
+        .delete({}, { headers });
 
       expect(deleteStatus).toBe(200);
 
       const { data, status: getStatus } = await elysia
-        .articles({ publicId: testArticle.publicId })
+        .articles({ publicId: article.publicId })
         .get();
 
       expect(getStatus).toBe(404);

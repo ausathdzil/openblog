@@ -1,31 +1,20 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-} from 'bun:test';
+import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
+import type { TestHelpers } from 'better-auth/plugins';
 
 import { elysia } from '@/lib/eden';
-import {
-  cleanupTestArticle,
-  cleanupTestUser,
-  createTestArticle,
-  createTestUser,
-} from '../utils';
+import { createTestUser, getTestHelpers } from '../test-setup';
+import { setupTestArticle } from './articles.utils';
 
+let testHelpers: TestHelpers;
 let testUser: Awaited<ReturnType<typeof createTestUser>>;
 
 beforeAll(async () => {
-  testUser = await createTestUser();
+  testHelpers = await getTestHelpers();
+  testUser = await createTestUser(testHelpers);
 });
 
 afterAll(async () => {
-  if (testUser?.userId) {
-    await cleanupTestUser(testUser.userId);
-  }
+  await testHelpers.deleteUser(testUser.id);
 });
 
 describe('Author', () => {
@@ -50,7 +39,7 @@ describe('Author', () => {
 
     test('return 200 and the author', async () => {
       const { data, status } = await elysia
-        .authors({ username: testUser.data.username })
+        .authors({ username: testUser.username })
         .get();
 
       expect(status).toBe(200);
@@ -59,15 +48,7 @@ describe('Author', () => {
   });
 
   describe('Get author articles', () => {
-    let testArticle: Awaited<ReturnType<typeof createTestArticle>>;
-
-    beforeEach(async () => {
-      testArticle = await createTestArticle(testUser.headers);
-    });
-
-    afterEach(async () => {
-      await cleanupTestArticle(testArticle.publicId);
-    });
+    setupTestArticle(() => testUser.id);
 
     test('return 404 if author not found', async () => {
       const { status } = await elysia
@@ -79,7 +60,7 @@ describe('Author', () => {
 
     test('return 200 and an array of articles', async () => {
       const { data: articles, status } = await elysia
-        .authors({ username: testUser.data.username })
+        .authors({ username: testUser.username })
         .articles.get();
 
       expect(status).toBe(200);
@@ -97,19 +78,11 @@ describe('Author', () => {
   });
 
   describe('Get author article by slug', () => {
-    let testArticle: Awaited<ReturnType<typeof createTestArticle>>;
-
-    beforeEach(async () => {
-      testArticle = await createTestArticle(testUser.headers);
-    });
-
-    afterEach(async () => {
-      await cleanupTestArticle(testArticle.publicId);
-    });
+    const ctx = setupTestArticle(() => testUser.id);
 
     test('return 404 if article not found', async () => {
       const { status } = await elysia
-        .authors({ username: testUser.data.username })
+        .authors({ username: testUser.username })
         .articles({ slug: 'non-existent' })
         .get();
 
@@ -117,9 +90,11 @@ describe('Author', () => {
     });
 
     test('return 200 and the article', async () => {
+      const article = ctx.article;
+
       const { data, status } = await elysia
-        .authors({ username: testUser.data.username })
-        .articles({ slug: testArticle.slug ?? '' })
+        .authors({ username: testUser.username })
+        .articles({ slug: article.slug ?? '' })
         .get();
 
       expect(status).toBe(200);
