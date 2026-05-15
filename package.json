@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "bun run --bun next dev",
+    "build": "bun run --bun next build",
     "start": "next start",
     "analyze": "next experimental-analyze",
     "check": "ultracite check",
@@ -68,6 +68,7 @@
     "typescript": "^6.0.3",
     "ultracite": "7.7.0"
   },
+  "packageManager": "bun@1.3.14",
   "ignoreScripts": [
     "sharp",
     "unrs-resolver"
