@@ -31,8 +31,6 @@ export const paginationMetaResponse = t.Object({
   hasPrev: t.Boolean(),
 });
 
-export type PaginationMetaResponse = typeof paginationMetaResponse.static;
-
 export const authorsResponse = t.Object({
   data: t.Array(authorResponse),
   pagination: paginationMetaResponse,
