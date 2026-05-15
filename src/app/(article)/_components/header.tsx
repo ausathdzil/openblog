@@ -22,13 +22,13 @@ export function Header({
   ...props
 }: HeaderProps) {
   const [showTitle, setShowTitle] = useState(false);
-  const router = useRouter();
+  const { back } = useRouter();
 
   const handleBack = () => {
     if (onBackClick) {
       onBackClick();
     } else {
-      router.back();
+      back();
     }
   };
 

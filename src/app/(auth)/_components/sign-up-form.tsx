@@ -86,7 +86,7 @@ export function SignUpForm({
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const router = useRouter();
+  const { push } = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -105,7 +105,7 @@ export function SignUpForm({
         },
         onSuccess: () => {
           setLoading(false);
-          router.push('/profile');
+          push('/profile');
         },
         onError: () => {
           setLoading(false);

@@ -36,7 +36,7 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [serverNameError, setServerNameError] = useState<string | null>(null);
-  const router = useRouter();
+  const { refresh } = useRouter();
   const nameDescriptionId = useId();
   const nameErrorId = useId();
 
@@ -68,7 +68,7 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
           },
           onSuccess: () => {
             toast.success('Name updated.');
-            router.refresh();
+            refresh();
           },
         }
       );

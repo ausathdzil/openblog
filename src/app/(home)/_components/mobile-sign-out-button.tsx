@@ -19,7 +19,7 @@ export function MobileSignOutButton({
   ...props
 }: MobileSignOutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const { push } = useRouter();
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -32,7 +32,7 @@ export function MobileSignOutButton({
         },
         onSuccess: () => {
           onSignedOut?.();
-          router.push('/sign-in');
+          push('/sign-in');
         },
         onError: (ctx) => {
           toast.error(ctx.error.message || 'An unexpected error occurred');

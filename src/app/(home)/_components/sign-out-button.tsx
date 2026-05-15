@@ -14,7 +14,7 @@ export function SignOutButton(
   props: React.ComponentProps<typeof DropdownMenuItem>
 ) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const { push } = useRouter();
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -26,7 +26,7 @@ export function SignOutButton(
           setLoading(false);
         },
         onSuccess: () => {
-          router.push('/sign-in');
+          push('/sign-in');
         },
         onError: (ctx) => {
           toast.error(ctx.error.message || 'An unexpected error occurred');

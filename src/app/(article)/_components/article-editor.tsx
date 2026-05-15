@@ -56,7 +56,7 @@ interface HeaderFormSelection {
 }
 
 export function ArticleEditor({ article }: { article: ArticleResponse }) {
-  const router = useRouter();
+  const { back } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm({
@@ -106,7 +106,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       }
       form.reset();
     }
-    router.back();
+    back();
   };
 
   return (
