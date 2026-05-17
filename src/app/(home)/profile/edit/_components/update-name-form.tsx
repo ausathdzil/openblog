@@ -56,6 +56,7 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
           },
           onSuccess: () => {
             setLoading(false);
+            setServerNameError(null);
             toast.success('Name updated.');
             refresh();
           },

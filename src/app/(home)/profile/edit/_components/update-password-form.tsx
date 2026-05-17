@@ -47,7 +47,7 @@ const updatePasswordSchema = z.object({
         'New password must include at least one special character.'
       )
     ),
-  revokeOtherSessions: z.optional(z.boolean()),
+  revokeOtherSessions: z.boolean(),
 });
 
 const CURRENT_PASSWORD_ERROR_PATTERN =
@@ -66,44 +66,40 @@ export function UpdatePasswordForm() {
     defaultValues: {
       currentPassword: '',
       newPassword: '',
+      revokeOtherSessions: false,
     },
     validators: {
       onSubmit: updatePasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      await authClient.changePassword(
-        { ...value, revokeOtherSessions: false },
-        {
-          onRequest: () => {
-            setLoading(true);
-            setFormError(null);
-            setServerCurrentPasswordError(null);
-          },
-          onSuccess: () => {
-            setLoading(false);
-            toast.success('Password updated.');
-            setShowCurrentPassword(false);
-            setShowNewPassword(false);
-            setFormError(null);
-            setServerCurrentPasswordError(null);
-            form.reset();
-          },
-          onError: (ctx) => {
-            setLoading(false);
+      await authClient.changePassword(value, {
+        onRequest: () => {
+          setLoading(true);
+          setFormError(null);
+          setServerCurrentPasswordError(null);
+        },
+        onSuccess: () => {
+          setLoading(false);
+          setFormError(null);
+          setServerCurrentPasswordError(null);
+          toast.success('Password updated.');
+          form.reset();
+        },
+        onError: (ctx) => {
+          setLoading(false);
 
-            const message =
-              ctx.error.message ||
-              'Unable to update your password, please try again.';
+          const message =
+            ctx.error.message ||
+            'Unable to update your password, please try again.';
 
-            if (CURRENT_PASSWORD_ERROR_PATTERN.test(message)) {
-              setServerCurrentPasswordError(message);
-              return;
-            }
+          if (CURRENT_PASSWORD_ERROR_PATTERN.test(message)) {
+            setServerCurrentPasswordError(message);
+            return;
+          }
 
-            setFormError(message);
-          },
-        }
-      );
+          setFormError(message);
+        },
+      });
     },
     onSubmitInvalid() {
       const $invalidInput = document.querySelector('[aria-invalid="true"]');

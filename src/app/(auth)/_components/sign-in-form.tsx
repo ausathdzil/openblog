@@ -69,22 +69,20 @@ export function SignInForm({
       onSubmit: signInFormSchema,
     },
     onSubmit: async ({ value }) => {
-      const { error } = await authClient.signIn.username(value, {
+      await authClient.signIn.username(value, {
         onRequest: () => {
           setLoading(true);
         },
         onSuccess: () => {
           setLoading(false);
+          setFormError(null);
           push('/profile');
         },
-        onError: () => {
+        onError: (ctx) => {
           setLoading(false);
+          setFormError(ctx.error.message || 'An unexpected error occurred');
         },
       });
-
-      if (error) {
-        setFormError(error.message || 'An unexpected error occurred');
-      }
     },
     onSubmitInvalid() {
       const $invalidInput = document.querySelector('[aria-invalid="true"]');
