@@ -172,7 +172,6 @@ export function SignUpForm({
           children={(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
-
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Username</FieldLabel>
@@ -323,7 +322,7 @@ export function SignUpForm({
           }}
           name="password"
           validators={{
-            onBlur: signUpFormSchema.shape.password,
+            onChange: signUpFormSchema.shape.password,
           }}
         />
         <Field>

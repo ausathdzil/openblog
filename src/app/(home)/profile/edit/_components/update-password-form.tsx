@@ -15,7 +15,6 @@ import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -211,7 +210,7 @@ export function UpdatePasswordForm() {
           }}
           name="currentPassword"
           validators={{
-            onBlur: updatePasswordSchema.shape.currentPassword,
+            onChange: updatePasswordSchema.shape.currentPassword,
           }}
         />
         <form.Field
@@ -270,10 +269,6 @@ export function UpdatePasswordForm() {
                     </InputGroupButton>
                   </InputGroupAddon>
                 </InputGroup>
-                <FieldDescription id={newPasswordDescriptionId}>
-                  Use 8-128 characters with at least one letter, one number, and
-                  one special character.
-                </FieldDescription>
                 {isInvalid && (
                   <FieldError
                     errors={field.state.meta.errors}
@@ -285,7 +280,7 @@ export function UpdatePasswordForm() {
           }}
           name="newPassword"
           validators={{
-            onBlur: updatePasswordSchema.shape.newPassword,
+            onChange: updatePasswordSchema.shape.newPassword,
           }}
         />
         {formError ? (
