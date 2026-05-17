@@ -87,7 +87,12 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
     >
       <FieldGroup>
         <form.Field
-          children={(field) => {
+          name="name"
+          validators={{
+            onBlur: updateNameSchema.shape.name,
+          }}
+        >
+          {(field) => {
             const hasClientError =
               field.state.meta.isTouched && !field.state.meta.isValid;
             const isInvalid = hasClientError || Boolean(serverNameError);
@@ -126,11 +131,7 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
               </Field>
             );
           }}
-          name="name"
-          validators={{
-            onBlur: updateNameSchema.shape.name,
-          }}
-        />
+        </form.Field>
         <Field>
           <Button disabled={loading} type="submit">
             {loading && <Spinner />}

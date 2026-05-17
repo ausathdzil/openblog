@@ -136,7 +136,12 @@ export function SignUpForm({
     >
       <FieldGroup>
         <form.Field
-          children={(field) => {
+          name="name"
+          validators={{
+            onBlur: signUpFormSchema.shape.name,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -162,49 +167,9 @@ export function SignUpForm({
               </Field>
             );
           }}
-          name="name"
-          validators={{
-            onBlur: signUpFormSchema.shape.name,
-          }}
-        />
+        </form.Field>
         <form.Field
           asyncDebounceMs={300}
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                <InputGroup>
-                  <InputGroupAddon>
-                    {isCheckingUsername ? (
-                      <Spinner />
-                    ) : (
-                      <HugeiconsIcon icon={AtIcon} strokeWidth={2} />
-                    )}
-                  </InputGroupAddon>
-                  <InputGroupInput
-                    aria-invalid={isInvalid}
-                    autoCapitalize="off"
-                    autoComplete="username"
-                    autoCorrect="off"
-                    id={field.name}
-                    maxLength={30}
-                    minLength={3}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="alice"
-                    required
-                    spellCheck="false"
-                    type="text"
-                    value={field.state.value}
-                  />
-                </InputGroup>
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
           name="username"
           validators={{
             onBlur: signUpFormSchema.shape.username,
@@ -244,9 +209,51 @@ export function SignUpForm({
               return;
             },
           }}
-        />
+        >
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Username</FieldLabel>
+                <InputGroup>
+                  <InputGroupAddon>
+                    {isCheckingUsername ? (
+                      <Spinner />
+                    ) : (
+                      <HugeiconsIcon icon={AtIcon} strokeWidth={2} />
+                    )}
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    aria-invalid={isInvalid}
+                    autoCapitalize="off"
+                    autoComplete="username"
+                    autoCorrect="off"
+                    id={field.name}
+                    maxLength={30}
+                    minLength={3}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="alice"
+                    required
+                    spellCheck="false"
+                    type="text"
+                    value={field.state.value}
+                  />
+                </InputGroup>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
         <form.Field
-          children={(field) => {
+          name="email"
+          validators={{
+            onBlur: signUpFormSchema.shape.email,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -269,13 +276,14 @@ export function SignUpForm({
               </Field>
             );
           }}
-          name="email"
-          validators={{
-            onBlur: signUpFormSchema.shape.email,
-          }}
-        />
+        </form.Field>
         <form.Field
-          children={(field) => {
+          name="password"
+          validators={{
+            onChange: signUpFormSchema.shape.password,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -320,11 +328,7 @@ export function SignUpForm({
               </Field>
             );
           }}
-          name="password"
-          validators={{
-            onChange: signUpFormSchema.shape.password,
-          }}
-        />
+        </form.Field>
         <Field>
           <Button disabled={loading} type="submit">
             {loading && <Spinner />}

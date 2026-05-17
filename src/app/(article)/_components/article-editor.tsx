@@ -99,7 +99,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
 
   const handleBack = () => {
     if (form.state.isDirty) {
-      // biome-ignore lint/suspicious/noAlert: native confirm for unsaved-changes (AGENTS.md)
+      // biome-ignore lint/suspicious/noAlert: native confirm for unsaved-changes
       const leave = window.confirm('You have unsaved changes. Leave anyway?');
       if (!leave) {
         return;
@@ -184,10 +184,14 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
           }}
         >
           <form.Field
-            children={(field) => {
+            name="title"
+            validators={{
+              onChange: articleSchema.shape.title,
+            }}
+          >
+            {(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
-
               return (
                 <ResizableTextarea
                   aria-label={field.name}
@@ -207,16 +211,16 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                 />
               );
             }}
-            name="title"
-            validators={{
-              onChange: articleSchema.shape.title,
-            }}
-          />
+          </form.Field>
           <form.Field
-            children={(field) => {
+            name="excerpt"
+            validators={{
+              onChange: articleSchema.shape.excerpt,
+            }}
+          >
+            {(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
-
               return (
                 <ResizableTextarea
                   aria-label={field.name}
@@ -235,21 +239,16 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                 />
               );
             }}
-            name="excerpt"
-            validators={{
-              onChange: articleSchema.shape.excerpt,
-            }}
-          />
-          <form.Field
-            children={(field) => (
+          </form.Field>
+          <form.Field name="content">
+            {(field) => (
               <ContentEditor
                 onBlur={field.handleBlur}
                 onChange={field.handleChange}
                 value={field.state.value}
               />
             )}
-            name="content"
-          />
+          </form.Field>
         </form>
       </main>
     </>

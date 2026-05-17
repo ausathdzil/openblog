@@ -123,7 +123,12 @@ export function UpdatePasswordForm() {
     >
       <FieldGroup>
         <form.Field
-          children={(field) => {
+          name="currentPassword"
+          validators={{
+            onChange: updatePasswordSchema.shape.currentPassword,
+          }}
+        >
+          {(field) => {
             const hasClientError =
               field.state.meta.isTouched && !field.state.meta.isValid;
             const isInvalid =
@@ -190,13 +195,14 @@ export function UpdatePasswordForm() {
               </Field>
             );
           }}
-          name="currentPassword"
-          validators={{
-            onChange: updatePasswordSchema.shape.currentPassword,
-          }}
-        />
+        </form.Field>
         <form.Field
-          children={(field) => {
+          name="newPassword"
+          validators={{
+            onChange: updatePasswordSchema.shape.newPassword,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -252,11 +258,7 @@ export function UpdatePasswordForm() {
               </Field>
             );
           }}
-          name="newPassword"
-          validators={{
-            onChange: updatePasswordSchema.shape.newPassword,
-          }}
-        />
+        </form.Field>
         {formError ? (
           <Alert variant="destructive">
             <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />

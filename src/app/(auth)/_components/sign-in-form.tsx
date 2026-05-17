@@ -106,7 +106,12 @@ export function SignInForm({
     >
       <FieldGroup>
         <form.Field
-          children={(field) => {
+          name="username"
+          validators={{
+            onBlur: signInFormSchema.shape.username,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -137,13 +142,14 @@ export function SignInForm({
               </Field>
             );
           }}
-          name="username"
-          validators={{
-            onBlur: signInFormSchema.shape.username,
-          }}
-        />
+        </form.Field>
         <form.Field
-          children={(field) => {
+          name="password"
+          validators={{
+            onBlur: signInFormSchema.shape.password,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -189,13 +195,14 @@ export function SignInForm({
               </Field>
             );
           }}
-          name="password"
-          validators={{
-            onBlur: signInFormSchema.shape.password,
-          }}
-        />
+        </form.Field>
         <form.Field
-          children={(field) => {
+          name="rememberMe"
+          validators={{
+            onBlur: signInFormSchema.shape.rememberMe,
+          }}
+        >
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -216,11 +223,7 @@ export function SignInForm({
               </Field>
             );
           }}
-          name="rememberMe"
-          validators={{
-            onBlur: signInFormSchema.shape.rememberMe,
-          }}
-        />
+        </form.Field>
         <Field>
           <Button disabled={loading} type="submit">
             {loading && <Spinner />}
