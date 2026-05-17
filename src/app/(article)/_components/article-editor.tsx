@@ -109,6 +109,12 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
     back();
   };
 
+  const handlePreventEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <>
       <form.Subscribe<boolean> selector={(state) => state.isDirty}>
@@ -205,6 +211,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  onKeyDown={handlePreventEnter}
                   placeholder="Title"
                   spellCheck
                   value={field.state.value}
@@ -233,6 +240,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  onKeyDown={handlePreventEnter}
                   placeholder="Excerpt"
                   spellCheck
                   value={field.state.value}

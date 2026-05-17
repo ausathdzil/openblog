@@ -39,7 +39,7 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
         },
       }),
       Placeholder.configure({
-        placeholder: ({ node, editor }) => {
+        placeholder: ({ node }) => {
           if (node.type.name === 'heading') {
             return `Heading ${node.attrs.level}`;
           }
@@ -55,7 +55,7 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
             return 'List';
           }
 
-          return editor.isFocused ? 'Start writing…' : '';
+          return 'Start writing…';
         },
       }),
     ],
