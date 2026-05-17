@@ -57,6 +57,9 @@ export function ResizableTextarea({
 }
 
 function resize(el: HTMLTextAreaElement) {
-  el.style.height = '0px';
-  el.style.height = `${el.scrollHeight}px`;
+  const nextHeight = `${el.scrollHeight}px`;
+  el.style.cssText = `
+    height: 0px; 
+    height: ${nextHeight};
+  `;
 }

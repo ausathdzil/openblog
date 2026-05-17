@@ -1,4 +1,4 @@
-import type { Route } from 'next';
+import type { Metadata, Route } from 'next';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -13,6 +13,10 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getArticles } from './_lib/data';
+
+export const metadata: Metadata = {
+  title: 'Home',
+};
 
 export default function Home() {
   return (

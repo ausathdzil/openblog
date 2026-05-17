@@ -1,5 +1,5 @@
 /** Elysia Drizzle spread helpers (+ `update`). Lint exceptions: `biome.json` `overrides` for this file.
- * @lastModified 2026-05-03
+ * @lastModified 2026-05-17
  * @see https://elysiajs.com/integrations/drizzle.html#utility
  */
 
@@ -33,7 +33,7 @@ type Spread<
 /**
  * Spread a Drizzle schema into a plain object
  */
-export const spread = <
+const spread = <
   T extends TObject | Table,
   Mode extends 'select' | 'insert' | 'update' | undefined,
 >(

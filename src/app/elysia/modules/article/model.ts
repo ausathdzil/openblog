@@ -41,7 +41,7 @@ export const articleResponse = t.Object({
 
 export type ArticleResponse = typeof articleResponse.static;
 
-export const articleListResponse = t.Object({
+const articleListResponse = t.Object({
   publicId: articles.publicId,
   title: articles.title,
   slug: articles.slug,
