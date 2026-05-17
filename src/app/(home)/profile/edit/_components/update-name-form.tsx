@@ -2,7 +2,7 @@
 
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
-import { useId, useRef, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -33,12 +33,9 @@ interface UpdateNameFormProps {
 }
 
 export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
-  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [serverNameError, setServerNameError] = useState<string | null>(null);
   const { refresh } = useRouter();
-  const nameDescriptionId = useId();
-  const nameErrorId = useId();
 
   const form = useForm({
     defaultValues: {
@@ -57,26 +54,23 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
             setLoading(true);
             setServerNameError(null);
           },
-          onResponse: () => {
+          onSuccess: () => {
             setLoading(false);
+            toast.success('Name updated.');
+            refresh();
           },
           onError: (ctx) => {
+            setLoading(false);
             setServerNameError(
               ctx.error.message ||
                 'Unable to update your name, please try again.'
             );
           },
-          onSuccess: () => {
-            toast.success('Name updated.');
-            refresh();
-          },
         }
       );
     },
     onSubmitInvalid() {
-      const $invalidInput = formRef.current?.querySelector(
-        '[aria-invalid="true"]'
-      );
+      const $invalidInput = document.querySelector('[aria-invalid="true"]');
 
       if ($invalidInput instanceof HTMLElement) {
         $invalidInput.focus();
@@ -86,12 +80,10 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
 
   return (
     <form
-      noValidate
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
       }}
-      ref={formRef}
     >
       <FieldGroup>
         <form.Field
@@ -104,7 +96,6 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Name</FieldLabel>
                 <Input
-                  aria-describedby={`${nameDescriptionId}${isInvalid ? ` ${nameErrorId}` : ''}`}
                   aria-invalid={isInvalid}
                   autoComplete="name"
                   autoCorrect="off"
@@ -123,16 +114,14 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
                   type="text"
                   value={field.state.value}
                 />
-                <FieldDescription id={nameDescriptionId}>
+                <FieldDescription>
                   Enter the name displayed on your profile.
                 </FieldDescription>
                 {hasClientError ? (
-                  <FieldError
-                    errors={field.state.meta.errors}
-                    id={nameErrorId}
-                  />
-                ) : serverNameError ? (
-                  <FieldError id={nameErrorId}>{serverNameError}</FieldError>
+                  <FieldError errors={field.state.meta.errors} />
+                ) : null}
+                {serverNameError ? (
+                  <FieldError>{serverNameError}</FieldError>
                 ) : null}
               </Field>
             );

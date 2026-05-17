@@ -7,7 +7,7 @@ import {
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { useId, useRef, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -47,13 +47,13 @@ const updatePasswordSchema = z.object({
         'New password must include at least one special character.'
       )
     ),
+  revokeOtherSessions: z.optional(z.boolean()),
 });
 
 const CURRENT_PASSWORD_ERROR_PATTERN =
   /current password|invalid password|incorrect password/i;
 
 export function UpdatePasswordForm() {
-  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -61,9 +61,6 @@ export function UpdatePasswordForm() {
   const [serverCurrentPasswordError, setServerCurrentPasswordError] = useState<
     string | null
   >(null);
-  const newPasswordDescriptionId = useId();
-  const currentPasswordErrorId = useId();
-  const newPasswordErrorId = useId();
 
   const form = useForm({
     defaultValues: {
@@ -75,21 +72,25 @@ export function UpdatePasswordForm() {
     },
     onSubmit: async ({ value }) => {
       await authClient.changePassword(
-        {
-          currentPassword: value.currentPassword,
-          newPassword: value.newPassword,
-          revokeOtherSessions: false,
-        },
+        { ...value, revokeOtherSessions: false },
         {
           onRequest: () => {
             setLoading(true);
             setFormError(null);
             setServerCurrentPasswordError(null);
           },
-          onResponse: () => {
+          onSuccess: () => {
             setLoading(false);
+            toast.success('Password updated.');
+            setShowCurrentPassword(false);
+            setShowNewPassword(false);
+            setFormError(null);
+            setServerCurrentPasswordError(null);
+            form.reset();
           },
           onError: (ctx) => {
+            setLoading(false);
+
             const message =
               ctx.error.message ||
               'Unable to update your password, please try again.';
@@ -101,21 +102,11 @@ export function UpdatePasswordForm() {
 
             setFormError(message);
           },
-          onSuccess: () => {
-            toast.success('Password updated.');
-            setShowCurrentPassword(false);
-            setShowNewPassword(false);
-            setFormError(null);
-            setServerCurrentPasswordError(null);
-            form.reset();
-          },
         }
       );
     },
     onSubmitInvalid() {
-      const $invalidInput = formRef.current?.querySelector(
-        '[aria-invalid="true"]'
-      );
+      const $invalidInput = document.querySelector('[aria-invalid="true"]');
 
       if ($invalidInput instanceof HTMLElement) {
         $invalidInput.focus();
@@ -125,12 +116,10 @@ export function UpdatePasswordForm() {
 
   return (
     <form
-      noValidate
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
       }}
-      ref={formRef}
     >
       <FieldGroup>
         <form.Field
@@ -145,9 +134,6 @@ export function UpdatePasswordForm() {
                 <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
                 <InputGroup aria-invalid={isInvalid}>
                   <InputGroupInput
-                    aria-describedby={
-                      isInvalid ? currentPasswordErrorId : undefined
-                    }
                     aria-invalid={isInvalid}
                     autoComplete="current-password"
                     id={field.name}
@@ -196,14 +182,10 @@ export function UpdatePasswordForm() {
                   </InputGroupAddon>
                 </InputGroup>
                 {hasClientError ? (
-                  <FieldError
-                    errors={field.state.meta.errors}
-                    id={currentPasswordErrorId}
-                  />
-                ) : serverCurrentPasswordError ? (
-                  <FieldError id={currentPasswordErrorId}>
-                    {serverCurrentPasswordError}
-                  </FieldError>
+                  <FieldError errors={field.state.meta.errors} />
+                ) : null}
+                {serverCurrentPasswordError ? (
+                  <FieldError>{serverCurrentPasswordError}</FieldError>
                 ) : null}
               </Field>
             );
@@ -217,14 +199,11 @@ export function UpdatePasswordForm() {
           children={(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
-            const describedBy = `${newPasswordDescriptionId}${isInvalid ? ` ${newPasswordErrorId}` : ''}`;
-
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
                 <InputGroup aria-invalid={isInvalid}>
                   <InputGroupInput
-                    aria-describedby={describedBy}
                     aria-invalid={isInvalid}
                     autoComplete="new-password"
                     id={field.name}
@@ -269,12 +248,7 @@ export function UpdatePasswordForm() {
                     </InputGroupButton>
                   </InputGroupAddon>
                 </InputGroup>
-                {isInvalid && (
-                  <FieldError
-                    errors={field.state.meta.errors}
-                    id={newPasswordErrorId}
-                  />
-                )}
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
