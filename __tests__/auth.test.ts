@@ -2,6 +2,7 @@
  * Duplicated from `src/lib/auth.ts` with `testUtils()` for integration tests only.
  * @see https://better-auth.com/docs/plugins/test-utils
  */
+import { describe, expect, test } from 'bun:test';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
 import { testUtils, username } from 'better-auth/plugins';
@@ -25,4 +26,17 @@ export const auth = betterAuth({
     }),
     testUtils(),
   ],
+});
+
+describe('Auth', () => {
+  test('exposes test utils', async () => {
+    const ctx = await auth.$context;
+
+    expect(ctx.test).toBeDefined();
+  });
+
+  test('validates usernames with configured regex', () => {
+    expect(usernameRegex.test('valid_name')).toBe(true);
+    expect(usernameRegex.test('.invalid')).toBe(false);
+  });
 });
