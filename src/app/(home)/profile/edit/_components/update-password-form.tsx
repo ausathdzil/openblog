@@ -1,16 +1,13 @@
 'use client';
 
-import {
-  AlertCircleIcon,
-  ViewIcon,
-  ViewOffSlashIcon,
-} from '@hugeicons/core-free-icons';
+import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
+import { PasswordToggle } from '@/components/password-toggle';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +19,6 @@ import {
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
@@ -54,7 +50,7 @@ const CURRENT_PASSWORD_ERROR_PATTERN =
   /current password|invalid password|incorrect password/i;
 
 export function UpdatePasswordForm() {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -71,34 +67,28 @@ export function UpdatePasswordForm() {
     validators: {
       onSubmit: updatePasswordSchema,
     },
-    onSubmit: async ({ value }) => {
-      await authClient.changePassword(value, {
-        onRequest: () => {
-          setLoading(true);
-          setFormError(null);
-          setServerCurrentPasswordError(null);
-        },
-        onSuccess: () => {
-          setLoading(false);
-          setFormError(null);
-          setServerCurrentPasswordError(null);
-          toast.success('Password updated.');
-          form.reset();
-        },
-        onError: (ctx) => {
-          setLoading(false);
+    onSubmit: ({ value }) => {
+      setFormError(null);
+      setServerCurrentPasswordError(null);
+      startTransition(async () => {
+        await authClient.changePassword(value, {
+          onSuccess: () => {
+            toast.success('Password updated.');
+            form.reset();
+          },
+          onError: (ctx) => {
+            const message =
+              ctx.error.message ||
+              'Unable to update your password, please try again.';
 
-          const message =
-            ctx.error.message ||
-            'Unable to update your password, please try again.';
+            if (CURRENT_PASSWORD_ERROR_PATTERN.test(message)) {
+              setServerCurrentPasswordError(message);
+              return;
+            }
 
-          if (CURRENT_PASSWORD_ERROR_PATTERN.test(message)) {
-            setServerCurrentPasswordError(message);
-            return;
-          }
-
-          setFormError(message);
-        },
+            setFormError(message);
+          },
+        });
       });
     },
     onSubmitInvalid() {
@@ -142,45 +132,16 @@ export function UpdatePasswordForm() {
                     minLength={1}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      setServerCurrentPasswordError(null);
-                      setFormError(null);
-                      field.handleChange(e.target.value);
-                    }}
+                    onChange={(e) => field.handleChange(e.target.value)}
                     required
                     spellCheck="false"
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={field.state.value}
                   />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      aria-label={
-                        showCurrentPassword
-                          ? 'Hide current password'
-                          : 'Show current password'
-                      }
-                      onClick={() =>
-                        setShowCurrentPassword(!showCurrentPassword)
-                      }
-                      size="icon-xs"
-                      title={
-                        showCurrentPassword
-                          ? 'Hide current password'
-                          : 'Show current password'
-                      }
-                      type="button"
-                      variant="ghost"
-                    >
-                      {showCurrentPassword ? (
-                        <HugeiconsIcon
-                          icon={ViewOffSlashIcon}
-                          strokeWidth={2}
-                        />
-                      ) : (
-                        <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
+                  <PasswordToggle
+                    isVisible={showCurrentPassword}
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  />
                 </InputGroup>
                 {hasClientError ? (
                   <FieldError errors={field.state.meta.errors} />
@@ -213,41 +174,17 @@ export function UpdatePasswordForm() {
                     minLength={8}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      setFormError(null);
-                      field.handleChange(e.target.value);
-                    }}
+                    onChange={(e) => field.handleChange(e.target.value)}
                     required
                     spellCheck="false"
                     type={showNewPassword ? 'text' : 'password'}
                     value={field.state.value}
                   />
                   <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      aria-label={
-                        showNewPassword
-                          ? 'Hide new password'
-                          : 'Show new password'
-                      }
+                    <PasswordToggle
+                      isVisible={showNewPassword}
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      size="icon-xs"
-                      title={
-                        showNewPassword
-                          ? 'Hide new password'
-                          : 'Show new password'
-                      }
-                      type="button"
-                      variant="ghost"
-                    >
-                      {showNewPassword ? (
-                        <HugeiconsIcon
-                          icon={ViewOffSlashIcon}
-                          strokeWidth={2}
-                        />
-                      ) : (
-                        <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
-                      )}
-                    </InputGroupButton>
+                    />
                   </InputGroupAddon>
                 </InputGroup>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -262,8 +199,8 @@ export function UpdatePasswordForm() {
           </Alert>
         ) : null}
         <Field>
-          <Button disabled={loading} type="submit">
-            {loading && <Spinner />}
+          <Button disabled={isPending} type="submit">
+            {isPending && <Spinner />}
             Update Password
           </Button>
         </Field>

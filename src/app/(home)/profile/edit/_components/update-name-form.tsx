@@ -2,7 +2,7 @@
 
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -33,7 +33,7 @@ interface UpdateNameFormProps {
 }
 
 export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [serverNameError, setServerNameError] = useState<string | null>(null);
   const { refresh } = useRouter();
 
@@ -44,31 +44,25 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
     validators: {
       onSubmit: updateNameSchema,
     },
-    onSubmit: async ({ value }) => {
-      await authClient.updateUser(
-        {
-          name: value.name.trim(),
-        },
-        {
+    onSubmit: ({ value }) => {
+      setServerNameError(null);
+      startTransition(async () => {
+        await authClient.updateUser(value, {
           onRequest: () => {
-            setLoading(true);
             setServerNameError(null);
           },
           onSuccess: () => {
-            setLoading(false);
-            setServerNameError(null);
             toast.success('Name updated.');
             refresh();
           },
           onError: (ctx) => {
-            setLoading(false);
             setServerNameError(
               ctx.error.message ||
                 'Unable to update your name, please try again.'
             );
           },
-        }
-      );
+        });
+      });
     },
     onSubmitInvalid() {
       const $invalidInput = document.querySelector('[aria-invalid="true"]');
@@ -110,10 +104,7 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
                   minLength={3}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    setServerNameError(null);
-                    field.handleChange(e.target.value);
-                  }}
+                  onChange={(e) => field.handleChange(e.target.value)}
                   placeholder={currentName}
                   required
                   spellCheck="false"
@@ -134,8 +125,8 @@ export function UpdateNameForm({ currentName }: UpdateNameFormProps) {
           }}
         </form.Field>
         <Field>
-          <Button disabled={loading} type="submit">
-            {loading && <Spinner />}
+          <Button disabled={isPending} type="submit">
+            {isPending && <Spinner />}
             Update Name
           </Button>
         </Field>

@@ -1,18 +1,14 @@
 'use client';
 
-import {
-  AlertCircleIcon,
-  AtIcon,
-  ViewIcon,
-  ViewOffSlashIcon,
-} from '@hugeicons/core-free-icons';
+import { AlertCircleIcon, AtIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import * as z from 'zod/mini';
 
+import { PasswordToggle } from '@/components/password-toggle';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +22,6 @@ import { Input } from '@/components/ui/input';
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
@@ -82,7 +77,7 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'form'>) {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -98,20 +93,17 @@ export function SignUpForm({
     validators: {
       onSubmit: signUpFormSchema,
     },
-    onSubmit: async ({ value }) => {
-      await authClient.signUp.email(value, {
-        onRequest: () => {
-          setLoading(true);
-        },
-        onSuccess: () => {
-          setLoading(false);
-          setFormError(null);
-          push('/profile');
-        },
-        onError: (ctx) => {
-          setLoading(false);
-          setFormError(ctx.error.message || 'An unexpected error occurred');
-        },
+    onSubmit: ({ value }) => {
+      setFormError(null);
+      startTransition(async () => {
+        await authClient.signUp.email(value, {
+          onSuccess: () => {
+            push('/profile');
+          },
+          onError: (ctx) => {
+            setFormError(ctx.error.message || 'An unexpected error occurred');
+          },
+        });
       });
     },
     onSubmitInvalid() {
@@ -302,23 +294,10 @@ export function SignUpForm({
                     value={field.state.value}
                   />
                   <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      aria-label={showPassword ? 'Hide' : 'Show'}
+                    <PasswordToggle
+                      isVisible={showPassword}
                       onClick={() => setShowPassword(!showPassword)}
-                      size="icon-xs"
-                      title={showPassword ? 'Hide' : 'Show'}
-                      type="button"
-                      variant="ghost"
-                    >
-                      {showPassword ? (
-                        <HugeiconsIcon
-                          icon={ViewOffSlashIcon}
-                          strokeWidth={2}
-                        />
-                      ) : (
-                        <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
-                      )}
-                    </InputGroupButton>
+                    />
                   </InputGroupAddon>
                 </InputGroup>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -327,8 +306,8 @@ export function SignUpForm({
           }}
         </form.Field>
         <Field>
-          <Button disabled={loading} type="submit">
-            {loading && <Spinner />}
+          <Button disabled={isPending} type="submit">
+            {isPending && <Spinner />}
             Create Account
           </Button>
           <FieldDescription className="text-center">
