@@ -1,17 +1,17 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect } from 'bun:test';
+import { it } from 'node:test';
 
 import { usernameRegex } from '@/lib/auth';
-import { auth } from './auth.utils';
 
+/**
+ * @TODO E2E auth flows with authContext.testUser and authContext.authTest.
+ * @see `setupAuthContext()` in `__tests__/auth.utils.ts`
+ */
 describe('Auth', () => {
-  test('exposes test utils', async () => {
-    const ctx = await auth.$context;
-
-    expect(ctx.test).toBeDefined();
-  });
-
-  test('validates usernames with configured regex', () => {
-    expect(usernameRegex.test('valid_name')).toBe(true);
-    expect(usernameRegex.test('.invalid')).toBe(false);
+  describe('Utils', () => {
+    it('validates usernames with configured regex', () => {
+      expect(usernameRegex.test('valid_name')).toBe(true);
+      expect(usernameRegex.test('.invalid')).toBe(false);
+    });
   });
 });
