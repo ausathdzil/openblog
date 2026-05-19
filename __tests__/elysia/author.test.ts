@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { setupTestContext } from '../test-setup';
+import { setupAuthContext } from '../auth.utils';
 import { setupTestArticle } from './articles.utils';
 
-const testContext = setupTestContext();
+const authContext = setupAuthContext();
 
 describe('Author', () => {
   describe('Get all authors', () => {
@@ -28,7 +28,7 @@ describe('Author', () => {
 
     test('return 200 and the author', async () => {
       const { data, status } = await elysia
-        .authors({ username: testContext.testUser.username })
+        .authors({ username: authContext.testUser.username })
         .get();
 
       expect(status).toBe(200);
@@ -37,7 +37,7 @@ describe('Author', () => {
   });
 
   describe('Get author articles', () => {
-    setupTestArticle(() => testContext.testUser.id);
+    setupTestArticle(() => authContext.testUser.id);
 
     test('return 404 if author not found', async () => {
       const { status } = await elysia
@@ -49,7 +49,7 @@ describe('Author', () => {
 
     test('return 200 and an array of articles', async () => {
       const { data: articles, status } = await elysia
-        .authors({ username: testContext.testUser.username })
+        .authors({ username: authContext.testUser.username })
         .articles.get();
 
       expect(status).toBe(200);
@@ -67,11 +67,11 @@ describe('Author', () => {
   });
 
   describe('Get author article by slug', () => {
-    const ctx = setupTestArticle(() => testContext.testUser.id);
+    const ctx = setupTestArticle(() => authContext.testUser.id);
 
     test('return 404 if article not found', async () => {
       const { status } = await elysia
-        .authors({ username: testContext.testUser.username })
+        .authors({ username: authContext.testUser.username })
         .articles({ slug: 'non-existent' })
         .get();
 
@@ -82,7 +82,7 @@ describe('Author', () => {
       const article = ctx.article;
 
       const { data, status } = await elysia
-        .authors({ username: testContext.testUser.username })
+        .authors({ username: authContext.testUser.username })
         .articles({ slug: article.slug ?? '' })
         .get();
 

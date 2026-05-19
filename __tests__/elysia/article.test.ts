@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { setupTestContext } from '../test-setup';
+import { setupAuthContext } from '../auth.utils';
 import { cleanupTestArticle, setupTestArticle } from './articles.utils';
 
-const testContext = setupTestContext();
+const authContext = setupAuthContext();
 
 describe('Article', () => {
   describe('Create article', () => {
@@ -28,8 +28,8 @@ describe('Article', () => {
     });
 
     test('return 201 and create an article', async () => {
-      const headers = await testContext.authTest.getAuthHeaders({
-        userId: testContext.testUser.id,
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
       });
 
       const { data, status } = await elysia.articles.post(
@@ -71,7 +71,7 @@ describe('Article', () => {
   });
 
   describe('Get article by publicId', () => {
-    const ctx = setupTestArticle(() => testContext.testUser.id);
+    const ctx = setupTestArticle(() => authContext.testUser.id);
 
     test('return 404 if article not found', async () => {
       const { status } = await elysia
@@ -94,11 +94,11 @@ describe('Article', () => {
   });
 
   describe('Update article', () => {
-    const ctx = setupTestArticle(() => testContext.testUser.id);
+    const ctx = setupTestArticle(() => authContext.testUser.id);
 
     test('return 404 if article does not exist', async () => {
-      const headers = await testContext.authTest.getAuthHeaders({
-        userId: testContext.testUser.id,
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
       });
 
       const { status } = await elysia
@@ -128,8 +128,8 @@ describe('Article', () => {
 
       const article = ctx.article;
 
-      const headers = await testContext.authTest.getAuthHeaders({
-        userId: testContext.testUser.id,
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
       });
 
       const { data, status } = await elysia
@@ -142,11 +142,11 @@ describe('Article', () => {
   });
 
   describe('Delete article', () => {
-    const ctx = setupTestArticle(() => testContext.testUser.id);
+    const ctx = setupTestArticle(() => authContext.testUser.id);
 
     test('return 404 if article does not exist', async () => {
-      const headers = await testContext.authTest.getAuthHeaders({
-        userId: testContext.testUser.id,
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
       });
 
       const { status } = await elysia
@@ -168,8 +168,8 @@ describe('Article', () => {
 
     test('return 200 and verify that the article is deleted', async () => {
       const article = ctx.article;
-      const headers = await testContext.authTest.getAuthHeaders({
-        userId: testContext.testUser.id,
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
       });
 
       const { status: deleteStatus } = await elysia

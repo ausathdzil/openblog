@@ -31,7 +31,7 @@ async function createTestUser(authTest: TestHelpers) {
   return testUser;
 }
 
-export function setupTestContext() {
+export function setupAuthContext() {
   let authTest: TestHelpers;
   let testUser: TestUser;
 

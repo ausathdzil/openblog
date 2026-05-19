@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { setupTestContext } from '../test-setup';
+import { setupAuthContext } from '../auth.utils';
 import { setupTestArticle } from './articles.utils';
 
-const testContext = setupTestContext();
+const authContext = setupAuthContext();
 
 describe('Me', () => {
   describe('Articles', () => {
-    setupTestArticle(() => testContext.testUser.id);
+    setupTestArticle(() => authContext.testUser.id);
 
     test('return 401 if not authenticated', async () => {
       const { status } = await elysia.me.articles.get();
@@ -18,8 +18,8 @@ describe('Me', () => {
 
     test('return 200 and current user articles', async () => {
       const { data: articles, status } = await elysia.me.articles.get({
-        headers: await testContext.authTest.getAuthHeaders({
-          userId: testContext.testUser.id,
+        headers: await authContext.authTest.getAuthHeaders({
+          userId: authContext.testUser.id,
         }),
       });
 
@@ -34,7 +34,7 @@ describe('Me', () => {
       expect(
         articles?.data.every(
           (article) =>
-            article.author?.username === testContext.testUser.username
+            article.author?.username === authContext.testUser.username
         )
       ).toBe(true);
     });
