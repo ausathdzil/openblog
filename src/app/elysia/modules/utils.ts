@@ -1,14 +1,11 @@
-import { and, eq } from 'drizzle-orm';
 import * as z from 'zod';
-
-import { db } from '@/db';
-import { article } from '@/db/schema';
 
 const Slug = z.string().slugify();
 
 export async function slugify(
   input: string | null | undefined,
-  authorId: string | null | undefined
+  authorId: string | null | undefined,
+  slugExists: (slug: string, authorId: string) => Promise<boolean>
 ) {
   if (!(input && authorId)) {
     return null;
@@ -18,18 +15,10 @@ export async function slugify(
   let slug = base;
   let suffix = 2;
 
-  while (true) {
-    const [existing] = await db
-      .select({ id: article.id })
-      .from(article)
-      .where(and(eq(article.slug, slug), eq(article.authorId, authorId)))
-      .limit(1);
-
-    if (!existing) {
-      return slug;
-    }
-
+  while (await slugExists(slug, authorId)) {
     slug = `${base}-${suffix}`;
     suffix++;
   }
+
+  return slug;
 }

@@ -4,13 +4,16 @@
  */
 
 import { Kind, type TObject } from '@sinclair/typebox';
-import type { Table } from 'drizzle-orm';
+import { and, eq, type Table } from 'drizzle-orm';
 import {
   type BuildSchema,
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from 'drizzle-typebox';
+
+import { db } from '.';
+import { article } from './schema';
 
 type Spread<
   T extends TObject | Table,
@@ -101,3 +104,13 @@ export const spreads = <
 
   return newSchema as any;
 };
+
+export async function slugExists(slug: string, authorId: string) {
+  const [existing] = await db
+    .select({ id: article.id })
+    .from(article)
+    .where(and(eq(article.slug, slug), eq(article.authorId, authorId)))
+    .limit(1);
+
+  return !!existing;
+}
