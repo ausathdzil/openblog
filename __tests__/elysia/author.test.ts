@@ -1,21 +1,10 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
-import type { TestHelpers } from 'better-auth/plugins';
+import { describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { createTestUser, getTestHelpers } from '../test-setup';
+import { setupTestContext } from '../test-setup';
 import { setupTestArticle } from './articles.utils';
 
-let testHelpers: TestHelpers;
-let testUser: Awaited<ReturnType<typeof createTestUser>>;
-
-beforeAll(async () => {
-  testHelpers = await getTestHelpers();
-  testUser = await createTestUser(testHelpers);
-});
-
-afterAll(async () => {
-  await testHelpers.deleteUser(testUser.id);
-});
+const testContext = setupTestContext();
 
 describe('Author', () => {
   describe('Get all authors', () => {
@@ -39,7 +28,7 @@ describe('Author', () => {
 
     test('return 200 and the author', async () => {
       const { data, status } = await elysia
-        .authors({ username: testUser.username })
+        .authors({ username: testContext.testUser.username })
         .get();
 
       expect(status).toBe(200);
@@ -48,7 +37,7 @@ describe('Author', () => {
   });
 
   describe('Get author articles', () => {
-    setupTestArticle(() => testUser.id);
+    setupTestArticle(() => testContext.testUser.id);
 
     test('return 404 if author not found', async () => {
       const { status } = await elysia
@@ -60,7 +49,7 @@ describe('Author', () => {
 
     test('return 200 and an array of articles', async () => {
       const { data: articles, status } = await elysia
-        .authors({ username: testUser.username })
+        .authors({ username: testContext.testUser.username })
         .articles.get();
 
       expect(status).toBe(200);
@@ -78,11 +67,11 @@ describe('Author', () => {
   });
 
   describe('Get author article by slug', () => {
-    const ctx = setupTestArticle(() => testUser.id);
+    const ctx = setupTestArticle(() => testContext.testUser.id);
 
     test('return 404 if article not found', async () => {
       const { status } = await elysia
-        .authors({ username: testUser.username })
+        .authors({ username: testContext.testUser.username })
         .articles({ slug: 'non-existent' })
         .get();
 
@@ -93,7 +82,7 @@ describe('Author', () => {
       const article = ctx.article;
 
       const { data, status } = await elysia
-        .authors({ username: testUser.username })
+        .authors({ username: testContext.testUser.username })
         .articles({ slug: article.slug ?? '' })
         .get();
 

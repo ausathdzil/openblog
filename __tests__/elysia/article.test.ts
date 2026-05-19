@@ -1,28 +1,10 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  describe,
-  expect,
-  test,
-} from 'bun:test';
-import type { TestHelpers } from 'better-auth/plugins';
+import { afterEach, describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { createTestUser, getTestHelpers } from '../test-setup';
+import { setupTestContext } from '../test-setup';
 import { cleanupTestArticle, setupTestArticle } from './articles.utils';
 
-let testHelpers: TestHelpers;
-let testUser: Awaited<ReturnType<typeof createTestUser>>;
-
-beforeAll(async () => {
-  testHelpers = await getTestHelpers();
-  testUser = await createTestUser(testHelpers);
-});
-
-afterAll(async () => {
-  await testHelpers.deleteUser(testUser.id);
-});
+const testContext = setupTestContext();
 
 describe('Article', () => {
   describe('Create article', () => {
@@ -46,8 +28,8 @@ describe('Article', () => {
     });
 
     test('return 201 and create an article', async () => {
-      const headers = await testHelpers.getAuthHeaders({
-        userId: testUser.id,
+      const headers = await testContext.authTest.getAuthHeaders({
+        userId: testContext.testUser.id,
       });
 
       const { data, status } = await elysia.articles.post(
@@ -61,8 +43,12 @@ describe('Article', () => {
       );
 
       expect(status).toBe(201);
+      expect(data).not.toBeNull();
+      expect(data?.publicId).toBeString();
 
-      createdArticles.push(data?.publicId ?? '');
+      if (data?.publicId) {
+        createdArticles.push(data.publicId);
+      }
     });
   });
 
@@ -85,7 +71,7 @@ describe('Article', () => {
   });
 
   describe('Get article by publicId', () => {
-    const ctx = setupTestArticle(() => testUser.id);
+    const ctx = setupTestArticle(() => testContext.testUser.id);
 
     test('return 404 if article not found', async () => {
       const { status } = await elysia
@@ -108,11 +94,11 @@ describe('Article', () => {
   });
 
   describe('Update article', () => {
-    const ctx = setupTestArticle(() => testUser.id);
+    const ctx = setupTestArticle(() => testContext.testUser.id);
 
     test('return 404 if article does not exist', async () => {
-      const headers = await testHelpers.getAuthHeaders({
-        userId: testUser.id,
+      const headers = await testContext.authTest.getAuthHeaders({
+        userId: testContext.testUser.id,
       });
 
       const { status } = await elysia
@@ -142,8 +128,8 @@ describe('Article', () => {
 
       const article = ctx.article;
 
-      const headers = await testHelpers.getAuthHeaders({
-        userId: testUser.id,
+      const headers = await testContext.authTest.getAuthHeaders({
+        userId: testContext.testUser.id,
       });
 
       const { data, status } = await elysia
@@ -156,11 +142,11 @@ describe('Article', () => {
   });
 
   describe('Delete article', () => {
-    const ctx = setupTestArticle(() => testUser.id);
+    const ctx = setupTestArticle(() => testContext.testUser.id);
 
     test('return 404 if article does not exist', async () => {
-      const headers = await testHelpers.getAuthHeaders({
-        userId: testUser.id,
+      const headers = await testContext.authTest.getAuthHeaders({
+        userId: testContext.testUser.id,
       });
 
       const { status } = await elysia
@@ -182,8 +168,8 @@ describe('Article', () => {
 
     test('return 200 and verify that the article is deleted', async () => {
       const article = ctx.article;
-      const headers = await testHelpers.getAuthHeaders({
-        userId: testUser.id,
+      const headers = await testContext.authTest.getAuthHeaders({
+        userId: testContext.testUser.id,
       });
 
       const { status: deleteStatus } = await elysia

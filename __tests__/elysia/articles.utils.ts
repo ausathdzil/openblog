@@ -1,4 +1,4 @@
-import { afterEach, beforeEach } from 'node:test';
+import { afterEach, beforeEach } from 'bun:test';
 import { eq } from 'drizzle-orm';
 
 import { slugify } from '@/app/elysia/modules/utils';
