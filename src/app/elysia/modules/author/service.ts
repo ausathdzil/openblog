@@ -37,7 +37,7 @@ export async function getAuthors({ q, page = 1, limit = 20 }: AuthorsQuery) {
 
   const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
 
-  const total = totalResult[0].count;
+  const total = totalResult[0]?.count ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   return {

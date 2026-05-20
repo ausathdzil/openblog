@@ -1,5 +1,5 @@
 import { and, count, desc, eq, ilike } from 'drizzle-orm';
-import { NotFoundError } from 'elysia';
+import { InternalServerError, NotFoundError } from 'elysia';
 
 import { db } from '@/db';
 import { article, user } from '@/db/schema';
@@ -47,6 +47,10 @@ export async function createArticle(
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
     });
+
+  if (!articleData) {
+    throw new InternalServerError('Failed to create article.');
+  }
 
   return {
     ...articleData,
@@ -99,7 +103,7 @@ export async function getArticles(
 
   const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
 
-  const total = totalResult[0].count;
+  const total = totalResult[0]?.count ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   return {
@@ -251,6 +255,10 @@ export async function updateArticle(
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
     });
+
+  if (!updatedData) {
+    throw new InternalServerError('Failed to update article.');
+  }
 
   return {
     ...updatedData,

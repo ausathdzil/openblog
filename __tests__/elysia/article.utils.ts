@@ -25,6 +25,10 @@ export async function createTestArticle(userId: string) {
     })
     .returning();
 
+  if (!articleData) {
+    throw new Error('Failed to create test article');
+  }
+
   return articleData;
 }
 
@@ -35,19 +39,28 @@ export async function cleanupTestArticle(publicId: string) {
 type Article = typeof article.$inferSelect;
 
 export function setupTestArticle(getUserId: () => string) {
-  let articleData: Article;
+  let articleData: Article | null = null;
+
+  const requireArticle = () => {
+    if (!articleData) {
+      throw new Error('Failed to setup test article');
+    }
+    return { articleData };
+  };
 
   beforeEach(async () => {
     articleData = await createTestArticle(getUserId());
   });
 
   afterEach(async () => {
-    await cleanupTestArticle(articleData.publicId);
+    if (articleData) {
+      await cleanupTestArticle(articleData.publicId);
+    }
   });
 
   return {
     get article() {
-      return articleData;
+      return requireArticle().articleData;
     },
   };
 }

@@ -58,8 +58,15 @@ async function createTestUser(authTest: TestHelpers) {
 }
 
 export function setupAuthContext() {
-  let authTest: TestHelpers;
-  let testUser: TestUser;
+  let authTest: TestHelpers | null = null;
+  let testUser: TestUser | null = null;
+
+  const requireContext = () => {
+    if (!(authTest && testUser)) {
+      throw new Error('Auth context is not set up yet');
+    }
+    return { authTest, testUser };
+  };
 
   beforeAll(async () => {
     const ctx = await auth.$context;
@@ -68,15 +75,17 @@ export function setupAuthContext() {
   });
 
   afterAll(async () => {
-    await authTest.deleteUser(testUser.id);
+    if (authTest && testUser) {
+      await authTest.deleteUser(testUser.id);
+    }
   });
 
   return {
     get authTest() {
-      return authTest;
+      return requireContext().authTest;
     },
     get testUser() {
-      return testUser;
+      return requireContext().testUser;
     },
   };
 }

@@ -1,6 +1,6 @@
 /** Elysia Drizzle spread helpers (+ `update`). Lint exceptions: `biome.json` `overrides` for this file.
- * @lastModified 2026-05-17
- * @see https://elysiajs.com/integrations/drizzle.html#utility
+ * @lastModified 2026-05-20
+ * @see https://elysiajs.com/integrations/drizzle#utility
  */
 
 import { Kind, type TObject } from '@sinclair/typebox';
@@ -99,6 +99,7 @@ export const spreads = <
   const keys = Object.keys(models);
 
   for (const key of keys) {
+    // @ts-expect-error
     newSchema[key] = spread(models[key], mode);
   }
 
