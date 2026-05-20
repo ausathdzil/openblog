@@ -1,5 +1,4 @@
-import { describe, expect } from 'bun:test';
-import { it } from 'node:test';
+import { describe, expect, it } from 'bun:test';
 
 import { usernameRegex } from '@/lib/auth';
 
