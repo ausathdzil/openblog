@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { setupAuthContext } from '../auth.utils';
 import { cleanupTestArticle, setupTestArticle } from './article.utils';
+import { setupAuthContext } from './auth.utils';
 
 const authContext = setupAuthContext();
 
