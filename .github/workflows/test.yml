@@ -10,38 +10,38 @@ on:
     branches:
       - main
     paths:
-      - "__tests__/**"
-      - ".github/workflows/test.yml"
-      - "drizzle/**"
-      - "public/**"
-      - "src/**"
-      - "biome.json"
-      - "bun.lock"
-      - "bunfig.toml"
-      - "drizzle.config.ts"
-      - "next.config.ts"
-      - "package.json"
-      - "playwright.config.ts"
-      - "postcss.config.mjs"
-      - "tsconfig.json"
+      - '__tests__/**'
+      - '.github/workflows/test.yml'
+      - 'drizzle/**'
+      - 'public/**'
+      - 'src/**'
+      - 'biome.json'
+      - 'bun.lock'
+      - 'bunfig.toml'
+      - 'drizzle.config.ts'
+      - 'next.config.ts'
+      - 'package.json'
+      - 'playwright.config.ts'
+      - 'postcss.config.mjs'
+      - 'tsconfig.json'
   pull_request:
     branches:
       - main
     paths:
-      - "__tests__/**"
-      - ".github/workflows/test.yml"
-      - "drizzle/**"
-      - "public/**"
-      - "src/**"
-      - "biome.json"
-      - "bun.lock"
-      - "bunfig.toml"
-      - "drizzle.config.ts"
-      - "next.config.ts"
-      - "package.json"
-      - "playwright.config.ts"
-      - "postcss.config.mjs"
-      - "tsconfig.json"
+      - '__tests__/**'
+      - '.github/workflows/test.yml'
+      - 'drizzle/**'
+      - 'public/**'
+      - 'src/**'
+      - 'biome.json'
+      - 'bun.lock'
+      - 'bunfig.toml'
+      - 'drizzle.config.ts'
+      - 'next.config.ts'
+      - 'package.json'
+      - 'playwright.config.ts'
+      - 'postcss.config.mjs'
+      - 'tsconfig.json'
 
 permissions:
   contents: read
@@ -58,7 +58,7 @@ jobs:
       - name: Notify Vercel
         uses: vercel/repository-dispatch/actions/status@v1
         with:
-          name: "Vercel - openblog: Run-Tests"
+          name: 'Vercel - openblog: Run-Tests'
 
       - uses: actions/checkout@v6
 
@@ -72,6 +72,7 @@ jobs:
         with:
           path: |
             ~/.bun/install/cache
+            ${{ github.workspace }}/.next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lock') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lock') }}
