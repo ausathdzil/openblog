@@ -1,6 +1,8 @@
 name: Run Lint, Type Check, and Test
 
 env:
+  BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+  BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 on:
@@ -15,9 +17,11 @@ on:
       - "src/**"
       - "biome.json"
       - "bun.lock"
+      - "bunfig.toml"
       - "drizzle.config.ts"
       - "next.config.ts"
       - "package.json"
+      - "playwright.config.ts"
       - "postcss.config.mjs"
       - "tsconfig.json"
   pull_request:
@@ -31,9 +35,11 @@ on:
       - "src/**"
       - "biome.json"
       - "bun.lock"
+      - "bunfig.toml"
       - "drizzle.config.ts"
       - "next.config.ts"
       - "package.json"
+      - "playwright.config.ts"
       - "postcss.config.mjs"
       - "tsconfig.json"
 
