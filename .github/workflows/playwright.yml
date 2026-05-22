@@ -12,6 +12,7 @@ on:
     paths:
       - '__tests__/**'
       - '.github/workflows/test.yml'
+      - '.github/workflows/playwright.yml'
       - 'drizzle/**'
       - 'public/**'
       - 'src/**'
@@ -30,6 +31,7 @@ on:
     paths:
       - '__tests__/**'
       - '.github/workflows/test.yml'
+      - '.github/workflows/playwright.yml'
       - 'drizzle/**'
       - 'public/**'
       - 'src/**'
