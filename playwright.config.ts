@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 
 config({ path: '.env.local', quiet: true });
 
-const baseURL = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000';
+const baseURL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export default defineConfig({
   timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
@@ -50,7 +50,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: process.env.CI ? 'bun start' : 'bun dev',
+    command: 'bun start',
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
