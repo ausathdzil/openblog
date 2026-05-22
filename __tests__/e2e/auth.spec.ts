@@ -22,7 +22,7 @@ test('Profile shows username', async ({ context, page, baseURL }) => {
   await context.addCookies(
     cookies.map((cookie) => ({
       ...cookie,
-      url: baseURL,
+      url: baseURL || 'http://127.0.0.1:3000',
       domain: undefined,
     }))
   );
