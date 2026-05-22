@@ -50,7 +50,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'bun start',
+    command: 'bun dev',
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
