@@ -36,10 +36,8 @@ export async function cleanupTestArticle(publicId: string) {
   await db.delete(article).where(eq(article.publicId, publicId));
 }
 
-type Article = typeof article.$inferSelect;
-
 export function setupTestArticle(getUserId: () => string) {
-  let articleData: Article | null = null;
+  let articleData: typeof article.$inferSelect | null = null;
 
   const requireArticle = () => {
     if (!articleData) {
@@ -55,6 +53,7 @@ export function setupTestArticle(getUserId: () => string) {
   afterEach(async () => {
     if (articleData) {
       await cleanupTestArticle(articleData.publicId);
+      articleData = null;
     }
   });
 

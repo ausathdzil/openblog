@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
+import { config } from 'dotenv';
+
+config({ path: '.env.local', quiet: true });
 
 const baseURL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export default defineConfig({
   timeout: 30 * 1000,
-  testDir: './e2e',
+  testDir: './__tests__/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 2,

@@ -10,7 +10,10 @@
     "check": "ultracite check",
     "fix": "ultracite fix",
     "typecheck": "bun --bun next typegen && tsc --noEmit",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "test:e2e": "playwright test",
+    "test:report": "playwright show-report",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
