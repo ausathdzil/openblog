@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { setupAuthContext } from '../auth.utils';
-import { setupTestArticle } from './article.utils';
+import { setupTestArticle } from './setup-article';
+import { setupAuthContext } from './setup-auth';
 
 const authContext = setupAuthContext();
 
