@@ -6,7 +6,7 @@ config({ path: '.env.local', quiet: true });
 const baseURL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export default defineConfig({
-  timeout: 30 * 1000,
+  timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
   testDir: './__tests__/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -50,7 +50,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'bun dev',
+    command: process.env.CI ? 'bun start' : 'bun dev',
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
