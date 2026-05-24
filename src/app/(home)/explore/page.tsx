@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import type { Metadata, Route } from 'next';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
@@ -154,7 +153,12 @@ async function AuthorsResults({ limit, page, q }: ResultsProps) {
                   @{author.displayUsername}
                 </ItemTitle>
                 <ItemDescription>
-                  Joined at {format(author.createdAt, 'MMM d, yyyy')}
+                  Joined at{' '}
+                  {author.createdAt.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
                 </ItemDescription>
               </ItemContent>
             </Item>

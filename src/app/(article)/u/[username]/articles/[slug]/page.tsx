@@ -5,7 +5,6 @@ import {
   renderToHTMLString,
   serializeChildrenToHTMLString,
 } from '@tiptap/static-renderer/pm/html-string';
-import { format } from 'date-fns';
 import { toHtml } from 'hast-util-to-html';
 import { common, createLowlight } from 'lowlight';
 import type { Metadata, Route } from 'next';
@@ -107,6 +106,7 @@ async function Article({ params }: ArticleProps) {
       },
     },
   });
+
   const renderedArticleBody = (
     <div
       className="[&_pre]:max-w-full [&_pre]:overflow-x-auto"
@@ -127,8 +127,12 @@ async function Article({ params }: ArticleProps) {
               {article.author?.name}
             </Link>
             <span>&bull;</span>
-            <time dateTime={format(article.createdAt, 'yyyy-MM-dd')}>
-              {format(article.createdAt, 'MMMM d, yyyy')}
+            <time dateTime={article.createdAt.toISOString().split('T')[0]}>
+              {article.createdAt.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
             </time>
           </div>
           {renderedArticleBody}

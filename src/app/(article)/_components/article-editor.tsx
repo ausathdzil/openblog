@@ -3,7 +3,6 @@
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
@@ -179,7 +178,15 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               Saving…
             </>
           ) : (
-            `Last saved on ${format(article.updatedAt, 'MMM d, yyyy h:mm a')}`
+            `Last saved on ${article.updatedAt.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            })}
+            `
           )}
         </div>
         <form
