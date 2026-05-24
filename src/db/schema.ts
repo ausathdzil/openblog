@@ -117,8 +117,10 @@ export const article = pgTable(
     excerpt: varchar('excerpt', { length: 255 }),
     status: articleStatus('status').default('draft').notNull(),
     coverImage: text('cover_image'),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at')
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
