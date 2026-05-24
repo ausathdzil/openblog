@@ -11,8 +11,7 @@ on:
       - main
     paths:
       - '__tests__/**'
-      - '.github/workflows/test.yml'
-      - '.github/workflows/playwright.yml'
+      - '.github/workflows/**'
       - 'drizzle/**'
       - 'public/**'
       - 'src/**'
@@ -30,8 +29,7 @@ on:
       - main
     paths:
       - '__tests__/**'
-      - '.github/workflows/test.yml'
-      - '.github/workflows/playwright.yml'
+      - '.github/workflows/**'
       - 'drizzle/**'
       - 'public/**'
       - 'src/**'
@@ -79,8 +77,13 @@ jobs:
       - name: Run Playwright tests
         run: bun run test:e2e
 
-      - uses: actions/upload-artifact@v7
+      - name: Check if running in act
+        id: check_act
+        run: echo "is_act=${ACT:-false}" >> "$GITHUB_OUTPUT"
         if: ${{ !cancelled() }}
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() && steps.check_act.outputs.is_act != 'true' }}
         with:
           name: playwright-report
           path: playwright-report/
