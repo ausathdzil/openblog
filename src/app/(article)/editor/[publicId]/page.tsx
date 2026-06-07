@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
 import { ArticleEditor } from '../../_components/article-editor';
-import { getArtcileByPublicId } from '../../_lib/data';
+import { getArticleByPublicId } from '../../_lib/data';
 
 export async function generateMetadata({
   params,
@@ -14,7 +14,7 @@ export async function generateMetadata({
   const headersRecord = Object.fromEntries(headersList.entries());
 
   const { publicId } = await params;
-  const { article, error } = await getArtcileByPublicId(
+  const { article, error } = await getArticleByPublicId(
     headersRecord,
     publicId
   );
@@ -46,7 +46,7 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   const headersRecord = Object.fromEntries(headersList.entries());
 
   const { publicId } = await params;
-  const { article, error } = await getArtcileByPublicId(
+  const { article, error } = await getArticleByPublicId(
     headersRecord,
     publicId
   );

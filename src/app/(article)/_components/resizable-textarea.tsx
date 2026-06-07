@@ -25,17 +25,14 @@ export function ResizableTextarea({
 
   useEffect(() => {
     const el = textareaRef.current;
-    if (!el) {
-      return;
+    if (el) {
+      resize(el, value);
     }
-
-    el.value = value;
-    resize(el);
   }, [value]);
 
   const handleValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.currentTarget.value);
-    resize(e.currentTarget);
+    resize(e.currentTarget, e.currentTarget.value);
   };
 
   return (
@@ -56,7 +53,7 @@ export function ResizableTextarea({
   );
 }
 
-function resize(el: HTMLTextAreaElement) {
+function resize(el: HTMLTextAreaElement, _value: string) {
   el.style.height = '0px';
   const nextHeight = `${el.scrollHeight}px`;
   el.style.height = nextHeight;

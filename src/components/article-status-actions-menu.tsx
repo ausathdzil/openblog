@@ -27,9 +27,9 @@ export function ArticleStatusActionsMenu({
     <>
       {status === 'draft' ? null : (
         <DropdownMenuItem onClick={onMoveToDraft}>
-          Move to draft
+          Draft
           <HugeiconsIcon
-            className="ml-4"
+            className="ml-auto"
             icon={QuillWrite01Icon}
             strokeWidth={2}
           />

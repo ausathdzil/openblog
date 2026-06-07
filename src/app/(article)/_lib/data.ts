@@ -25,7 +25,7 @@ export async function getUserArticles(
   return { articles, articlesError };
 }
 
-export async function getArtcileByPublicId(
+export async function getArticleByPublicId(
   headersRecord: Record<string, string>,
   publicId: string
 ) {
