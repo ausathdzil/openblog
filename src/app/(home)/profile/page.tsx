@@ -74,7 +74,9 @@ async function Profile() {
   return (
     <div className="grid grid-rows-[auto_auto_auto] gap-4">
       <Avatar className="size-36 justify-self-center">
-        <AvatarImage src={session.user.image ?? ''} />
+        {session.user.image ? (
+          <AvatarImage alt={session.user.name} src={session.user.image} />
+        ) : null}
         <AvatarFallback className="text-6xl">
           {session.user.name.charAt(0)}
         </AvatarFallback>

@@ -18,6 +18,7 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from '@/components/ui/field';
 import {
   InputGroup,
@@ -25,9 +26,9 @@ import {
   InputGroupInput,
   InputGroupText,
 } from '@/components/ui/input-group';
-import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { SignInWithGoogle } from './sign-in-with-google';
 
 const signInFormSchema = z.object({
   username: z
@@ -96,6 +97,8 @@ export function SignInForm({
       {...props}
     >
       <FieldGroup>
+        <SignInWithGoogle onFormError={setFormError} />
+        <FieldSeparator>Or continue with</FieldSeparator>
         <form.Field
           name="username"
           validators={{
@@ -204,7 +207,6 @@ export function SignInForm({
         </form.Field>
         <Field>
           <Button disabled={isPending} type="submit">
-            {isPending && <Spinner />}
             Sign In
           </Button>
           <FieldDescription className="text-center">
