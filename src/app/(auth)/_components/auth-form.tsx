@@ -25,30 +25,47 @@ import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
 import { SignInWithGoogle } from './sign-in-with-google';
 
-const signInFormSchema = z.object({
+const authFormSchema = z.object({
+  name: z.optional(
+    z
+      .string()
+      .check(
+        z.trim(),
+        z.minLength(3, 'Name must be at least 3 characters long.'),
+        z.maxLength(30, 'Name must be 30 characters or fewer.')
+      )
+  ),
   email: z
-    .email('Invalid email address.')
+    .email('Please enter a valid email.')
     .check(
       z.trim(),
       z.maxLength(100, 'Email must be 100 characters or fewer.')
     ),
 });
 
-export function SignInForm({
-  className,
-  ...props
-}: React.ComponentProps<'form'>) {
+type AuthFormValues = z.infer<typeof authFormSchema>;
+
+interface AuthFormProps extends React.ComponentProps<'form'> {
+  mode: 'sign-in' | 'sign-up';
+}
+
+export function AuthForm({ mode, className, ...props }: AuthFormProps) {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [isOtpDialogOpen, setIsOtpDialogOpen] = useState(false);
   const { push } = useRouter();
 
+  const isSignUp = mode === 'sign-up';
+
+  const defaultValues: AuthFormValues = {
+    name: isSignUp ? '' : undefined,
+    email: '',
+  };
+
   const form = useForm({
-    defaultValues: {
-      email: '',
-    },
+    defaultValues,
     validators: {
-      onSubmit: signInFormSchema,
+      onSubmit: authFormSchema,
     },
     onSubmit: ({ value }) => {
       setFormError(null);
@@ -63,7 +80,10 @@ export function SignInForm({
               setIsOtpDialogOpen(true);
             },
             onError: (ctx) => {
-              setFormError(ctx.error.message || 'An unexpected error occurred');
+              setFormError(
+                ctx.error.message ||
+                  'Failed to send verification email. Please try again.'
+              );
             },
           }
         );
@@ -78,7 +98,7 @@ export function SignInForm({
     },
   });
 
-  const handleSignInOtp = async (
+  const handleVerifyOtp = async (
     otp: string,
     setFormError: (error: string | null) => void
   ) => {
@@ -86,11 +106,12 @@ export function SignInForm({
       {
         email: form.state.values.email,
         otp,
+        ...(isSignUp ? { name: form.state.values.name } : {}),
       },
       {
         onSuccess: () => {
           setIsOtpDialogOpen(false);
-          push('/profile');
+          push(isSignUp ? '/username' : '/profile');
         },
         onError: (ctx) => {
           setFormError(ctx.error.message || 'An unexpected error occurred');
@@ -110,12 +131,52 @@ export function SignInForm({
         {...props}
       >
         <FieldGroup>
-          <SignInWithGoogle onFormError={setFormError} />
+          <SignInWithGoogle
+            label={isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
+            onFormError={setFormError}
+          />
           <FieldSeparator />
+          {isSignUp && (
+            <form.Field
+              name="name"
+              validators={{
+                onBlur: authFormSchema.shape.name,
+              }}
+            >
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                    <Input
+                      aria-invalid={isInvalid}
+                      autoComplete="name"
+                      autoCorrect="off"
+                      id={field.name}
+                      maxLength={30}
+                      minLength={3}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Alice"
+                      required
+                      spellCheck="false"
+                      type="text"
+                      value={field.state.value}
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            </form.Field>
+          )}
           <form.Field
             name="email"
             validators={{
-              onBlur: signInFormSchema.shape.email,
+              onBlur: authFormSchema.shape.email,
             }}
           >
             {(field) => {
@@ -148,7 +209,16 @@ export function SignInForm({
               Continue with Email
             </Button>
             <FieldDescription className="text-center">
-              Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
+              {isSignUp ? (
+                <>
+                  Already have an account? <Link href="/sign-in">Sign in</Link>
+                </>
+              ) : (
+                <>
+                  Don&apos;t have an account?{' '}
+                  <Link href="/sign-up">Sign up</Link>
+                </>
+              )}
             </FieldDescription>
             {formError ? (
               <Alert variant="destructive">
@@ -162,10 +232,10 @@ export function SignInForm({
       <OtpDialog
         email={form.state.values.email}
         onOpenChange={setIsOtpDialogOpen}
-        onSubmit={handleSignInOtp}
+        onSubmit={handleVerifyOtp}
         open={isOtpDialogOpen}
         resendType="sign-in"
-        submitLabel="Sign In"
+        submitLabel={isSignUp ? 'Sign Up' : 'Sign In'}
       />
     </>
   );

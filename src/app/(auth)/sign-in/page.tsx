@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Muted, Title } from '@/components/typography';
-import { SignInForm } from '../_components/sign-in-form';
+import { AuthForm } from '../_components/auth-form';
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -14,7 +14,7 @@ export default function SignInPage() {
         <Title className="text-2xl">Welcome back</Title>
         <Muted className="text-balance">Sign in with your Google account</Muted>
       </div>
-      <SignInForm />
+      <AuthForm mode="sign-in" />
     </div>
   );
 }
