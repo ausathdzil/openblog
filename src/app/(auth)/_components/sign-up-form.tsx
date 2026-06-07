@@ -42,7 +42,7 @@ const signUpFormSchema = z.object({
     .email('Please enter a valid email.')
     .check(
       z.trim(),
-      z.maxLength(255, 'Email must be 255 characters or fewer.')
+      z.maxLength(100, 'Email must be 100 characters or fewer.')
     ),
   password: z
     .string()

@@ -1,10 +1,11 @@
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
 import { nextCookies } from 'better-auth/next-js';
-import { openAPI, username } from 'better-auth/plugins';
+import { emailOTP, openAPI, username } from 'better-auth/plugins';
 
 import { db } from '@/db';
 import * as schema from '@/db/schema';
+import { resend } from './resend';
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -24,6 +25,32 @@ export const auth = betterAuth({
   },
   plugins: [
     openAPI(),
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }) {
+        const typeMap = {
+          'sign-in': 'Sign In',
+          'email-verification': 'Email Verification',
+          'forget-password': 'Password Reset',
+          'change-email': 'Change Email',
+        } as const;
+
+        const normalizedType =
+          typeMap[type as keyof typeof typeMap] || 'Verification';
+
+        await resend.emails.send({
+          from: 'OpenBlog <noreply@openblog.ausathikram.com>',
+          to: email,
+          subject: `${otp} is your OpenBlog verification code`,
+          template: {
+            id: 'one-time-password',
+            variables: {
+              otp,
+              type: normalizedType,
+            },
+          },
+        });
+      },
+    }),
     username({
       /**
        * Username can only contain letters, numbers, underscores, and dots,
