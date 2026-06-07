@@ -17,7 +17,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { MobileSignOutButton } from '../../_components/mobile-sign-out-button';
 import { UpdateNameForm } from './_components/update-name-form';
-import { UpdatePasswordForm } from './_components/update-password-form';
 
 export const metadata: Metadata = {
   title: 'Edit profile',
@@ -58,17 +57,6 @@ async function EditProfileContent() {
               </ItemDescription>
             </div>
             <UpdateNameForm currentName={session.user.name} />
-          </ItemContent>
-        </Item>
-        <Item variant="outline">
-          <ItemContent className="gap-6">
-            <div className="space-y-1">
-              <ItemTitle>Update Password</ItemTitle>
-              <ItemDescription>
-                Change your password to keep your account secure.
-              </ItemDescription>
-            </div>
-            <UpdatePasswordForm />
           </ItemContent>
         </Item>
       </ItemGroup>
