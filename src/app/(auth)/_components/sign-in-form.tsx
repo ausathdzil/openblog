@@ -4,6 +4,7 @@ import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import * as z from 'zod/mini';
 
@@ -40,7 +41,7 @@ export function SignInForm({
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [isOtpDialogOpen, setIsOtpDialogOpen] = useState(false);
-  const [emailForOtp, setEmailForOtp] = useState('');
+  const { push } = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -59,7 +60,6 @@ export function SignInForm({
           },
           {
             onSuccess: () => {
-              setEmailForOtp(value.email);
               setIsOtpDialogOpen(true);
             },
             onError: (ctx) => {
@@ -77,6 +77,27 @@ export function SignInForm({
       }
     },
   });
+
+  const handleSignInOtp = async (
+    otp: string,
+    setFormError: (error: string | null) => void
+  ) => {
+    await authClient.signIn.emailOtp(
+      {
+        email: form.state.values.email,
+        otp,
+      },
+      {
+        onSuccess: () => {
+          setIsOtpDialogOpen(false);
+          push('/profile');
+        },
+        onError: (ctx) => {
+          setFormError(ctx.error.message || 'An unexpected error occurred');
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -126,13 +147,6 @@ export function SignInForm({
               {isPending && <Spinner />}
               Continue with Email
             </Button>
-            <Button
-              onClick={() => setIsOtpDialogOpen(true)}
-              type="button"
-              variant="outline"
-            >
-              Test Open Dialog
-            </Button>
             <FieldDescription className="text-center">
               Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
             </FieldDescription>
@@ -146,9 +160,12 @@ export function SignInForm({
         </FieldGroup>
       </form>
       <OtpDialog
-        email={emailForOtp}
+        email={form.state.values.email}
         onOpenChange={setIsOtpDialogOpen}
+        onSubmit={handleSignInOtp}
         open={isOtpDialogOpen}
+        resendType="sign-in"
+        submitLabel="Sign In"
       />
     </>
   );

@@ -3,7 +3,6 @@
 import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
@@ -43,13 +42,29 @@ const signInOtpFormSchema = z.object({
 interface OtpDialogProps {
   email: string;
   onOpenChange: (open: boolean) => void;
+  onSubmit: (
+    otp: string,
+    setFormError: (err: string | null) => void
+  ) => Promise<void> | void;
   open: boolean;
+  resendType?:
+    | 'sign-in'
+    | 'email-verification'
+    | 'forget-password'
+    | 'change-email';
+  submitLabel?: string;
 }
 
-export function OtpDialog({ email, open, onOpenChange }: OtpDialogProps) {
+export function OtpDialog({
+  email,
+  open,
+  onOpenChange,
+  submitLabel = 'Confirm',
+  resendType = 'sign-in',
+  onSubmit,
+}: OtpDialogProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const { push } = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -61,21 +76,7 @@ export function OtpDialog({ email, open, onOpenChange }: OtpDialogProps) {
     onSubmit: ({ value }) => {
       setFormError(null);
       startTransition(async () => {
-        await authClient.signIn.emailOtp(
-          {
-            email,
-            otp: value.otp,
-          },
-          {
-            onSuccess: () => {
-              onOpenChange(false);
-              push('/profile');
-            },
-            onError: (ctx) => {
-              setFormError(ctx.error.message || 'An unexpected error occurred');
-            },
-          }
-        );
+        await onSubmit(value.otp, setFormError);
       });
     },
   });
@@ -155,15 +156,19 @@ export function OtpDialog({ email, open, onOpenChange }: OtpDialogProps) {
                 </Alert>
               </Field>
             ) : null}
+            <OtpResendButton
+              email={email}
+              setFormError={setFormError}
+              type={resendType}
+            />
           </FieldGroup>
         </form>
         <AlertDialogFooter className="grid grid-cols-1">
           <AlertDialogAction disabled={isPending} form="otp-form" type="submit">
             {isPending && <Spinner />}
-            Sign In
+            {submitLabel}
           </AlertDialogAction>
-          <OtpResendButton email={email} setFormError={setFormError} />
-          <AlertDialogCancel variant="ghost">Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -173,9 +178,14 @@ export function OtpDialog({ email, open, onOpenChange }: OtpDialogProps) {
 interface OtpResendButtonProps {
   email: string;
   setFormError: (error: string | null) => void;
+  type?: 'sign-in' | 'email-verification' | 'forget-password' | 'change-email';
 }
 
-export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
+export function OtpResendButton({
+  email,
+  setFormError,
+  type = 'sign-in',
+}: OtpResendButtonProps) {
   const [countdown, setCountdown] = useState(60);
   const [isPending, setIsPending] = useState(false);
 
@@ -196,7 +206,7 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
     setFormError(null);
     const { error } = await authClient.emailOtp.sendVerificationOtp({
       email,
-      type: 'sign-in',
+      type,
     });
 
     setIsPending(false);
