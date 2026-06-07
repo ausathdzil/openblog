@@ -93,7 +93,7 @@ export function SignInForm({
       await authClient.signIn.social(
         {
           provider: 'google',
-          callbackURL: '/profile',
+          callbackURL: '/username',
         },
         {
           onError: (ctx) => {
