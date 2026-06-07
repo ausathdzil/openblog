@@ -3,7 +3,6 @@
 import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -29,6 +28,7 @@ import {
 } from '@/components/ui/input-group';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { SignInWithGoogle } from './sign-in-with-google';
 
 const signInFormSchema = z.object({
   username: z
@@ -87,23 +87,6 @@ export function SignInForm({
     },
   });
 
-  const signInWithGoogle = () => {
-    startTransition(async () => {
-      setFormError(null);
-      await authClient.signIn.social(
-        {
-          provider: 'google',
-          callbackURL: '/username',
-        },
-        {
-          onError: (ctx) => {
-            setFormError(ctx.error.message || 'An unexpected error occurred');
-          },
-        }
-      );
-    });
-  };
-
   return (
     <form
       className={cn('flex flex-col gap-6', className)}
@@ -114,25 +97,7 @@ export function SignInForm({
       {...props}
     >
       <FieldGroup>
-        <Field>
-          <Button
-            className="gap-2.5"
-            disabled={isPending}
-            onClick={signInWithGoogle}
-            size="lg"
-            type="button"
-            variant="outline"
-          >
-            <Image
-              alt="Google"
-              className="size-5"
-              height={20}
-              src="/google.svg"
-              width={20}
-            />
-            Sign in with Google
-          </Button>
-        </Field>
+        <SignInWithGoogle onFormError={setFormError} />
         <FieldSeparator>Or continue with</FieldSeparator>
         <form.Field
           name="username"

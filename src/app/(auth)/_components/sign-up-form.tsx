@@ -17,6 +17,7 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -27,6 +28,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { SignInWithGoogle } from './sign-in-with-google';
 
 const signUpFormSchema = z.object({
   name: z
@@ -106,6 +108,11 @@ export function SignUpForm({
       {...props}
     >
       <FieldGroup>
+        <SignInWithGoogle
+          label="Sign up with Google"
+          onFormError={setFormError}
+        />
+        <FieldSeparator>Or continue with</FieldSeparator>
         <form.Field
           name="name"
           validators={{
