@@ -103,7 +103,7 @@ export function OtpDialog({
             <form.Field
               name="otp"
               validators={{
-                onChange: signInOtpFormSchema.shape.otp,
+                onBlur: signInOtpFormSchema.shape.otp,
               }}
             >
               {(field) => {
