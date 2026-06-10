@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { ProfileForm } from '@/components/profile-form';
 import { Muted, Title } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,7 +17,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { MobileSignOutButton } from '../../_components/mobile-sign-out-button';
-import { UpdateNameForm } from './_components/update-name-form';
 
 export const metadata: Metadata = {
   title: 'Edit profile',
@@ -55,12 +55,16 @@ async function EditProfileContent() {
         <Item variant="outline">
           <ItemContent className="gap-6">
             <div className="space-y-1">
-              <ItemTitle>Update Name</ItemTitle>
+              <ItemTitle>Profile Settings</ItemTitle>
               <ItemDescription>
-                This updates the name shown on your profile.
+                Update your display name and username.
               </ItemDescription>
             </div>
-            <UpdateNameForm currentName={session.user.name} />
+            <ProfileForm
+              defaultName={session.user.name}
+              defaultUsername={session.user.displayUsername ?? ''}
+              submitLabel="Save Changes"
+            />
           </ItemContent>
         </Item>
       </ItemGroup>

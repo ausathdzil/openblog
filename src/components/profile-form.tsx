@@ -3,8 +3,10 @@
 import { AlertCircleIcon, AtIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import { Alert, AlertTitle } from '@/components/ui/alert';
@@ -24,7 +26,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
-const setupFormSchema = z.object({
+const profileFormSchema = z.object({
   name: z
     .string()
     .check(
@@ -51,23 +53,31 @@ const setupFormSchema = z.object({
     ),
 });
 
-interface SetupFormProps {
+interface ProfileFormProps {
   defaultName: string;
+  defaultUsername?: string;
+  redirectPath?: Route;
+  submitLabel?: string;
 }
 
-export function SetupForm({ defaultName }: SetupFormProps) {
+export function ProfileForm({
+  defaultName,
+  defaultUsername = '',
+  redirectPath,
+  submitLabel = 'Save Changes',
+}: ProfileFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const { push } = useRouter();
+  const { push, refresh } = useRouter();
 
   const form = useForm({
     defaultValues: {
       name: defaultName,
-      username: '',
+      username: defaultUsername,
     },
     validators: {
-      onSubmit: setupFormSchema,
+      onSubmit: profileFormSchema,
     },
     onSubmit: ({ value }) => {
       setFormError(null);
@@ -80,7 +90,12 @@ export function SetupForm({ defaultName }: SetupFormProps) {
           },
           {
             onSuccess: () => {
-              push('/profile');
+              toast.success('Profile updated.');
+              if (redirectPath) {
+                push(redirectPath);
+              } else {
+                refresh();
+              }
             },
             onError: (ctx) => {
               setFormError(ctx.error.message || 'An unexpected error occurred');
@@ -110,7 +125,7 @@ export function SetupForm({ defaultName }: SetupFormProps) {
         <form.Field
           name="name"
           validators={{
-            onChange: setupFormSchema.shape.name,
+            onChange: profileFormSchema.shape.name,
           }}
         >
           {(field) => {
@@ -143,9 +158,13 @@ export function SetupForm({ defaultName }: SetupFormProps) {
           asyncDebounceMs={300}
           name="username"
           validators={{
-            onChange: setupFormSchema.shape.username,
+            onChange: profileFormSchema.shape.username,
             onChangeAsync: async ({ value }) => {
-              const parsed = setupFormSchema.shape.username.safeParse(value);
+              if (value === defaultUsername) {
+                return;
+              }
+
+              const parsed = profileFormSchema.shape.username.safeParse(value);
 
               if (!parsed.success) {
                 return;
@@ -221,7 +240,7 @@ export function SetupForm({ defaultName }: SetupFormProps) {
         <Field>
           <Button disabled={isPending} type="submit">
             {isPending && <Spinner />}
-            Continue
+            {submitLabel}
           </Button>
           {formError ? (
             <Alert variant="destructive">
