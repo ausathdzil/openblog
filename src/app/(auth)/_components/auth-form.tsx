@@ -4,7 +4,7 @@ import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import * as z from 'zod/mini';
 
 import { Alert, AlertTitle } from '@/components/ui/alert';
@@ -36,7 +36,7 @@ export function AuthForm({
   className,
   ...props
 }: React.ComponentProps<'form'>) {
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [isOtpDialogOpen, setIsOtpDialogOpen] = useState(false);
   const { push } = useRouter();
@@ -49,26 +49,29 @@ export function AuthForm({
       onSubmit: authFormSchema,
     },
     onSubmit: ({ value }) => {
-      setFormError(null);
-      startTransition(async () => {
-        await authClient.emailOtp.sendVerificationOtp(
-          {
-            email: value.email,
-            type: 'sign-in',
+      authClient.emailOtp.sendVerificationOtp(
+        {
+          email: value.email,
+          type: 'sign-in',
+        },
+        {
+          onRequest: () => {
+            setFormError(null);
+            setIsLoading(true);
           },
-          {
-            onSuccess: () => {
-              setIsOtpDialogOpen(true);
-            },
-            onError: (ctx) => {
-              setFormError(
-                ctx.error.message ||
-                  'Failed to send verification email. Please try again.'
-              );
-            },
-          }
-        );
-      });
+          onSuccess: () => {
+            setIsOtpDialogOpen(true);
+            setIsLoading(false);
+          },
+          onError: (ctx) => {
+            setFormError(
+              ctx.error.message ||
+                'Failed to send verification email. Please try again.'
+            );
+            setIsLoading(false);
+          },
+        }
+      );
     },
     onSubmitInvalid() {
       const $invalidInput = document.querySelector('[aria-invalid="true"]');
@@ -144,8 +147,8 @@ export function AuthForm({
             }}
           </form.Field>
           <Field>
-            <Button disabled={isPending} type="submit">
-              {isPending && <Spinner />}
+            <Button disabled={isLoading} type="submit">
+              {isLoading && <Spinner />}
               Continue with Email
             </Button>
             {formError ? (

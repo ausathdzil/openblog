@@ -180,8 +180,6 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
   }, [countdown]);
 
   const handleResend = async () => {
-    setFormError(null);
-
     await authClient.emailOtp.sendVerificationOtp(
       {
         email,
@@ -190,18 +188,18 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
       {
         onRequest: () => {
           setIsLoading(true);
-        },
-        onError: (ctx) => {
-          setIsLoading(false);
-          setFormError(
-            ctx.error.message ||
-              'Failed to resend verification email. Please try again.'
-          );
+          setFormError(null);
         },
         onSuccess: () => {
           setIsLoading(false);
           toast.success('Verification code resent successfully.');
           setCountdown(60);
+        },
+        onError: (ctx) => {
+          setIsLoading(false);
+          setFormError(
+            ctx.error.message || 'Failed to resend code. Please try again.'
+          );
         },
       }
     );

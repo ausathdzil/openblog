@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
     <main className="flex min-h-svh flex-col gap-4 p-6 md:p-10">
-      <div className="flex justify-center gap-2 md:justify-start">
+      <div className="flex justify-center gap-2">
         <Button
           className="gap-2"
           nativeButton={false}

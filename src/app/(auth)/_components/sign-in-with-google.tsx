@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useTransition } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
@@ -10,30 +10,32 @@ interface SignInWithGoogleProps {
 }
 
 export function SignInWithGoogle({ onFormError }: SignInWithGoogleProps) {
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
 
   const signInWithGoogle = () => {
-    startTransition(async () => {
-      onFormError(null);
-      await authClient.signIn.social(
-        {
-          provider: 'google',
-          callbackURL: '/setup',
+    authClient.signIn.social(
+      {
+        provider: 'google',
+        callbackURL: '/setup',
+      },
+      {
+        onRequest: () => {
+          onFormError(null);
+          setIsLoading(true);
         },
-        {
-          onError: (ctx) => {
-            onFormError(ctx.error.message || 'An unexpected error occurred');
-          },
-        }
-      );
-    });
+        onError: (ctx) => {
+          onFormError(ctx.error.message || 'An unexpected error occurred');
+          setIsLoading(false);
+        },
+      }
+    );
   };
 
   return (
     <Field>
       <Button
         className="gap-2.5"
-        disabled={isPending}
+        disabled={isLoading}
         onClick={signInWithGoogle}
         size="lg"
         type="button"
@@ -46,7 +48,7 @@ export function SignInWithGoogle({ onFormError }: SignInWithGoogleProps) {
           src="/google.svg"
           width={20}
         />
-        Continue with Google
+        Sign in with Google
       </Button>
     </Field>
   );
