@@ -57,26 +57,44 @@ export function Header({
       className={cn('sticky top-0 z-10 bg-background pt-safe-top', className)}
       {...props}
     >
-      <div className="relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 p-4">
-        <Button
-          className="h-11 px-3 sm:h-8 sm:px-2.5"
-          onClick={handleBack}
-          size="sm"
-          variant="ghost"
-        >
+      <div className="relative mx-auto hidden w-full max-w-6xl items-center justify-between gap-4 p-4 sm:flex">
+        <Button onClick={handleBack} size="sm" variant="ghost">
           <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
           Back
         </Button>
         <Large
           aria-hidden={!showTitle}
           className={cn(
-            'absolute left-1/2 hidden -translate-x-1/2 transition-opacity sm:block',
+            'absolute left-1/2 line-clamp-1 -translate-x-1/2 transition-opacity',
             showTitle ? 'opacity-100' : 'opacity-0'
           )}
         >
           {title}
         </Large>
         {children}
+      </div>
+
+      <div className="relative mx-auto flex w-full max-w-6xl items-center p-4 sm:hidden">
+        <button
+          aria-label="Go back"
+          className="size-11 sm:hidden"
+          onClick={handleBack}
+          type="button"
+        >
+          <HugeiconsIcon
+            icon={ArrowLeft01Icon}
+            onClick={handleBack}
+            strokeWidth={2}
+          />
+        </button>
+        <Large
+          className={cn(
+            'line-clamp-1',
+            showTitle ? 'opacity-100' : 'opacity-0'
+          )}
+        >
+          {title}
+        </Large>
       </div>
     </header>
   );
