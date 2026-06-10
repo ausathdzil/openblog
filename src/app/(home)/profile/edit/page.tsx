@@ -39,6 +39,10 @@ async function EditProfileContent() {
     redirect('/sign-in');
   }
 
+  if (!session.user.username) {
+    redirect('/setup');
+  }
+
   return (
     <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
       <div className="space-y-2">

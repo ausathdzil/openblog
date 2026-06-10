@@ -6,14 +6,10 @@ import { Field } from '@/components/ui/field';
 import { authClient } from '@/lib/auth-client';
 
 interface SignInWithGoogleProps {
-  label?: string | undefined;
   onFormError: (message: string | null) => void;
 }
 
-export function SignInWithGoogle({
-  label = 'Sign in with Google',
-  onFormError,
-}: SignInWithGoogleProps) {
+export function SignInWithGoogle({ onFormError }: SignInWithGoogleProps) {
   const [isPending, startTransition] = useTransition();
 
   const signInWithGoogle = () => {
@@ -22,7 +18,7 @@ export function SignInWithGoogle({
       await authClient.signIn.social(
         {
           provider: 'google',
-          callbackURL: '/username',
+          callbackURL: '/setup',
         },
         {
           onError: (ctx) => {
@@ -50,7 +46,7 @@ export function SignInWithGoogle({
           src="/google.svg"
           width={20}
         />
-        {label}
+        Continue with Google
       </Button>
     </Field>
   );

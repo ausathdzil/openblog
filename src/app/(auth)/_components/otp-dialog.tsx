@@ -47,20 +47,12 @@ interface OtpDialogProps {
     setFormError: (err: string | null) => void
   ) => Promise<void> | void;
   open: boolean;
-  resendType?:
-    | 'sign-in'
-    | 'email-verification'
-    | 'forget-password'
-    | 'change-email';
-  submitLabel?: string;
 }
 
 export function OtpDialog({
   email,
   open,
   onOpenChange,
-  submitLabel = 'Confirm',
-  resendType = 'sign-in',
   onSubmit,
 }: OtpDialogProps) {
   const [formError, setFormError] = useState<string | null>(null);
@@ -100,12 +92,7 @@ export function OtpDialog({
           }}
         >
           <FieldGroup>
-            <form.Field
-              name="otp"
-              validators={{
-                onBlur: signInOtpFormSchema.shape.otp,
-              }}
-            >
+            <form.Field name="otp">
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
@@ -156,19 +143,15 @@ export function OtpDialog({
                 </Alert>
               </Field>
             ) : null}
-            <OtpResendButton
-              email={email}
-              setFormError={setFormError}
-              type={resendType}
-            />
           </FieldGroup>
         </form>
         <AlertDialogFooter className="grid grid-cols-1">
           <AlertDialogAction disabled={isPending} form="otp-form" type="submit">
             {isPending && <Spinner />}
-            {submitLabel}
+            Verify
           </AlertDialogAction>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <OtpResendButton email={email} setFormError={setFormError} />
+          <AlertDialogCancel variant="ghost">Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -178,16 +161,11 @@ export function OtpDialog({
 interface OtpResendButtonProps {
   email: string;
   setFormError: (error: string | null) => void;
-  type?: 'sign-in' | 'email-verification' | 'forget-password' | 'change-email';
 }
 
-export function OtpResendButton({
-  email,
-  setFormError,
-  type = 'sign-in',
-}: OtpResendButtonProps) {
+export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
   const [countdown, setCountdown] = useState(60);
-  const [isPending, setIsPending] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (countdown === 0) {
@@ -202,24 +180,34 @@ export function OtpResendButton({
   }, [countdown]);
 
   const handleResend = async () => {
-    setIsPending(true);
     setFormError(null);
-    const { error } = await authClient.emailOtp.sendVerificationOtp({
-      email,
-      type,
-    });
 
-    setIsPending(false);
-
-    if (error) {
-      setFormError(error.message || 'Failed to resend code. Please try again.');
-    } else {
-      toast.success('Verification code resent successfully.');
-      setCountdown(60);
-    }
+    await authClient.emailOtp.sendVerificationOtp(
+      {
+        email,
+        type: 'sign-in',
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+        },
+        onError: (ctx) => {
+          setIsLoading(false);
+          setFormError(
+            ctx.error.message ||
+              'Failed to resend verification email. Please try again.'
+          );
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+          toast.success('Verification code resent successfully.');
+          setCountdown(60);
+        },
+      }
+    );
   };
 
-  const isDisabled = isPending || countdown > 0;
+  const isDisabled = isLoading || countdown > 0;
   const labelText =
     countdown > 0 ? `Resend Code (${countdown})` : 'Resend Code';
 
@@ -231,7 +219,7 @@ export function OtpResendButton({
       type="button"
       variant="outline"
     >
-      {isPending && <Spinner />}
+      {isLoading && <Spinner />}
       {labelText}
     </Button>
   );

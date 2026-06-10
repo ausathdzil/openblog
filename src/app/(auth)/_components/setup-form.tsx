@@ -15,6 +15,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import {
   InputGroup,
   InputGroupAddon,
@@ -23,7 +24,14 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
-const usernameFormSchema = z.object({
+const setupFormSchema = z.object({
+  name: z
+    .string()
+    .check(
+      z.trim(),
+      z.minLength(3, 'Name must be at least 3 characters long.'),
+      z.maxLength(30, 'Name must be 30 characters or fewer.')
+    ),
   username: z
     .string()
     .check(
@@ -43,7 +51,11 @@ const usernameFormSchema = z.object({
     ),
 });
 
-export function UsernameForm() {
+interface SetupFormProps {
+  defaultName: string;
+}
+
+export function SetupForm({ defaultName }: SetupFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -51,16 +63,18 @@ export function UsernameForm() {
 
   const form = useForm({
     defaultValues: {
+      name: defaultName,
       username: '',
     },
     validators: {
-      onSubmit: usernameFormSchema,
+      onSubmit: setupFormSchema,
     },
     onSubmit: ({ value }) => {
       setFormError(null);
       startTransition(async () => {
         await authClient.updateUser(
           {
+            name: value.name,
             username: value.username,
             displayUsername: value.username,
           },
@@ -94,12 +108,44 @@ export function UsernameForm() {
     >
       <FieldGroup>
         <form.Field
+          name="name"
+          validators={{
+            onChange: setupFormSchema.shape.name,
+          }}
+        >
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  autoComplete="name"
+                  id={field.name}
+                  maxLength={30}
+                  minLength={3}
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Alice Smith"
+                  required
+                  type="text"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field
           asyncDebounceMs={300}
           name="username"
           validators={{
-            onChange: usernameFormSchema.shape.username,
+            onChange: setupFormSchema.shape.username,
             onChangeAsync: async ({ value }) => {
-              const parsed = usernameFormSchema.shape.username.safeParse(value);
+              const parsed = setupFormSchema.shape.username.safeParse(value);
 
               if (!parsed.success) {
                 return;
@@ -139,9 +185,7 @@ export function UsernameForm() {
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel className="sr-only" htmlFor={field.name}>
-                  Username
-                </FieldLabel>
+                <FieldLabel htmlFor={field.name}>Username</FieldLabel>
                 <InputGroup>
                   <InputGroupAddon>
                     {isCheckingUsername ? (
@@ -173,6 +217,7 @@ export function UsernameForm() {
             );
           }}
         </form.Field>
+
         <Field>
           <Button disabled={isPending} type="submit">
             {isPending && <Spinner />}

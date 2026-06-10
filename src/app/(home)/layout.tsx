@@ -74,7 +74,7 @@ async function HeaderActions() {
           <Button
             className="h-11 px-4"
             nativeButton={false}
-            render={<Link href="/sign-up" />}
+            render={<Link href="/sign-in" />}
             size="pill-sm"
           >
             Get Started

@@ -71,6 +71,10 @@ async function Profile() {
     redirect('/sign-in');
   }
 
+  if (!session.user.username) {
+    redirect('/setup');
+  }
+
   return (
     <div className="grid grid-rows-[auto_auto_auto] gap-4">
       <Avatar className="size-36 justify-self-center">

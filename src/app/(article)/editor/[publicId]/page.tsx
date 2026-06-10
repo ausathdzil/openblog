@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
+import { auth } from '@/lib/auth';
 import { ArticleEditor } from '../../_components/article-editor';
 import { getArticleByPublicId } from '../../_lib/data';
 
@@ -44,6 +45,18 @@ export default function EditArticlePage({
 async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   const headersList = await headers();
   const headersRecord = Object.fromEntries(headersList.entries());
+
+  const session = await auth.api.getSession({
+    headers: headersRecord,
+  });
+
+  if (!session) {
+    redirect('/sign-in');
+  }
+
+  if (!session.user.username) {
+    redirect('/setup');
+  }
 
   const { publicId } = await params;
   const { article, error } = await getArticleByPublicId(

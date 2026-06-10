@@ -55,14 +55,6 @@ export async function UserButton({
             nativeButton={false}
             render={<Link href="/sign-in" />}
             size="pill-sm"
-            variant="secondary"
-          >
-            Sign In
-          </Button>
-          <Button
-            nativeButton={false}
-            render={<Link href="/sign-up" />}
-            size="pill-sm"
             variant="default"
           >
             Get Started

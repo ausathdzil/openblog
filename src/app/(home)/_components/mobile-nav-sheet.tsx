@@ -68,12 +68,6 @@ const guestLinks: MobileNavLink[] = [
   },
   {
     href: '/sign-in',
-    label: 'Sign In',
-    icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,
-    variant: 'outline',
-  },
-  {
-    href: '/sign-up',
     label: 'Get Started',
     icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,
     variant: 'default',

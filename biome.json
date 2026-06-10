@@ -6,10 +6,7 @@
   ],
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": [
-      "!drizzle",
-      "!src/components/ui/*"
-    ]
+    "includes": ["!drizzle", "!src/components/ui/*"]
   },
   "linter": {
     "rules": {
@@ -35,16 +32,10 @@
           "level": "on",
           "options": {
             "groups": [
-              [
-                ":BUN:",
-                ":NODE:"
-              ],
+              [":BUN:", ":NODE:"],
               ":PACKAGE:",
               ":BLANK_LINE:",
-              [
-                ":ALIAS:",
-                ":PATH:"
-              ]
+              [":ALIAS:", ":PATH:"]
             ]
           }
         }
@@ -58,9 +49,7 @@
   },
   "overrides": [
     {
-      "includes": [
-        "src/db/utils.ts"
-      ],
+      "includes": ["src/db/utils.ts"],
       "linter": {
         "rules": {
           "complexity": {

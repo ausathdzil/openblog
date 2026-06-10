@@ -13,15 +13,9 @@
     },
     "tailwindcss-language-server": {
       "settings": {
-        "classFunctions": [
-          "clsx",
-          "cn",
-          "cva"
-        ],
+        "classFunctions": ["clsx", "cn", "cva"],
         "experimental": {
-          "classRegex": [
-            "[cls|className]\\s\\:\\=\\s\"([^\"]*)"
-          ]
+          "classRegex": ["[cls|className]\\s\\:\\=\\s\"([^\"]*)"]
         }
       }
     }
@@ -63,7 +57,7 @@
     "CSS": {
       "language_servers": [
         "tailwindcss-intellisense-css",
-        "!vscode-css-language-server",
+        "!vscode-css-language-server"
       ]
     }
   }
