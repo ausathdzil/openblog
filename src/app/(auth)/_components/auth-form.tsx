@@ -116,12 +116,7 @@ export function AuthForm({
         <FieldGroup>
           <SignInWithGoogle onFormError={setFormError} />
           <FieldSeparator>OR</FieldSeparator>
-          <form.Field
-            name="email"
-            validators={{
-              onBlur: authFormSchema.shape.email,
-            }}
-          >
+          <form.Field name="email">
             {(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
