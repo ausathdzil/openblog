@@ -43,6 +43,13 @@
       "when": 1772635749693,
       "tag": "0005_rename_articles_to_article",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782295027648,
+      "tag": "0006_keen_lady_ursula",
+      "breakpoints": true
     }
   ]
 }

@@ -25,6 +25,13 @@ import {
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
 
 const profileFormSchema = z.object({
   name: z
@@ -114,142 +121,157 @@ export function ProfileForm({
   });
 
   return (
-    <form
-      className="flex flex-col gap-6"
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-    >
-      <FieldGroup>
-        <form.Field
-          name="name"
-          validators={{
-            onChange: profileFormSchema.shape.name,
+    <Card>
+      <CardHeader>
+        <CardTitle>Profile Settings</CardTitle>
+        <CardDescription>
+          Update your display name and username.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          className="flex flex-col gap-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
           }}
         >
-          {(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  autoComplete="name"
-                  id={field.name}
-                  maxLength={30}
-                  minLength={3}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Alice Smith"
-                  required
-                  type="text"
-                  value={field.state.value}
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
-
-        <form.Field
-          asyncDebounceMs={300}
-          name="username"
-          validators={{
-            onChange: profileFormSchema.shape.username,
-            onChangeAsync: async ({ value }) => {
-              if (value === defaultUsername) {
-                return;
-              }
-
-              const parsed = profileFormSchema.shape.username.safeParse(value);
-
-              if (!parsed.success) {
-                return;
-              }
-
-              const { data, error } = await authClient.isUsernameAvailable(
-                {
-                  username: value,
-                },
-                {
-                  onRequest: () => {
-                    setIsCheckingUsername(true);
-                  },
-                  onSuccess: () => {
-                    setIsCheckingUsername(false);
-                  },
-                  onError: () => {
-                    setIsCheckingUsername(false);
-                  },
-                }
-              );
-
-              if (error) {
-                return { message: 'Error checking username availability.' };
-              }
-
-              if (!data.available) {
-                return { message: 'Username is not available.' };
-              }
-
-              return;
-            },
-          }}
-        >
-          {(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                <InputGroup>
-                  <InputGroupAddon>
-                    {isCheckingUsername ? (
-                      <Spinner />
-                    ) : (
-                      <HugeiconsIcon icon={AtIcon} strokeWidth={2} />
+          <FieldGroup>
+            <form.Field
+              name="name"
+              validators={{
+                onChange: profileFormSchema.shape.name,
+              }}
+            >
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
+                    <Input
+                      aria-invalid={isInvalid}
+                      autoComplete="name"
+                      id={field.name}
+                      maxLength={30}
+                      minLength={3}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Alice Smith"
+                      required
+                      type="text"
+                      value={field.state.value}
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
                     )}
-                  </InputGroupAddon>
-                  <InputGroupInput
-                    aria-invalid={isInvalid}
-                    autoCapitalize="off"
-                    autoComplete="username"
-                    autoCorrect="off"
-                    id={field.name}
-                    maxLength={30}
-                    minLength={3}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="alice"
-                    required
-                    spellCheck="false"
-                    type="text"
-                    value={field.state.value}
-                  />
-                </InputGroup>
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
+                  </Field>
+                );
+              }}
+            </form.Field>
 
-        <Field>
-          <Button disabled={isPending} type="submit">
-            {isPending && <Spinner />}
-            {submitLabel}
-          </Button>
-          {formError ? (
-            <Alert variant="destructive">
-              <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
-              <AlertTitle>{formError}</AlertTitle>
-            </Alert>
-          ) : null}
-        </Field>
-      </FieldGroup>
-    </form>
+            <form.Field
+              asyncDebounceMs={300}
+              name="username"
+              validators={{
+                onChange: profileFormSchema.shape.username,
+                onChangeAsync: async ({ value }) => {
+                  if (value === defaultUsername) {
+                    return;
+                  }
+
+                  const parsed =
+                    profileFormSchema.shape.username.safeParse(value);
+
+                  if (!parsed.success) {
+                    return;
+                  }
+
+                  const { data, error } = await authClient.isUsernameAvailable(
+                    {
+                      username: value,
+                    },
+                    {
+                      onRequest: () => {
+                        setIsCheckingUsername(true);
+                      },
+                      onSuccess: () => {
+                        setIsCheckingUsername(false);
+                      },
+                      onError: () => {
+                        setIsCheckingUsername(false);
+                      },
+                    }
+                  );
+
+                  if (error) {
+                    return { message: 'Error checking username availability.' };
+                  }
+
+                  if (!data.available) {
+                    return { message: 'Username is not available.' };
+                  }
+
+                  return;
+                },
+              }}
+            >
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Username</FieldLabel>
+                    <InputGroup>
+                      <InputGroupAddon>
+                        {isCheckingUsername ? (
+                          <Spinner />
+                        ) : (
+                          <HugeiconsIcon icon={AtIcon} strokeWidth={2} />
+                        )}
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        aria-invalid={isInvalid}
+                        autoCapitalize="off"
+                        autoComplete="username"
+                        autoCorrect="off"
+                        id={field.name}
+                        maxLength={30}
+                        minLength={3}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="alice"
+                        required
+                        spellCheck="false"
+                        type="text"
+                        value={field.state.value}
+                      />
+                    </InputGroup>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            </form.Field>
+
+            <Field>
+              <Button disabled={isPending} type="submit">
+                {isPending && <Spinner />}
+                {submitLabel}
+              </Button>
+              {formError ? (
+                <Alert variant="destructive">
+                  <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
+                  <AlertTitle>{formError}</AlertTitle>
+                </Alert>
+              ) : null}
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

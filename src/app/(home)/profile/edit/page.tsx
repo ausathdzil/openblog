@@ -7,16 +7,10 @@ import { Suspense } from 'react';
 import { ProfileForm } from '@/components/profile-form';
 import { Muted, Title } from '@/components/typography';
 import { Button } from '@/components/ui/button';
-import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemTitle,
-} from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { MobileSignOutButton } from '../../_components/mobile-sign-out-button';
+import { PasskeySettings } from '../../_components/passkey-settings';
 
 export const metadata: Metadata = {
   title: 'Edit profile',
@@ -43,6 +37,10 @@ async function EditProfileContent() {
     redirect('/setup');
   }
 
+  const passkeys = await auth.api.listPasskeys({
+    headers: await headers(),
+  });
+
   return (
     <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
       <div className="space-y-2">
@@ -51,23 +49,12 @@ async function EditProfileContent() {
           Manage your account settings and security details.
         </Muted>
       </div>
-      <ItemGroup>
-        <Item variant="outline">
-          <ItemContent className="gap-6">
-            <div className="space-y-1">
-              <ItemTitle>Profile Settings</ItemTitle>
-              <ItemDescription>
-                Update your display name and username.
-              </ItemDescription>
-            </div>
-            <ProfileForm
-              defaultName={session.user.name}
-              defaultUsername={session.user.displayUsername ?? ''}
-              submitLabel="Save Changes"
-            />
-          </ItemContent>
-        </Item>
-      </ItemGroup>
+      <ProfileForm
+        defaultName={session.user.name}
+        defaultUsername={session.user.displayUsername ?? ''}
+        submitLabel="Save Changes"
+      />
+      <PasskeySettings initialPasskeys={passkeys ?? []} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button
           className="justify-self-start"

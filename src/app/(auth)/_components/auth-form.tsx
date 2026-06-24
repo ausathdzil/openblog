@@ -3,7 +3,8 @@
 import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import * as z from 'zod/mini';
 
 import { Muted, Title } from '@/components/typography';
@@ -22,6 +23,7 @@ import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import { OtpForm } from './otp-form';
 import { SignInWithGoogle } from './sign-in-with-google';
+import { SignInWithPasskey } from './sign-in-with-passkey';
 
 const authFormSchema = z.object({
   email: z
@@ -39,6 +41,32 @@ export function AuthForm({
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [otpEmail, setOtpEmail] = useState<string | null>(null);
+  const { push } = useRouter();
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.PublicKeyCredential &&
+      PublicKeyCredential.isConditionalMediationAvailable
+    ) {
+      PublicKeyCredential.isConditionalMediationAvailable().then(
+        (available) => {
+          if (available) {
+            authClient.signIn
+              .passkey({
+                autoFill: true,
+                fetchOptions: {
+                  onSuccess: () => {
+                    push('/profile');
+                  },
+                },
+              })
+              .catch(console.error);
+          }
+        }
+      );
+    }
+  }, [push]);
 
   const form = useForm({
     defaultValues: {
@@ -55,8 +83,8 @@ export function AuthForm({
         },
         {
           onRequest: () => {
-            setFormError(null);
             setIsLoading(true);
+            setFormError(null);
           },
           onSuccess: () => {
             setIsLoading(false);
@@ -64,11 +92,11 @@ export function AuthForm({
             form.reset();
           },
           onError: (ctx) => {
+            setIsLoading(false);
             setFormError(
               ctx.error.message ||
                 'Failed to send verification email. Please try again.'
             );
-            setIsLoading(false);
           },
         }
       );
@@ -103,7 +131,10 @@ export function AuthForm({
         {...props}
       >
         <FieldGroup>
-          <SignInWithGoogle onFormError={setFormError} />
+          <div className="flex flex-col gap-2">
+            <SignInWithGoogle onFormError={setFormError} />
+            <SignInWithPasskey onFormError={setFormError} />
+          </div>
           <FieldSeparator>OR</FieldSeparator>
           <form.Field name="email">
             {(field) => {
@@ -114,7 +145,7 @@ export function AuthForm({
                   <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                   <Input
                     aria-invalid={isInvalid}
-                    autoComplete="email"
+                    autoComplete="username webauthn"
                     id={field.name}
                     maxLength={100}
                     name={field.name}

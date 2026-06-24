@@ -16,16 +16,16 @@ export function SignInWithGoogle({ onFormError }: SignInWithGoogleProps) {
     authClient.signIn.social(
       {
         provider: 'google',
-        callbackURL: '/setup',
+        callbackURL: '/profile',
       },
       {
         onRequest: () => {
-          onFormError(null);
           setIsLoading(true);
+          onFormError(null);
         },
         onError: (ctx) => {
-          onFormError(ctx.error.message || 'An unexpected error occurred');
           setIsLoading(false);
+          onFormError(ctx.error.message || 'An unexpected error occurred');
         },
       }
     );

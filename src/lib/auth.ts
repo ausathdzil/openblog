@@ -1,3 +1,4 @@
+import { getAuthenticatorName, passkey } from '@better-auth/passkey';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
 import { nextCookies } from 'better-auth/next-js';
@@ -58,6 +59,17 @@ export const auth = betterAuth({
        */
       usernameValidator: (username) =>
         /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/.test(username),
+    }),
+    passkey({
+      rpID: process.env.NEXT_PUBLIC_APP_URL
+        ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
+        : 'localhost',
+      rpName: 'OpenBlog',
+      registration: {
+        afterVerification: async ({ verification }) => ({
+          name: getAuthenticatorName(verification.registrationInfo?.aaguid),
+        }),
+      },
     }),
     nextCookies(),
   ],
