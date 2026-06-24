@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="mx-auto grid w-full max-w-5xl flex-1 p-4">
+    <main className="mx-auto grid w-full max-w-5xl flex-1 p-6 sm:p-4">
       <Suspense fallback={<ArticlesSkeleton />}>
         <Articles />
       </Suspense>

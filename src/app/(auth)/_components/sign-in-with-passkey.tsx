@@ -36,13 +36,13 @@ export function SignInWithPasskey({ onFormError }: SignInWithPasskeyProps) {
 
   return (
     <Button
-      className="w-full"
+      className="w-full gap-2.5"
       disabled={isLoading}
       onClick={handleSignIn}
       type="button"
       variant="outline"
     >
-      <HugeiconsIcon icon={Key01Icon} strokeWidth={2} />
+      <HugeiconsIcon className="size-5" icon={Key01Icon} strokeWidth={2} />
       Sign in with Passkey
     </Button>
   );

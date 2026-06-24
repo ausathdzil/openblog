@@ -42,7 +42,7 @@ async function EditProfileContent() {
   });
 
   return (
-    <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
+    <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
       <div className="space-y-2">
         <Title>Edit profile</Title>
         <Muted className="text-center">
@@ -72,7 +72,7 @@ async function EditProfileContent() {
 
 function EditProfileSkeleton() {
   return (
-    <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
+    <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
       <div className="space-y-2">
         <Skeleton className="mx-auto h-10 w-48" />
         <Skeleton className="mx-auto h-5 w-80" />

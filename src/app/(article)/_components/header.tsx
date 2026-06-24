@@ -74,7 +74,7 @@ export function Header({
         {children}
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-6xl items-center p-4 sm:hidden">
+      <div className="relative mx-auto flex w-full max-w-6xl items-center p-6 sm:hidden">
         <button
           aria-label="Go back"
           className="size-11 sm:hidden"

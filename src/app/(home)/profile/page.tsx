@@ -43,7 +43,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ searchParams }: ProfilePageProps) {
   return (
-    <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
+    <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
       <Suspense fallback={<ProfileSkeleton />}>
         <Profile />
       </Suspense>

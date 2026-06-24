@@ -164,7 +164,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
           )}
         </form.Subscribe>
       </Header>
-      <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-4 sm:p-8">
+      <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-6 sm:p-4">
         <div
           className={cn(
             buttonVariants({ size: 'lg', variant: 'ghost' }),

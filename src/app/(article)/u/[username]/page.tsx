@@ -47,7 +47,7 @@ export default function UserPage({ params, searchParams }: UserPageProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="mx-auto grid w-full max-w-2xl gap-8 p-4 pb-32">
+      <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
         <Suspense fallback={<ProfileSkeleton />}>
           <Profile params={params} />
         </Suspense>
