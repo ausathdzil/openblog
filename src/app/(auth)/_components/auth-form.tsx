@@ -3,10 +3,10 @@
 import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as z from 'zod/mini';
 
+import { Muted, Title } from '@/components/typography';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-import { OtpDialog } from './otp-dialog';
+import { OtpForm } from './otp-form';
 import { SignInWithGoogle } from './sign-in-with-google';
 
 const authFormSchema = z.object({
@@ -38,8 +38,7 @@ export function AuthForm({
 }: React.ComponentProps<'form'>) {
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [isOtpDialogOpen, setIsOtpDialogOpen] = useState(false);
-  const { push } = useRouter();
+  const [otpEmail, setOtpEmail] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -60,8 +59,9 @@ export function AuthForm({
             setIsLoading(true);
           },
           onSuccess: () => {
-            setIsOtpDialogOpen(true);
             setIsLoading(false);
+            setOtpEmail(value.email);
+            form.reset();
           },
           onError: (ctx) => {
             setFormError(
@@ -82,29 +82,18 @@ export function AuthForm({
     },
   });
 
-  const handleVerifyOtp = async (
-    otp: string,
-    setFormError: (error: string | null) => void
-  ) => {
-    await authClient.signIn.emailOtp(
-      {
-        email: form.state.values.email,
-        otp,
-      },
-      {
-        onSuccess: () => {
-          setIsOtpDialogOpen(false);
-          push('/setup');
-        },
-        onError: (ctx) => {
-          setFormError(ctx.error.message || 'An unexpected error occurred');
-        },
-      }
-    );
-  };
+  if (otpEmail) {
+    return <OtpForm email={otpEmail} onBack={() => setOtpEmail(null)} />;
+  }
 
   return (
     <>
+      <div className="flex flex-col items-center gap-1 text-center">
+        <Title className="text-2xl">Welcome to OpenBlog</Title>
+        <Muted className="text-balance">
+          Get started with Google or enter your email
+        </Muted>
+      </div>
       <form
         className={cn('flex flex-col gap-6', className)}
         onSubmit={(e) => {
@@ -155,12 +144,6 @@ export function AuthForm({
           </Field>
         </FieldGroup>
       </form>
-      <OtpDialog
-        email={form.state.values.email}
-        onOpenChange={setIsOtpDialogOpen}
-        onSubmit={handleVerifyOtp}
-        open={isOtpDialogOpen}
-      />
     </>
   );
 }

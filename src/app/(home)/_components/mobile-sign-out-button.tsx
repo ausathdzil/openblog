@@ -2,7 +2,6 @@
 
 import { LogoutCircle02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -19,7 +18,6 @@ export function MobileSignOutButton({
   ...props
 }: MobileSignOutButtonProps) {
   const [isPending, startTransition] = useTransition();
-  const { push } = useRouter();
 
   const handleSignOut = () => {
     startTransition(async () => {
@@ -27,7 +25,7 @@ export function MobileSignOutButton({
         fetchOptions: {
           onSuccess: () => {
             onSignedOut?.();
-            push('/sign-in');
+            window.location.href = '/sign-in';
           },
           onError: (ctx) => {
             toast.error(ctx.error.message || 'An unexpected error occurred');

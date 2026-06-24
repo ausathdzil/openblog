@@ -2,7 +2,6 @@
 
 import { LogoutCircle02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -14,14 +13,13 @@ export function SignOutButton(
   props: React.ComponentProps<typeof DropdownMenuItem>
 ) {
   const [isPending, startTransition] = useTransition();
-  const { push } = useRouter();
 
   const handleSignOut = () => {
     startTransition(async () => {
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {
-            push('/sign-in');
+            window.location.href = '/sign-in';
           },
           onError: (ctx) => {
             toast.error(ctx.error.message || 'An unexpected error occurred');
