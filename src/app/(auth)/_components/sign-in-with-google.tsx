@@ -1,9 +1,9 @@
-import Image from 'next/image';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { authClient } from '@/lib/auth-client';
+import { Google } from './google';
 
 interface SignInWithGoogleProps {
   onFormError: (message: string | null) => void;
@@ -41,13 +41,7 @@ export function SignInWithGoogle({ onFormError }: SignInWithGoogleProps) {
         type="button"
         variant="outline"
       >
-        <Image
-          alt="Google"
-          className="size-5"
-          height={20}
-          src="/google.svg"
-          width={20}
-        />
+        <Google className="size-5" />
         Sign in with Google
       </Button>
     </Field>
