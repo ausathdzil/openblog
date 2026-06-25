@@ -1,11 +1,13 @@
 'use client';
 
-import { AlertCircleIcon } from '@hugeicons/core-free-icons';
+import {
+  AlertCircleIcon,
+  CheckmarkCircle02Icon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
-import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import { Muted, Title } from '@/components/typography';
@@ -38,7 +40,10 @@ interface OtpFormProps extends Omit<React.ComponentProps<'form'>, 'onSubmit'> {
 }
 
 export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formStatus, setFormStatus] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
   const [isPending, startTransition] = useTransition();
   const { push } = useRouter();
 
@@ -50,7 +55,7 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
       onSubmit: signInOtpFormSchema,
     },
     onSubmit: ({ value }) => {
-      setFormError(null);
+      setFormStatus(null);
       startTransition(async () => {
         const { data } = await authClient.signIn.emailOtp(
           {
@@ -59,7 +64,10 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
           },
           {
             onError: (ctx) => {
-              setFormError(ctx.error.message || 'An unexpected error occurred');
+              setFormStatus({
+                type: 'error',
+                message: ctx.error.message || 'An unexpected error occurred',
+              });
             },
           }
         );
@@ -139,21 +147,31 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
               );
             }}
           </form.Field>
-          {formError ? (
-            <Field>
-              <Alert variant="destructive">
-                <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
-                <AlertTitle>{formError}</AlertTitle>
-              </Alert>
-            </Field>
-          ) : null}
+          <Field>
+            <Alert
+              className={cn(
+                formStatus ? 'visible opacity-100' : 'invisible opacity-0'
+              )}
+              variant={formStatus?.type === 'error' ? 'destructive' : 'success'}
+            >
+              <HugeiconsIcon
+                icon={
+                  formStatus?.type === 'error'
+                    ? AlertCircleIcon
+                    : CheckmarkCircle02Icon
+                }
+                strokeWidth={2}
+              />
+              <AlertTitle>{formStatus?.message || 'Placeholder'}</AlertTitle>
+            </Alert>
+          </Field>
         </FieldGroup>
         <div className="flex flex-col gap-2">
           <Button disabled={isPending} type="submit">
             {isPending && <Spinner />}
             Verify
           </Button>
-          <OtpResendButton email={email} setFormError={setFormError} />
+          <OtpResendButton email={email} setFormStatus={setFormStatus} />
           {onBack && (
             <Button
               disabled={isPending}
@@ -172,10 +190,15 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
 
 interface OtpResendButtonProps {
   email: string;
-  setFormError: (error: string | null) => void;
+  setFormStatus: (
+    status: { type: 'success' | 'error'; message: string } | null
+  ) => void;
 }
 
-export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
+export function OtpResendButton({
+  email,
+  setFormStatus,
+}: OtpResendButtonProps) {
   const [countdown, setCountdown] = useState(60);
   const [isPending, startTransition] = useTransition();
 
@@ -192,7 +215,7 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
   }, [countdown]);
 
   const handleResend = () => {
-    setFormError(null);
+    setFormStatus(null);
     startTransition(async () => {
       const { error } = await authClient.emailOtp.sendVerificationOtp({
         email,
@@ -200,11 +223,15 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
       });
 
       if (error) {
-        setFormError(
-          error.message || 'Failed to resend code. Please try again.'
-        );
+        setFormStatus({
+          type: 'error',
+          message: error.message || 'Failed to resend code. Please try again.',
+        });
       } else {
-        toast.success('Verification code resent');
+        setFormStatus({
+          type: 'success',
+          message: 'Verification code resent',
+        });
         setCountdown(60);
       }
     });

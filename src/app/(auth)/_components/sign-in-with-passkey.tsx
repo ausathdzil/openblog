@@ -16,7 +16,7 @@ export function SignInWithPasskey({ onFormError }: SignInWithPasskeyProps) {
   const [isPending, startTransition] = useTransition();
   const { push } = useRouter();
 
-  const handleSignIn = () => {
+  const signInWithPasskey = () => {
     onFormError(null);
     startTransition(async () => {
       const { data, error } = await authClient.signIn.passkey();
@@ -33,7 +33,8 @@ export function SignInWithPasskey({ onFormError }: SignInWithPasskeyProps) {
     <Button
       className="gap-2.5"
       disabled={isPending}
-      onClick={handleSignIn}
+      onClick={signInWithPasskey}
+      size="lg"
       type="button"
       variant="outline"
     >

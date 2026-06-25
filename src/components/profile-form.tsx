@@ -1,15 +1,14 @@
 'use client';
 
-import { AlertCircleIcon, AtIcon } from '@hugeicons/core-free-icons';
+import { AtIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
-import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -25,6 +24,7 @@ import {
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
+import { cn } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -73,7 +73,10 @@ export function ProfileForm({
   redirectPath,
   submitLabel = 'Save Changes',
 }: ProfileFormProps) {
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formStatus, setFormStatus] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { push, refresh } = useRouter();
@@ -87,7 +90,7 @@ export function ProfileForm({
       onSubmit: profileFormSchema,
     },
     onSubmit: ({ value }) => {
-      setFormError(null);
+      setFormStatus(null);
       startTransition(async () => {
         await authClient.updateUser(
           {
@@ -97,7 +100,7 @@ export function ProfileForm({
           },
           {
             onSuccess: () => {
-              toast.success('Profile updated');
+              setFormStatus({ type: 'success', message: 'Profile updated' });
               if (redirectPath) {
                 push(redirectPath);
               } else {
@@ -105,7 +108,10 @@ export function ProfileForm({
               }
             },
             onError: (ctx) => {
-              setFormError(ctx.error.message || 'An unexpected error occurred');
+              setFormStatus({
+                type: 'error',
+                message: ctx.error.message || 'An unexpected error occurred',
+              });
             },
           }
         );
@@ -262,12 +268,16 @@ export function ProfileForm({
                 {isPending && <Spinner />}
                 {submitLabel}
               </Button>
-              {formError ? (
-                <Alert variant="destructive">
-                  <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} />
-                  <AlertTitle>{formError}</AlertTitle>
-                </Alert>
-              ) : null}
+              <Muted
+                className={cn(
+                  formStatus ? 'visible' : 'invisible',
+                  formStatus?.type === 'error'
+                    ? 'text-destructive'
+                    : 'text-emerald-600 dark:text-emerald-500'
+                )}
+              >
+                {formStatus?.message || ' '}
+              </Muted>
             </Field>
           </FieldGroup>
         </form>
