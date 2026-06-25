@@ -38,10 +38,9 @@ interface OtpFormProps extends Omit<React.ComponentProps<'form'>, 'onSubmit'> {
 }
 
 export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
-  const { push } = useRouter();
-
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { push } = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -59,9 +58,6 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
             otp: value.otp,
           },
           {
-            onSuccess: () => {
-              form.reset();
-            },
             onError: (ctx) => {
               setFormError(ctx.error.message || 'An unexpected error occurred');
             },
@@ -181,7 +177,7 @@ interface OtpResendButtonProps {
 
 export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
   const [countdown, setCountdown] = useState(60);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (countdown === 0) {
@@ -195,33 +191,26 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
     return () => clearInterval(timer);
   }, [countdown]);
 
-  const handleResend = async () => {
-    await authClient.emailOtp.sendVerificationOtp(
-      {
+  const handleResend = () => {
+    setFormError(null);
+    startTransition(async () => {
+      const { error } = await authClient.emailOtp.sendVerificationOtp({
         email,
         type: 'sign-in',
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          setFormError(null);
-        },
-        onSuccess: () => {
-          setIsLoading(false);
-          toast.success('Verification code resent successfully.');
-          setCountdown(60);
-        },
-        onError: (ctx) => {
-          setIsLoading(false);
-          setFormError(
-            ctx.error.message || 'Failed to resend code. Please try again.'
-          );
-        },
+      });
+
+      if (error) {
+        setFormError(
+          error.message || 'Failed to resend code. Please try again.'
+        );
+      } else {
+        toast.success('Verification code resent successfully.');
+        setCountdown(60);
       }
-    );
+    });
   };
 
-  const isDisabled = isLoading || countdown > 0;
+  const isDisabled = isPending || countdown > 0;
   const labelText =
     countdown > 0 ? `Resend Code (${countdown})` : 'Resend Code';
 
@@ -233,7 +222,7 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
       type="button"
       variant="outline"
     >
-      {isLoading && <Spinner />}
+      {isPending && <Spinner />}
       {labelText}
     </Button>
   );

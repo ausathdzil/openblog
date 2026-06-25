@@ -4,7 +4,7 @@ import { getAuthenticatorName } from '@better-auth/passkey';
 import { Delete01Icon, Key01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useTransition } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -42,46 +42,37 @@ interface PasskeySettingsProps {
 }
 
 export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { refresh } = useRouter();
 
-  const handleAddPasskey = async () => {
-    await authClient.passkey.addPasskey({
-      fetchOptions: {
-        onRequest: () => setIsLoading(true),
-        onSuccess: () => {
-          setIsLoading(false);
-          toast.success('Passkey added successfully.');
-          refresh();
-        },
-        onError: (ctx) => {
-          setIsLoading(false);
-          toast.error(
-            ctx.error.message || 'Failed to add passkey. Please try again.'
-          );
-        },
-      },
+  const handleAddPasskey = () => {
+    startTransition(async () => {
+      const { error } = await authClient.passkey.addPasskey();
+
+      if (error) {
+        toast.error(
+          error.message || 'Failed to add passkey. Please try again.'
+        );
+      } else {
+        toast.success('Passkey added successfully.');
+        refresh();
+      }
     });
   };
 
-  const handleDeletePasskey = async (id: string) => {
-    await authClient.passkey.deletePasskey(
-      { id },
-      {
-        onRequest: () => setIsLoading(true),
-        onSuccess: () => {
-          setIsLoading(false);
-          toast.success('Passkey deleted.');
-          refresh();
-        },
-        onError: (ctx) => {
-          setIsLoading(false);
-          toast.error(
-            ctx.error.message || 'Failed to delete passkey. Please try again.'
-          );
-        },
+  const handleDeletePasskey = (id: string) => {
+    startTransition(async () => {
+      const { error } = await authClient.passkey.deletePasskey({ id });
+
+      if (error) {
+        toast.error(
+          error.message || 'Failed to delete passkey. Please try again.'
+        );
+      } else {
+        toast.success('Passkey deleted.');
+        refresh();
       }
-    );
+    });
   };
 
   return (
@@ -135,11 +126,11 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        disabled={isLoading}
+                        disabled={isPending}
                         onClick={() => handleDeletePasskey(pk.id)}
                         variant="destructive"
                       >
-                        {isLoading ? (
+                        {isPending ? (
                           <Spinner />
                         ) : (
                           <HugeiconsIcon icon={Delete01Icon} size={18} />
@@ -160,11 +151,11 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
       </CardContent>
       <CardFooter className="border-t px-6 py-4">
         <Button
-          disabled={isLoading}
+          disabled={isPending}
           onClick={handleAddPasskey}
           variant="secondary"
         >
-          {isLoading ? (
+          {isPending ? (
             <Spinner />
           ) : (
             <HugeiconsIcon icon={Key01Icon} strokeWidth={2} />

@@ -4,7 +4,7 @@ import { AlertCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import * as z from 'zod/mini';
 
 import { Muted, Title } from '@/components/typography';
@@ -38,34 +38,39 @@ export function AuthForm({
   className,
   ...props
 }: React.ComponentProps<'form'>) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+  const [isEmailPending, startEmailTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [otpEmail, setOtpEmail] = useState<string | null>(null);
   const { push } = useRouter();
 
+  const isLoading = isPasskeyLoading || isEmailPending;
+
   useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window.PublicKeyCredential &&
-      PublicKeyCredential.isConditionalMediationAvailable
-    ) {
-      PublicKeyCredential.isConditionalMediationAvailable().then(
-        (available) => {
-          if (available) {
-            authClient.signIn
-              .passkey({
-                autoFill: true,
-                fetchOptions: {
-                  onSuccess: () => {
-                    push('/profile');
-                  },
-                },
-              })
-              .catch(console.error);
-          }
-        }
-      );
+    if (!PublicKeyCredential.isConditionalMediationAvailable?.()) {
+      return;
     }
+
+    authClient.signIn.passkey(
+      { autoFill: true },
+      {
+        onRequest: () => {
+          setIsPasskeyLoading(true);
+          setFormError(null);
+        },
+        onError: (ctx) => {
+          setIsPasskeyLoading(false);
+          setFormError(
+            ctx.error.message || 'Failed to sign in. Please try again.'
+          );
+        },
+        onSuccess: () => {
+          startEmailTransition(() => {
+            push('/profile');
+          });
+        },
+      }
+    );
   }, [push]);
 
   const form = useForm({
@@ -76,30 +81,23 @@ export function AuthForm({
       onSubmit: authFormSchema,
     },
     onSubmit: ({ value }) => {
-      authClient.emailOtp.sendVerificationOtp(
-        {
+      setFormError(null);
+      startEmailTransition(async () => {
+        const { error } = await authClient.emailOtp.sendVerificationOtp({
           email: value.email,
           type: 'sign-in',
-        },
-        {
-          onRequest: () => {
-            setIsLoading(true);
-            setFormError(null);
-          },
-          onSuccess: () => {
-            setIsLoading(false);
-            setOtpEmail(value.email);
-            form.reset();
-          },
-          onError: (ctx) => {
-            setIsLoading(false);
-            setFormError(
-              ctx.error.message ||
-                'Failed to send verification email. Please try again.'
-            );
-          },
+        });
+
+        if (error) {
+          setFormError(
+            error.message ||
+              'Failed to send verification email. Please try again.'
+          );
+        } else {
+          setOtpEmail(value.email);
+          form.reset();
         }
-      );
+      });
     },
     onSubmitInvalid() {
       const $invalidInput = document.querySelector('[aria-invalid="true"]');
@@ -145,7 +143,7 @@ export function AuthForm({
                   <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                   <Input
                     aria-invalid={isInvalid}
-                    autoComplete="username webauthn"
+                    autoComplete="email webauthn"
                     id={field.name}
                     maxLength={100}
                     name={field.name}
