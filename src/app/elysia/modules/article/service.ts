@@ -3,7 +3,7 @@ import { InternalServerError, NotFoundError } from 'elysia';
 
 import { db } from '@/db';
 import { article, user } from '@/db/schema';
-import { slugExists } from '@/db/utils';
+import { getExistingSlugs } from '@/db/utils';
 import { AuthError } from '../auth';
 import { getAuthorById, getAuthorByUsername } from '../author/service';
 import { slugify } from '../utils';
@@ -29,7 +29,7 @@ export async function createArticle(
     .insert(article)
     .values({
       title: title?.trim(),
-      slug: await slugify(title, author.id, slugExists),
+      slug: await slugify(title, author.id, getExistingSlugs),
       content: content?.trim(),
       excerpt: excerpt?.trim(),
       status,
@@ -222,7 +222,7 @@ export async function updateArticle(
 
   if (title !== undefined && title !== articleData.title) {
     payload.title = title?.trim();
-    payload.slug = await slugify(title, author.id, slugExists);
+    payload.slug = await slugify(title, author.id, getExistingSlugs);
   }
 
   if (content !== undefined && content !== articleData.content) {

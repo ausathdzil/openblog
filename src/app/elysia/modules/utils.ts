@@ -5,20 +5,28 @@ const Slug = z.string().slugify();
 export async function slugify(
   input: string | null | undefined,
   authorId: string | null | undefined,
-  slugExists: (slug: string, authorId: string) => Promise<boolean>
+  getExistingSlugs: (base: string, authorId: string) => Promise<string[]>
 ) {
   if (!(input && authorId)) {
     return null;
   }
 
   const base = Slug.parse(input);
-  let slug = base;
-  let suffix = 2;
+  const existingSlugs = await getExistingSlugs(base, authorId);
+  
+  if (existingSlugs.length === 0) {
+    return base;
+  }
+  
+  const existingSet = new Set(existingSlugs);
+  if (!existingSet.has(base)) {
+    return base;
+  }
 
-  while (await slugExists(slug, authorId)) {
-    slug = `${base}-${suffix}`;
+  let suffix = 2;
+  while (existingSet.has(`${base}-${suffix}`)) {
     suffix++;
   }
 
-  return slug;
+  return `${base}-${suffix}`;
 }

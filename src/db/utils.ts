@@ -4,7 +4,7 @@
  */
 
 import { Kind, type TObject } from '@sinclair/typebox';
-import { and, eq, type Table } from 'drizzle-orm';
+import { and, eq, like, type Table } from 'drizzle-orm';
 import {
   type BuildSchema,
   createInsertSchema,
@@ -106,12 +106,16 @@ export const spreads = <
   return newSchema as any;
 };
 
-export async function slugExists(slug: string, authorId: string) {
-  const [existing] = await db
-    .select({ id: article.id })
+export async function getExistingSlugs(base: string, authorId: string): Promise<string[]> {
+  const existing = await db
+    .select({ slug: article.slug })
     .from(article)
-    .where(and(eq(article.slug, slug), eq(article.authorId, authorId)))
-    .limit(1);
+    .where(
+      and(
+        like(article.slug, `${base}%`),
+        eq(article.authorId, authorId)
+      )
+    );
 
-  return !!existing;
+  return existing.map((e) => e.slug).filter((s): s is string => s !== null);
 }
