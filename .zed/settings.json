@@ -10,6 +10,14 @@
           }
         }
       }
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "classFunctions": ["cva", "cx"],
+        "experimental": {
+          "classRegex": ["[cls|className]\\s\\:\\=\\s\"([^\"]*)"]
+        }
+      }
     }
   },
   "languages": {
@@ -45,6 +53,13 @@
           "name": "biome"
         }
       }
+    },
+    "CSS": {
+      "language_servers": [
+        "tailwindcss-intellisense-css",
+        "!vscode-css-language-server",
+        "..."
+      ]
     }
   }
 }
