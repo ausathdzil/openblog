@@ -2,9 +2,9 @@ function generateSlug(input: string) {
   return input
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 export async function slugify(
@@ -18,11 +18,11 @@ export async function slugify(
 
   const base = generateSlug(input);
   const existingSlugs = await getExistingSlugs(base, authorId);
-  
+
   if (existingSlugs.length === 0) {
     return base;
   }
-  
+
   const existingSet = new Set(existingSlugs);
   if (!existingSet.has(base)) {
     return base;

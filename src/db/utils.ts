@@ -106,16 +106,14 @@ export const spreads = <
   return newSchema as any;
 };
 
-export async function getExistingSlugs(base: string, authorId: string): Promise<string[]> {
+export async function getExistingSlugs(
+  base: string,
+  authorId: string
+): Promise<string[]> {
   const existing = await db
     .select({ slug: article.slug })
     .from(article)
-    .where(
-      and(
-        like(article.slug, `${base}%`),
-        eq(article.authorId, authorId)
-      )
-    );
+    .where(and(like(article.slug, `${base}%`), eq(article.authorId, authorId)));
 
   return existing.map((e) => e.slug).filter((s): s is string => s !== null);
 }

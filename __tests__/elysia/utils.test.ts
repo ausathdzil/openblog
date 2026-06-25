@@ -31,7 +31,10 @@ describe('Module utils', () => {
     });
 
     it('increments until suffix is unique', async () => {
-      const getExistingSlugs = mock(async () => ['hello-world', 'hello-world-2']);
+      const getExistingSlugs = mock(async () => [
+        'hello-world',
+        'hello-world-2',
+      ]);
 
       const result = await slugify('Hello World', 'user-1', getExistingSlugs);
 
