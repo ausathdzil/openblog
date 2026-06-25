@@ -17,14 +17,10 @@ import {
 
 interface PaginationControlProps
   extends React.ComponentProps<typeof Pagination> {
-  currentPage: number;
-  pathname: string;
   totalPages: number;
 }
 
 export function PaginationControl({
-  pathname,
-  currentPage,
   totalPages,
   ...props
 }: PaginationControlProps) {

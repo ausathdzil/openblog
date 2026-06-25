@@ -102,12 +102,7 @@ async function ArticlesResults({ limit, page, q }: ResultsProps) {
           </li>
         ))}
       </ItemGroup>
-      <PaginationControl
-        className="mt-auto"
-        currentPage={page}
-        pathname="/explore"
-        totalPages={totalPages ?? 1}
-      />
+      <PaginationControl className="mt-auto" totalPages={totalPages ?? 1} />
     </>
   );
 }
@@ -165,12 +160,7 @@ async function AuthorsResults({ limit, page, q }: ResultsProps) {
           </li>
         ))}
       </ItemGroup>
-      <PaginationControl
-        className="mt-auto"
-        currentPage={page}
-        pathname="/explore"
-        totalPages={totalPages ?? 1}
-      />
+      <PaginationControl className="mt-auto" totalPages={totalPages ?? 1} />
     </>
   );
 }

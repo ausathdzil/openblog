@@ -125,7 +125,6 @@ type PaginationButtonProps = {
 } & React.ComponentProps<typeof Button>
 
 function PaginationButton({
-  className,
   isActive,
   size = "icon",
   ...props
