@@ -120,7 +120,7 @@ export function AuthForm({
       <div className="flex flex-col items-center gap-1 text-center">
         <Title className="text-2xl">Welcome to OpenBlog</Title>
         <Muted className="text-balance">
-          Get started with Google or enter your email
+          Choose a sign in method or enter your email
         </Muted>
       </div>
       <form
