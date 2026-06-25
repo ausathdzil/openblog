@@ -211,6 +211,11 @@ export async function updateArticle(
   }
 
   const articleData = await getArticleByPublicId(publicId, userId);
+
+  if (articleData.authorId !== userId) {
+    throw new AuthError('You are not allowed to perform this action.', 403);
+  }
+
   const author = await getAuthorById(articleData.authorId);
 
   const payload: Partial<UpdateArticleBody> = {};
@@ -275,6 +280,10 @@ export async function deleteArticle(
   }
 
   const articleData = await getArticleByPublicId(publicId, userId);
+
+  if (articleData.authorId !== userId) {
+    throw new AuthError('You are not allowed to perform this action.', 403);
+  }
 
   await db.delete(article).where(eq(article.publicId, articleData.publicId));
 
