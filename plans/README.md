@@ -16,7 +16,7 @@ honor its STOP conditions, and update your row when done.
 | 006  | Add CI pipeline dependency and TypeScript caching | P2 | S | — | DONE |
 | 007  | Remove redundant Zod usage for slugifying text | P3 | S | — | DONE |
 | 008  | Await WebAuthn Promise in auth-form | P3 | S | — | DONE |
-| 009  | Optimize lowlight language bundle in content editor | P3 | S | — | TODO |
+| 009  | Optimize lowlight language bundle in content editor | P3 | S | — | DONE |
 
 ## Dependency notes
 
