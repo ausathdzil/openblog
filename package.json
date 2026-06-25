@@ -17,7 +17,10 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "act:all": "act --secret-file .env.local",
+    "act:test": "act -W .github/workflows/test.yml --secret-file .env.local",
+    "act:playwright": "act -W .github/workflows/playwright.yml --secret-file .env.local"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

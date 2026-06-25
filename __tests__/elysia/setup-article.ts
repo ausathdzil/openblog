@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { slugify } from '@/app/elysia/modules/utils';
 import { db } from '@/db';
 import { article } from '@/db/schema';
-import { slugExists } from '@/db/utils';
+import { getExistingSlugs } from '@/db/utils';
 
 export async function createTestArticle(userId: string) {
   const title = 'Test article';
@@ -16,7 +16,7 @@ export async function createTestArticle(userId: string) {
     .insert(article)
     .values({
       title,
-      slug: await slugify(title, userId, slugExists),
+      slug: await slugify(title, userId, getExistingSlugs),
       content,
       excerpt: content,
       status,

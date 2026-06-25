@@ -124,7 +124,9 @@ export async function updateArticle(
   }
 
   if (data) {
-    updateTag('articles');
+    if (data.status === 'published') {
+      updateTag('articles');
+    }
     updateTag(`articles-${data.author?.username}`);
     updateTag(`article-${data.slug}`);
   }

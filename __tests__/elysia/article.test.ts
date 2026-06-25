@@ -5,6 +5,7 @@ import { cleanupTestArticle, setupTestArticle } from './setup-article';
 import { setupAuthContext } from './setup-auth';
 
 const authContext = setupAuthContext();
+const secondaryAuthContext = setupAuthContext();
 
 describe('Article', () => {
   describe('Create article', () => {
@@ -118,6 +119,21 @@ describe('Article', () => {
       expect(status).toBe(401);
     });
 
+    test('return 403 if user is not the author', async () => {
+      const article = ctx.article;
+
+      // Get headers for a DIFFERENT user
+      const headers = await secondaryAuthContext.authTest.getAuthHeaders({
+        userId: secondaryAuthContext.testUser.id,
+      });
+
+      const { status } = await elysia
+        .articles({ publicId: article.publicId })
+        .patch({ title: 'Hacked Title' }, { headers });
+
+      expect(status).toBe(403);
+    });
+
     test('return 200 and update the article', async () => {
       const body = {
         title: 'Test update',
@@ -164,6 +180,21 @@ describe('Article', () => {
         .delete();
 
       expect(status).toBe(401);
+    });
+
+    test('return 403 if user is not the author', async () => {
+      const article = ctx.article;
+
+      // Get headers for a DIFFERENT user
+      const headers = await secondaryAuthContext.authTest.getAuthHeaders({
+        userId: secondaryAuthContext.testUser.id,
+      });
+
+      const { status } = await elysia
+        .articles({ publicId: article.publicId })
+        .delete({}, { headers });
+
+      expect(status).toBe(403);
     });
 
     test('return 200 and verify that the article is deleted', async () => {

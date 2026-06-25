@@ -47,30 +47,33 @@ export function AuthForm({
   const isLoading = isPasskeyLoading || isEmailPending;
 
   useEffect(() => {
-    if (!PublicKeyCredential.isConditionalMediationAvailable?.()) {
-      return;
-    }
-
-    authClient.signIn.passkey(
-      { autoFill: true },
-      {
-        onRequest: () => {
-          setIsPasskeyLoading(true);
-          setFormError(null);
-        },
-        onError: (ctx) => {
-          setIsPasskeyLoading(false);
-          setFormError(
-            ctx.error.message || 'Failed to sign in. Please try again.'
-          );
-        },
-        onSuccess: () => {
-          startEmailTransition(() => {
-            push('/profile');
-          });
-        },
+    async function checkWebAuthn() {
+      if (!(await PublicKeyCredential.isConditionalMediationAvailable?.())) {
+        return;
       }
-    );
+
+      authClient.signIn.passkey(
+        { autoFill: true },
+        {
+          onRequest: () => {
+            setIsPasskeyLoading(true);
+            setFormError(null);
+          },
+          onError: (ctx) => {
+            setIsPasskeyLoading(false);
+            setFormError(
+              ctx.error.message || 'Failed to sign in. Please try again.'
+            );
+          },
+          onSuccess: () => {
+            startEmailTransition(() => {
+              push('/profile');
+            });
+          },
+        }
+      );
+    }
+    checkWebAuthn();
   }, [push]);
 
   const form = useForm({
