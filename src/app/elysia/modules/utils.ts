@@ -1,6 +1,11 @@
-import * as z from 'zod';
-
-const Slug = z.string().slugify();
+function generateSlug(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export async function slugify(
   input: string | null | undefined,
@@ -11,7 +16,7 @@ export async function slugify(
     return null;
   }
 
-  const base = Slug.parse(input);
+  const base = generateSlug(input);
   const existingSlugs = await getExistingSlugs(base, authorId);
   
   if (existingSlugs.length === 0) {
