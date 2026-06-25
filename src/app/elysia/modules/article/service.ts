@@ -278,5 +278,5 @@ export async function deleteArticle(
 
   await db.delete(article).where(eq(article.publicId, articleData.publicId));
 
-  return { message: 'Article deleted successfully' };
+  return { message: 'Article deleted' };
 }

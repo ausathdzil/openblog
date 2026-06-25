@@ -53,7 +53,7 @@ export async function archiveArticle(publicId: string, username: string) {
     updateTag('articles');
     updateTag(`articles-${username}`);
     updateTag(`article-${data.slug}`);
-    return { message: 'Article archived successfully' };
+    return { message: 'Article archived' };
   }
 
   return {
@@ -83,7 +83,7 @@ export async function moveArticleToDraft(publicId: string, username: string) {
     updateTag('articles');
     updateTag(`articles-${username}`);
     updateTag(`article-${data.slug}`);
-    return { message: 'Article moved to draft successfully' };
+    return { message: 'Article moved to draft' };
   }
 
   return {

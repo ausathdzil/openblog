@@ -97,7 +97,7 @@ export function ProfileForm({
           },
           {
             onSuccess: () => {
-              toast.success('Profile updated.');
+              toast.success('Profile updated');
               if (redirectPath) {
                 push(redirectPath);
               } else {

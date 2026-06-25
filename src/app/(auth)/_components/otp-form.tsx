@@ -204,7 +204,7 @@ export function OtpResendButton({ email, setFormError }: OtpResendButtonProps) {
           error.message || 'Failed to resend code. Please try again.'
         );
       } else {
-        toast.success('Verification code resent successfully.');
+        toast.success('Verification code resent');
         setCountdown(60);
       }
     });

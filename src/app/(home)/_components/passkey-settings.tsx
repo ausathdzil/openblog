@@ -51,10 +51,10 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
 
       if (error) {
         toast.error(
-          error.message || 'Failed to add passkey. Please try again.'
+          error.message || 'Failed to add passkey, please try again'
         );
       } else {
-        toast.success('Passkey added successfully.');
+        toast.success('Passkey added');
         refresh();
       }
     });
@@ -66,10 +66,10 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
 
       if (error) {
         toast.error(
-          error.message || 'Failed to delete passkey. Please try again.'
+          error.message || 'Failed to delete passkey, please try again'
         );
       } else {
-        toast.success('Passkey deleted.');
+        toast.success('Passkey deleted');
         refresh();
       }
     });
