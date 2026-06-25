@@ -14,6 +14,7 @@ import { Suspense } from 'react';
 
 import { Header } from '@/app/(article)/_components/header';
 import { getUserArticleBySlug } from '@/app/(article)/_lib/data';
+import { HeaderActions } from '@/app/(home)/_components/header-actions';
 import { Spinner } from '@/components/ui/spinner';
 
 export async function generateMetadata({
@@ -117,7 +118,9 @@ async function Article({ params }: ArticleProps) {
 
   return (
     <>
-      <Header title={article.title || 'Untitled Draft'} />
+      <Header title={article.title || 'Untitled Draft'}>
+        <HeaderActions />
+      </Header>
       <main className="grid min-h-screen">
         <article className="prose prose-neutral dark:prose-invert mx-auto size-full min-w-0 p-6 sm:p-4">
           <h1>{article.title}</h1>

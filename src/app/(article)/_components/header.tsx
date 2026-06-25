@@ -74,27 +74,26 @@ export function Header({
         {children}
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-6xl items-center p-6 sm:hidden">
-        <button
-          aria-label="Go back"
-          className="size-11 sm:hidden"
-          onClick={handleBack}
-          type="button"
-        >
-          <HugeiconsIcon
-            icon={ArrowLeft01Icon}
+      <div className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:hidden">
+        <div className="flex min-w-0 flex-1 items-center gap-2 pr-2">
+          <button
+            aria-label="Go back"
+            className="-ml-4 flex size-11 shrink-0 items-center justify-center"
             onClick={handleBack}
-            strokeWidth={2}
-          />
-        </button>
-        <Large
-          className={cn(
-            'line-clamp-1',
-            showTitle ? 'opacity-100' : 'opacity-0'
-          )}
-        >
-          {title}
-        </Large>
+            type="button"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
+          </button>
+          <Large
+            className={cn(
+              'line-clamp-1 transition-opacity',
+              showTitle ? 'opacity-100' : 'opacity-0'
+            )}
+          >
+            {title}
+          </Large>
+        </div>
+        {children}
       </div>
     </header>
   );

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { HeaderActions } from '@/app/(home)/_components/header-actions';
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -46,7 +47,9 @@ export async function generateMetadata({
 export default function UserPage({ params, searchParams }: UserPageProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <Header>
+        <HeaderActions />
+      </Header>
       <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
         <Suspense fallback={<ProfileSkeleton />}>
           <Profile params={params} />
