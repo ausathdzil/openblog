@@ -10,8 +10,8 @@ import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { updateArticle } from '@/lib/article-actions';
 import { cn } from '@/lib/utils';
-import { updateArticle } from '../_lib/actions';
 import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
 import { EditorActions } from './editor-actions';

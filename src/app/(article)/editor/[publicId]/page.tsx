@@ -4,9 +4,9 @@ import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
+import { getArticleByPublicId } from '@/lib/article-data';
 import { auth } from '@/lib/auth';
 import { ArticleEditor } from '../../_components/article-editor';
-import { getArticleByPublicId } from '../../_lib/data';
 
 export async function generateMetadata({
   params,

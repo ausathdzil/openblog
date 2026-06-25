@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { MobileSignOutButton } from '@/components/mobile-sign-out-button';
 import { ProfileForm } from '@/components/profile-form';
 import { Muted, Title } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
-import { MobileSignOutButton } from '../../_components/mobile-sign-out-button';
 import { PasskeySettings } from '../../_components/passkey-settings';
 
 export const metadata: Metadata = {

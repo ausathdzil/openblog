@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { createDraft } from '../_lib/actions';
+import { createDraft } from '@/lib/article-actions';
 
 export function CreateArticleButton(
   props: React.ComponentProps<typeof Button>

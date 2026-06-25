@@ -16,9 +16,9 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getArticles, getAuthors } from '@/lib/article-data';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ScopeToggle } from '../_components/scope-toggle';
-import { getArticles, getAuthors } from '../_lib/data';
 
 export const metadata: Metadata = {
   title: 'Explore',

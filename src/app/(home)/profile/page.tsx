@@ -17,11 +17,11 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getCurrentUserArticles } from '@/lib/article-data';
 import { auth } from '@/lib/auth';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ArticleActions } from '../_components/article-actions';
 import { StatusToggle } from '../_components/status-toggle';
-import { getCurrentUserArticles } from '../_lib/data';
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await auth.api.getSession({

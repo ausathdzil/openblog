@@ -12,7 +12,7 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getArticles } from './_lib/data';
+import { getArticles } from '@/lib/article-data';
 
 export const metadata: Metadata = {
   title: 'Home',

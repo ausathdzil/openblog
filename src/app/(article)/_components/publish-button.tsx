@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { updateArticle } from '../_lib/actions';
+import { updateArticle } from '@/lib/article-actions';
 
 interface PublishButtonProps extends React.ComponentProps<typeof Button> {
   isContentEmpty: boolean;

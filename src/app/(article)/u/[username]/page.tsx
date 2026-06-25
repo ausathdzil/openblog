@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { HeaderActions } from '@/app/(home)/_components/header-actions';
+import { HeaderActions } from '@/components/header-actions';
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,9 +17,9 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getAuthor, getUserArticles } from '@/lib/article-data';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { Header } from '../../_components/header';
-import { getAuthor, getUserArticles } from '../../_lib/data';
 
 interface UserPageProps {
   params: Promise<{ username: string }>;

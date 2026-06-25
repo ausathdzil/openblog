@@ -13,9 +13,9 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Header } from '@/app/(article)/_components/header';
-import { getUserArticleBySlug } from '@/app/(article)/_lib/data';
-import { HeaderActions } from '@/app/(home)/_components/header-actions';
+import { HeaderActions } from '@/components/header-actions';
 import { Spinner } from '@/components/ui/spinner';
+import { getUserArticleBySlug } from '@/lib/article-data';
 
 export async function generateMetadata({
   params,

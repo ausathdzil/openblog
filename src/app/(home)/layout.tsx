@@ -2,8 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import openblog from '@/../public/openblog.png';
+import { HeaderActions } from '@/components/header-actions';
 import { Button } from '@/components/ui/button';
-import { HeaderActions } from './_components/header-actions';
 
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
   return (
