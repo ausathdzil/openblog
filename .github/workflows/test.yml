@@ -5,6 +5,8 @@ env:
   BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
 on:
   push:
