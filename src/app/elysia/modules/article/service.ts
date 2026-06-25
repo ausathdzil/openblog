@@ -63,11 +63,10 @@ export async function getArticles(
   username?: string | null | undefined
 ) {
   const offset = (page - 1) * limit;
-  const author = username ? await getAuthorByUsername(username) : null;
 
   const whereConditions = and(
     eq(article.status, status ?? 'published'),
-    author ? eq(article.authorId, author.id) : undefined,
+    username ? eq(user.username, username) : undefined,
     q ? ilike(article.title, `%${q}%`) : undefined
   );
 
@@ -99,9 +98,14 @@ export async function getArticles(
   const countQuery = db
     .select({ count: count() })
     .from(article)
+    .leftJoin(user, eq(article.authorId, user.id))
     .where(whereConditions);
 
   const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
+
+  if (data.length === 0 && username) {
+    await getAuthorByUsername(username); // throws NotFoundError if not found
+  }
 
   const total = totalResult[0]?.count ?? 0;
   const totalPages = Math.ceil(total / limit);
@@ -160,8 +164,6 @@ export async function getArticleByPublicId(
 }
 
 export async function getArticleBySlug(slug: string, username: string) {
-  const author = await getAuthorByUsername(username);
-
   const [articleData] = await db
     .select({
       publicId: article.publicId,
@@ -174,13 +176,21 @@ export async function getArticleBySlug(slug: string, username: string) {
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
       authorId: article.authorId,
+      author: {
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+        username: user.username,
+        displayUsername: user.displayUsername,
+      },
     })
     .from(article)
+    .innerJoin(user, eq(article.authorId, user.id))
     .where(
       and(
         eq(article.status, 'published'),
         eq(article.slug, slug),
-        eq(article.authorId, author.id)
+        eq(user.username, username)
       )
     )
     .limit(1);
@@ -189,10 +199,7 @@ export async function getArticleBySlug(slug: string, username: string) {
     throw new NotFoundError('Article not found.');
   }
 
-  return {
-    ...articleData,
-    author,
-  } satisfies ArticleResponse;
+  return articleData satisfies ArticleResponse;
 }
 
 export async function updateArticle(
@@ -216,13 +223,11 @@ export async function updateArticle(
     throw new AuthError('You are not allowed to perform this action.', 403);
   }
 
-  const author = await getAuthorById(articleData.authorId);
-
   const payload: Partial<UpdateArticleBody> = {};
 
   if (title !== undefined && title !== articleData.title) {
     payload.title = title?.trim();
-    payload.slug = await slugify(title, author.id, getExistingSlugs);
+    payload.slug = await slugify(title, articleData.authorId, getExistingSlugs);
   }
 
   if (content !== undefined && content !== articleData.content) {
@@ -267,7 +272,7 @@ export async function updateArticle(
 
   return {
     ...updatedData,
-    author,
+    author: articleData.author!,
   } satisfies ArticleResponse;
 }
 
