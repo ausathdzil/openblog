@@ -227,7 +227,13 @@ export async function updateArticle(
 
   if (title !== undefined && title !== articleData.title) {
     payload.title = title?.trim();
-    payload.slug = await slugify(title, articleData.authorId, getExistingSlugs);
+    if (articleData.status === 'draft') {
+      payload.slug = await slugify(
+        title,
+        articleData.authorId,
+        getExistingSlugs
+      );
+    }
   }
 
   if (content !== undefined && content !== articleData.content) {
