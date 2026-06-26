@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
@@ -10,32 +10,29 @@ interface SignInWithGoogleProps {
 }
 
 export function SignInWithGoogle({ onFormError }: SignInWithGoogleProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const signInWithGoogle = () => {
-    authClient.signIn.social(
-      {
+    onFormError(null);
+    startTransition(async () => {
+      const { error } = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/profile',
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          onFormError(null);
-        },
-        onError: (ctx) => {
-          setIsLoading(false);
-          onFormError(ctx.error.message || 'An unexpected error occurred');
-        },
+      });
+
+      if (error) {
+        onFormError(
+          error.message || 'Failed to sign in with Google. Please try again.'
+        );
       }
-    );
+    });
   };
 
   return (
     <Field>
       <Button
         className="gap-2.5"
-        disabled={isLoading}
+        disabled={isPending}
         onClick={signInWithGoogle}
         size="lg"
         type="button"

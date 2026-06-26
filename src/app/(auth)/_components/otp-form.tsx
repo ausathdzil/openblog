@@ -66,7 +66,7 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
             onError: (ctx) => {
               setFormStatus({
                 type: 'error',
-                message: ctx.error.message || 'An unexpected error occurred',
+                message: ctx.error.message || 'An unexpected error occurred.',
               });
             },
           }
@@ -195,10 +195,7 @@ interface OtpResendButtonProps {
   ) => void;
 }
 
-export function OtpResendButton({
-  email,
-  setFormStatus,
-}: OtpResendButtonProps) {
+function OtpResendButton({ email, setFormStatus }: OtpResendButtonProps) {
   const [countdown, setCountdown] = useState(60);
   const [isPending, startTransition] = useTransition();
 
@@ -230,7 +227,7 @@ export function OtpResendButton({
       } else {
         setFormStatus({
           type: 'success',
-          message: 'Verification code resent',
+          message: 'Verification code resent. Please check your email.',
         });
         setCountdown(60);
       }

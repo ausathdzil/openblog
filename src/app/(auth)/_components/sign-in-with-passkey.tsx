@@ -22,7 +22,9 @@ export function SignInWithPasskey({ onFormError }: SignInWithPasskeyProps) {
       const { data, error } = await authClient.signIn.passkey();
 
       if (error) {
-        onFormError(error.message || 'Failed to sign in with passkey');
+        onFormError(
+          error.message || 'Failed to sign in with passkey. Please try again.'
+        );
       } else if (data) {
         push('/profile');
       }
