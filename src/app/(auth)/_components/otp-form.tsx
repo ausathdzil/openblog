@@ -79,6 +79,13 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
         }
       });
     },
+    onSubmitInvalid() {
+      const $invalidInput = document.querySelector('[aria-invalid="true"]');
+
+      if ($invalidInput instanceof HTMLElement) {
+        $invalidInput.focus();
+      }
+    },
   });
 
   if (!email) {
