@@ -155,6 +155,39 @@ describe('Article', () => {
       expect(status).toBe(200);
       expect(data).toMatchObject(body);
     });
+
+    test('does not regenerate slug when title is updated and article is published', async () => {
+      const article = ctx.article;
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
+      });
+
+      const { data, status } = await elysia
+        .articles({ publicId: article.publicId })
+        .patch({ title: 'New Title For Published' }, { headers });
+
+      expect(status).toBe(200);
+      expect(data?.slug).toBe(article.slug);
+    });
+
+    test('regenerates slug when title is updated and article is a draft', async () => {
+      const article = ctx.article;
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
+      });
+
+      await elysia
+        .articles({ publicId: article.publicId })
+        .patch({ status: 'draft' }, { headers });
+
+      const { data, status } = await elysia
+        .articles({ publicId: article.publicId })
+        .patch({ title: 'New Title For Draft' }, { headers });
+
+      expect(status).toBe(200);
+      expect(data?.slug).not.toBe(article.slug);
+      expect(data?.slug).toInclude('new-title-for-draft');
+    });
   });
 
   describe('Delete article', () => {
