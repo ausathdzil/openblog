@@ -91,7 +91,7 @@ export function SearchInput({
           </InputGroupAddon>
         ) : null
       ) : (
-        <InputGroupAddon align="inline-end">
+        <InputGroupAddon align="inline-end" className="hidden sm:flex">
           <Kbd>{isMac ? '⌘' : 'Ctrl'}&nbsp;+&nbsp;K</Kbd>
         </InputGroupAddon>
       )}
