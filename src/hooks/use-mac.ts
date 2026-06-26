@@ -1,15 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
-const macRegex = /Mac/;
+function subscribe() {
+  return () => {
+    // no-op
+  };
+}
+
+function getSnapshot() {
+  return typeof window === 'undefined'
+    ? false
+    : /Mac/.test(window.navigator.userAgent);
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 export function useMac() {
-  const [isMac, setIsMac] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsMac(macRegex.test(window.navigator.userAgent));
-    }
-  }, []);
-
-  return !!isMac;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

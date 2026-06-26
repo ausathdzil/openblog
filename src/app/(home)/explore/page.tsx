@@ -32,7 +32,7 @@ export default function ExplorePage({ searchParams }: ExplorePageProps) {
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-6 sm:p-4">
       <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-        <SearchInput autoFocus placeholder="Search articles or authors…" />
+        <SearchInput placeholder="Search articles or authors…" />
       </Suspense>
       <Suspense fallback={<Skeleton className="h-10 w-49 self-center" />}>
         <ScopeToggle className="self-center" />

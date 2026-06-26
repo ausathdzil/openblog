@@ -39,14 +39,6 @@ const articleSchema = z.object({
   ),
 });
 
-function isContentEmpty(content: string): boolean {
-  const normalized = content
-    .replace(/\u00A0/g, '') // Remove the non-breaking space character
-    .replace(/&nbsp;/gi, '') // Remove the literal "&nbsp;" string
-    .trim();
-  return normalized.length === 0;
-}
-
 interface HeaderFormSelection {
   content: string;
   isValid: boolean;
@@ -106,12 +98,6 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       form.reset();
     }
     back();
-  };
-
-  const handlePreventEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-    }
   };
 
   return (
@@ -210,7 +196,6 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   aria-label={field.name}
                   autoCapitalize="words"
                   autoCorrect="on"
-                  autoFocus
                   className="font-extrabold text-(--tw-prose-headings) text-4xl leading-[1.11111]"
                   errors={field.state.meta.errors}
                   isInvalid={isInvalid}
@@ -268,4 +253,18 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       </main>
     </>
   );
+}
+
+function isContentEmpty(content: string): boolean {
+  const normalized = content
+    .replace(/\u00A0/g, '') // Remove the non-breaking space character
+    .replace(/&nbsp;/gi, '') // Remove the literal "&nbsp;" string
+    .trim();
+  return normalized.length === 0;
+}
+
+function handlePreventEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+  }
 }

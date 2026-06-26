@@ -1,5 +1,5 @@
+import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { getAuthenticatorName, passkey } from '@better-auth/passkey';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
 import { nextCookies } from 'better-auth/next-js';
 import { emailOTP, openAPI, username } from 'better-auth/plugins';

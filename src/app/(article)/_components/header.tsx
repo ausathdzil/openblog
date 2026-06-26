@@ -3,7 +3,7 @@
 import { ArrowLeft01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 import { Large } from '@/components/typography';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,12 @@ export function Header({
   children,
   ...props
 }: HeaderProps) {
-  const [showTitle, setShowTitle] = useState(false);
+  const showTitle = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
+
   const { back } = useRouter();
 
   const handleBack = () => {
@@ -31,26 +36,6 @@ export function Header({
       back();
     }
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const y =
-        window.scrollY ||
-        document.documentElement.scrollTop ||
-        document.body.scrollTop ||
-        0;
-
-      const threshold = 80; // px
-      setShowTitle(y > threshold);
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   return (
     <header
@@ -65,7 +50,7 @@ export function Header({
         <Large
           aria-hidden={!showTitle}
           className={cn(
-            'absolute left-1/2 line-clamp-1 -translate-x-1/2 transition-opacity',
+            'absolute left-1/2 line-clamp-1 -translate-x-1/2',
             showTitle ? 'opacity-100' : 'opacity-0'
           )}
         >
@@ -86,7 +71,7 @@ export function Header({
           </button>
           <Large
             className={cn(
-              'line-clamp-1 transition-opacity',
+              'line-clamp-1',
               showTitle ? 'opacity-100' : 'opacity-0'
             )}
           >
@@ -97,4 +82,32 @@ export function Header({
       </div>
     </header>
   );
+}
+
+function subscribe(callback: () => void) {
+  if (typeof window === 'undefined') {
+    return () => {
+      // no-op
+    };
+  }
+  window.addEventListener('scroll', callback, { passive: true });
+  return () => {
+    window.removeEventListener('scroll', callback);
+  };
+}
+
+function getSnapshot() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  const y =
+    window.scrollY ||
+    document.documentElement.scrollTop ||
+    document.body.scrollTop ||
+    0;
+  return y > 80;
+}
+
+function getServerSnapshot() {
+  return false;
 }
