@@ -195,7 +195,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
-                  onKeyDown={handlePreventEnter}
+                  onKeyDown={handleTitleEnter}
                   placeholder="Title"
                   spellCheck
                   value={field.state.value}
@@ -226,8 +226,12 @@ function isContentEmpty(content: string): boolean {
   return normalized.length === 0;
 }
 
-function handlePreventEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+function handleTitleEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
   if (e.key === 'Enter') {
     e.preventDefault();
+    setTimeout(() => {
+      const editorEl = document.querySelector('.ProseMirror') as HTMLElement;
+      editorEl?.focus();
+    }, 0);
   }
 }
