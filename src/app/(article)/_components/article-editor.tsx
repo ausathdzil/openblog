@@ -27,12 +27,6 @@ const articleSchema = z.object({
       z.maxLength(255, 'Title must be 255 characters or fewer.')
     ),
   content: z.string().check(z.trim()),
-  excerpt: z
-    .string()
-    .check(
-      z.trim(),
-      z.maxLength(255, 'Excerpt must be 255 characters or fewer.')
-    ),
   status: z.literal(
     ['draft', 'published', 'archived'],
     'Status must be either draft, published, or archived.'
@@ -54,7 +48,6 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
     defaultValues: {
       title: article.title ?? '',
       content: article.content ?? '',
-      excerpt: article.excerpt ?? '',
       status: article.status,
     },
     validators: {
@@ -76,7 +69,6 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
         const res = await updateArticle(article.publicId, {
           title: value.title,
           content: value.content,
-          excerpt: value.excerpt,
         });
 
         if (res?.error) {
@@ -205,35 +197,6 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   onChange={field.handleChange}
                   onKeyDown={handlePreventEnter}
                   placeholder="Title"
-                  spellCheck
-                  value={field.state.value}
-                />
-              );
-            }}
-          </form.Field>
-          <form.Field
-            name="excerpt"
-            validators={{
-              onChange: articleSchema.shape.excerpt,
-            }}
-          >
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <ResizableTextarea
-                  aria-label={field.name}
-                  autoCapitalize="on"
-                  autoCorrect="on"
-                  className="font-semibold text-2xl"
-                  errors={field.state.meta.errors}
-                  isInvalid={isInvalid}
-                  maxLength={255}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={field.handleChange}
-                  onKeyDown={handlePreventEnter}
-                  placeholder="Excerpt"
                   spellCheck
                   value={field.state.value}
                 />
