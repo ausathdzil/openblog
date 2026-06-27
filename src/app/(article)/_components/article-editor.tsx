@@ -9,9 +9,9 @@ import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
+import { Marker, MarkerContent, MarkerIcon } from '@/components/ui/marker';
 import { updateArticle } from '@/lib/article-actions';
-import { cn } from '@/lib/utils';
 import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
 import { EditorActions } from './editor-actions';
@@ -143,28 +143,28 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
         </form.Subscribe>
       </Header>
       <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-6 sm:p-4">
-        <div
-          className={cn(
-            buttonVariants({ size: 'lg', variant: 'ghost' }),
-            'pointer-events-none fixed right-4 bottom-4 z-20 hidden opacity-50 sm:inline-flex',
-            isPending && 'animate-pulse'
-          )}
-        >
+        <div className="pointer-events-none fixed right-6 bottom-6 z-20 gap-2">
           {isPending ? (
-            <>
-              <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} />
-              Saving…
-            </>
+            <Marker role="status">
+              <MarkerIcon>
+                <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} />
+              </MarkerIcon>
+              <MarkerContent>Saving…</MarkerContent>
+            </Marker>
           ) : (
-            `Last saved on ${article.updatedAt.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true,
-            })}
-            `
+            <Marker>
+              <MarkerContent>
+                Last saved{' '}
+                {article.updatedAt.toLocaleString('en-US', {
+                  month: '2-digit',
+                  day: '2-digit',
+                  year: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: false,
+                })}
+              </MarkerContent>
+            </Marker>
           )}
         </div>
         <form
