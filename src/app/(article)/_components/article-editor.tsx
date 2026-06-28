@@ -3,13 +3,13 @@
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
-import { Button } from '@/components/ui/button';
 import { Marker, MarkerContent, MarkerIcon } from '@/components/ui/marker';
 import { updateArticle } from '@/lib/article-actions';
 import { BeforeUnloadGuard } from './before-unload-guard';
@@ -18,6 +18,7 @@ import { EditorActions } from './editor-actions';
 import { Header } from './header';
 import { PublishButton } from './publish-button';
 import { ResizableTextarea } from './resizable-textarea';
+import { SaveButton } from './save-button';
 
 const articleSchema = z.object({
   title: z
@@ -113,15 +114,22 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
             <div className="flex items-center gap-2">
               <EditorActions article={article} />
               {formState.status === 'published' ? (
-                <Button
+                <SaveButton
+                  article={article}
                   className="h-11 sm:h-8"
-                  disabled={isPending}
-                  form="article-editor-form"
-                  size="pill-sm"
-                  type="submit"
-                >
-                  {isPending ? 'Saving…' : 'Save'}
-                </Button>
+                  content={formState.content}
+                  isValid={formState.isValid}
+                  onSaved={() => {
+                    form.reset({
+                      ...form.state.values,
+                      status: 'published',
+                    });
+                    router.push(
+                      `/@${article.author?.username}/articles/${article.slug}` as Route
+                    );
+                  }}
+                  title={formState.title}
+                />
               ) : (
                 <PublishButton
                   className="h-11 sm:h-8"
@@ -133,13 +141,9 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                       ...form.state.values,
                       status: 'published',
                     });
-                    if (article.author?.username && article.slug) {
-                      router.push(
-                        `/u/${article.author.username}/articles/${article.slug}`
-                      );
-                    } else {
-                      router.back();
-                    }
+                    router.push(
+                      `/@${article.author?.username}/articles/${article.slug}` as Route
+                    );
                   }}
                   publicId={article.publicId}
                   status={formState.status}
