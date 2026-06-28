@@ -1,5 +1,6 @@
 'use client';
 
+import { useForm } from '@tanstack/react-form';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -36,7 +37,29 @@ export function PublishButton({
   const [isPending, startTransition] = useTransition();
   const [isPublished, setIsPublished] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [excerpt, setExcerpt] = useState('');
+
+  const form = useForm({
+    defaultValues: {
+      excerpt: '',
+    },
+    onSubmit: ({ value }) => {
+      startTransition(async () => {
+        const res = await updateArticle(publicId, {
+          status: 'published',
+          excerpt: value.excerpt,
+        });
+
+        if (res?.error) {
+          toast.error(res.error.message, { position: 'top-center' });
+          return;
+        }
+
+        setIsPublished(true);
+        setIsOpen(false);
+        onPublished();
+      });
+    },
+  });
 
   if (status === 'published') {
     return null;
@@ -68,26 +91,6 @@ export function PublishButton({
     setIsOpen(open);
   };
 
-  const handlePublish = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    startTransition(async () => {
-      const res = await updateArticle(publicId, {
-        status: 'published',
-        excerpt,
-      });
-
-      if (res?.error) {
-        toast.error(res.error.message, { position: 'top-center' });
-        return;
-      }
-
-      setIsPublished(true);
-      setIsOpen(false);
-      onPublished();
-    });
-  };
-
   return (
     <Dialog onOpenChange={handleOpenChange} open={isOpen}>
       <DialogTrigger
@@ -105,17 +108,30 @@ export function PublishButton({
         <DialogHeader>
           <DialogTitle>Ready to publish?</DialogTitle>
         </DialogHeader>
-        <form className="space-y-4" onSubmit={handlePublish}>
-          <div className="space-y-2">
-            <Label htmlFor="excerpt">Excerpt</Label>
-            <Textarea
-              id="excerpt"
-              onChange={(e) => setExcerpt(e.target.value)}
-              placeholder="Write a brief summary of your article..."
-              rows={3}
-              value={excerpt}
-            />
-          </div>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <form.Field name="excerpt">
+            {(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Excerpt</Label>
+                <Textarea
+                  id={field.name}
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Write a brief summary of your article..."
+                  rows={3}
+                  value={field.state.value}
+                />
+              </div>
+            )}
+          </form.Field>
           <div className="flex justify-end space-x-2">
             <Button
               disabled={isPending}
@@ -125,9 +141,20 @@ export function PublishButton({
             >
               Cancel
             </Button>
-            <Button disabled={isPending} type="submit">
-              {isPending ? 'Publishing...' : 'Confirm Publish'}
-            </Button>
+            <form.Subscribe
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
+            >
+              {([canSubmit, isSubmitting]) => (
+                <Button
+                  disabled={!canSubmit || isSubmitting || isPending}
+                  type="submit"
+                >
+                  {isSubmitting || isPending
+                    ? 'Publishing...'
+                    : 'Confirm Publish'}
+                </Button>
+              )}
+            </form.Subscribe>
           </div>
         </form>
       </DialogContent>
