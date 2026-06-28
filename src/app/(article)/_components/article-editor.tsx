@@ -41,7 +41,7 @@ interface HeaderFormSelection {
 }
 
 export function ArticleEditor({ article }: { article: ArticleResponse }) {
-  const { back } = useRouter();
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm({
@@ -89,7 +89,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       }
       form.reset();
     }
-    back();
+    router.back();
   };
 
   return (
@@ -133,6 +133,13 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                       ...form.state.values,
                       status: 'published',
                     });
+                    if (article.author?.username && article.slug) {
+                      router.push(
+                        `/u/${article.author.username}/articles/${article.slug}`
+                      );
+                    } else {
+                      router.back();
+                    }
                   }}
                   publicId={article.publicId}
                   status={formState.status}

@@ -1,5 +1,7 @@
 'use client';
 
+import { QuillWrite01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -8,11 +10,13 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { updateArticle } from '@/lib/article-actions';
 
@@ -106,7 +110,10 @@ export function PublishButton({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ready to publish?</DialogTitle>
+          <DialogTitle>Publish Article</DialogTitle>
+          <DialogDescription>
+            Add a more details to help readers know what this article is about.
+          </DialogDescription>
         </DialogHeader>
         <form
           className="space-y-4"
@@ -121,12 +128,12 @@ export function PublishButton({
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Excerpt</Label>
                 <Textarea
+                  className="min-h-32"
                   id={field.name}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Write a brief summary of your article..."
-                  rows={3}
+                  placeholder="A brief summary of your article..."
                   value={field.state.value}
                 />
               </div>
@@ -141,20 +148,14 @@ export function PublishButton({
             >
               Cancel
             </Button>
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-            >
-              {([canSubmit, isSubmitting]) => (
-                <Button
-                  disabled={!canSubmit || isSubmitting || isPending}
-                  type="submit"
-                >
-                  {isSubmitting || isPending
-                    ? 'Publishing...'
-                    : 'Confirm Publish'}
-                </Button>
+            <Button disabled={isPending} type="submit">
+              {isPending ? (
+                <Spinner />
+              ) : (
+                <HugeiconsIcon icon={QuillWrite01Icon} strokeWidth={2} />
               )}
-            </form.Subscribe>
+              Publish
+            </Button>
           </div>
         </form>
       </DialogContent>
