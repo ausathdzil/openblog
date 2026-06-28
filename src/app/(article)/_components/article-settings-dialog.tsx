@@ -61,6 +61,13 @@ export function ArticleSettingsDialog({
       onChange: excerptSchema,
     },
     onSubmit: ({ value }) => onSubmit(value),
+    onSubmitInvalid() {
+      const $invalidInput = document.querySelector('[aria-invalid="true"]');
+
+      if ($invalidInput instanceof HTMLElement) {
+        $invalidInput.focus();
+      }
+    },
   });
 
   return (
