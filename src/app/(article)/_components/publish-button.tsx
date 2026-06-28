@@ -1,10 +1,13 @@
 'use client';
 
+import { QuillWrite01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { updateArticle } from '@/lib/article-actions';
+import { ArticleSettingsDialog } from './article-settings-dialog';
 
 interface PublishButtonProps extends React.ComponentProps<typeof Button> {
   isContentEmpty: boolean;
@@ -26,36 +29,43 @@ export function PublishButton({
 }: PublishButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [isPublished, setIsPublished] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (status === 'published') {
     return null;
   }
 
-  const handlePublish = () => {
-    if (!isValid) {
-      toast.error('Please fix all errors before publishing', {
-        position: 'top-center',
-      });
-      return;
-    }
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      if (!isValid) {
+        toast.error('Please fix all errors before publishing', {
+          position: 'top-center',
+        });
+        return;
+      }
 
-    if (isTitleEmpty) {
-      toast.error('Please enter a title before publishing', {
-        position: 'top-center',
-      });
-      return;
-    }
+      if (isTitleEmpty) {
+        toast.error('Please enter a title before publishing', {
+          position: 'top-center',
+        });
+        return;
+      }
 
-    if (isContentEmpty) {
-      toast.error('Please enter some content before publishing', {
-        position: 'top-center',
-      });
-      return;
+      if (isContentEmpty) {
+        toast.error('Please enter some content before publishing', {
+          position: 'top-center',
+        });
+        return;
+      }
     }
+    setIsOpen(open);
+  };
 
+  const handleSubmit = (values: { excerpt: string }) => {
     startTransition(async () => {
       const res = await updateArticle(publicId, {
         status: 'published',
+        excerpt: values.excerpt,
       });
 
       if (res?.error) {
@@ -64,18 +74,24 @@ export function PublishButton({
       }
 
       setIsPublished(true);
+      setIsOpen(false);
       onPublished();
     });
   };
 
   return (
-    <Button
-      disabled={isPending || isPublished}
-      onClick={handlePublish}
-      size="pill-sm"
-      {...props}
+    <ArticleSettingsDialog
+      isOpen={isOpen}
+      isPending={isPending}
+      onOpenChange={handleOpenChange}
+      onSubmit={handleSubmit}
+      submitIcon={<HugeiconsIcon icon={QuillWrite01Icon} strokeWidth={2} />}
+      submitLabel="Publish"
+      title="Publish Article"
     >
-      {isPublished ? 'Published' : 'Publish'}
-    </Button>
+      <Button disabled={isPending || isPublished} size="pill-sm" {...props}>
+        {isPublished ? 'Published' : 'Publish'}
+      </Button>
+    </ArticleSettingsDialog>
   );
 }

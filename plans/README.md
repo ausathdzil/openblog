@@ -19,7 +19,7 @@ honor its STOP conditions, and update your row when done.
 | 009  | Optimize lowlight language bundle in content editor | P3 | S | — | DONE |
 | 010  | Freeze slugs of published articles | P2 | S | — | DONE |
 | 011  | Remove excerpt field from article editor | P1 | S | — | DONE |
-| 012  | Update publish flow with confirmation dialog | P1 | M | 011 | TODO |
+| 012  | Update publish flow with confirmation dialog | P1 | M | 011 | DONE |
 | 013  | Add floating and bubble menus to content editor | P2 | M | — | TODO |
 | 014  | Fix editor Enter key bugs and title navigation | P1 | M | — | DONE |
 | 015  | Fix Tiptap Prosemirror Duplication and Title Navigation | P1 | S | 014 | DONE |
