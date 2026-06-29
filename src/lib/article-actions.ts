@@ -129,6 +129,7 @@ export async function updateArticle(
     }
     updateTag(`articles-${data.author?.username}`);
     updateTag(`article-${data.slug}`);
+    return { data };
   }
 }
 
