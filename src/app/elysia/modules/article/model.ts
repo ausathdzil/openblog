@@ -9,8 +9,7 @@ const { updateArticle } = validation.update;
 
 export const createArticleBody = t.Object({
   title: createArticle.title,
-  content: createArticle.content,
-  contentJson: t.Optional(t.Any()),
+  contentJson: createArticle.contentJson,
   excerpt: createArticle.excerpt,
   status: createArticle.status,
   coverImage: createArticle.coverImage,
@@ -31,7 +30,6 @@ export const articleResponse = t.Object({
   publicId: articles.publicId,
   title: articles.title,
   slug: articles.slug,
-  content: articles.content,
   contentJson: articles.contentJson,
   excerpt: articles.excerpt,
   status: articles.status,
@@ -77,8 +75,7 @@ export const updateArticleBody = t.Object({
   status: updateArticle.status,
   title: updateArticle.title,
   slug: updateArticle.slug,
-  content: updateArticle.content,
-  contentJson: t.Optional(t.Any()),
+  contentJson: updateArticle.contentJson,
   excerpt: updateArticle.excerpt,
   coverImage: updateArticle.coverImage,
 });

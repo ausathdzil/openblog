@@ -21,7 +21,6 @@ describe('Article', () => {
     test('return 401 if not authenticated', async () => {
       const { status } = await elysia.articles.post({
         title: 'Test article',
-        content: 'Test content',
         status: 'draft',
       });
 
@@ -36,7 +35,6 @@ describe('Article', () => {
       const { data, status } = await elysia.articles.post(
         {
           title: 'Test article',
-          content: 'Test content',
           coverImage: 'https://example.com',
           status: 'draft',
         },
@@ -137,7 +135,6 @@ describe('Article', () => {
     test('return 200 and update the article', async () => {
       const body = {
         title: 'Test update',
-        content: 'Test content',
         coverImage: null,
         status: 'draft' as 'draft' | 'published' | 'archived' | undefined,
       };

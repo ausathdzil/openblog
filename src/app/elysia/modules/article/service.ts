@@ -16,14 +16,7 @@ import type {
 } from './model';
 
 export async function createArticle(
-  {
-    title,
-    content,
-    contentJson,
-    status,
-    excerpt,
-    coverImage,
-  }: CreateArticleBody,
+  { title, contentJson, status, excerpt, coverImage }: CreateArticleBody,
   userId: string | undefined
 ) {
   if (!userId) {
@@ -37,7 +30,6 @@ export async function createArticle(
     .values({
       title: title?.trim(),
       slug: await slugify(title, author.id, getExistingSlugs),
-      content: content?.trim(),
       contentJson,
       excerpt: excerpt?.trim(),
       status,
@@ -48,7 +40,6 @@ export async function createArticle(
       publicId: article.publicId,
       title: article.title,
       slug: article.slug,
-      content: article.content,
       // biome-ignore lint/suspicious/noExplicitAny: bypass typecheck
       contentJson: article.contentJson as any,
       excerpt: article.excerpt,
@@ -142,7 +133,6 @@ export async function getArticleByPublicId(
       publicId: article.publicId,
       title: article.title,
       slug: article.slug,
-      content: article.content,
       // biome-ignore lint/suspicious/noExplicitAny: bypass typecheck
       contentJson: article.contentJson as any,
       excerpt: article.excerpt,
@@ -181,7 +171,6 @@ export async function getArticleBySlug(slug: string, username: string) {
       publicId: article.publicId,
       title: article.title,
       slug: article.slug,
-      content: article.content,
       // biome-ignore lint/suspicious/noExplicitAny: bypass typecheck
       contentJson: article.contentJson as any,
       excerpt: article.excerpt,
@@ -220,7 +209,6 @@ export async function updateArticle(
   publicId: string,
   {
     title,
-    content,
     contentJson,
     excerpt,
     status: articleStatus,
@@ -251,10 +239,6 @@ export async function updateArticle(
     }
   }
 
-  if (content !== undefined && content !== articleData.content) {
-    payload.content = content?.trim();
-  }
-
   if (contentJson !== undefined) {
     payload.contentJson = contentJson;
   }
@@ -283,7 +267,6 @@ export async function updateArticle(
       publicId: article.publicId,
       title: article.title,
       slug: article.slug,
-      content: article.content,
       // biome-ignore lint/suspicious/noExplicitAny: bypass typecheck
       contentJson: article.contentJson as any,
       excerpt: article.excerpt,

@@ -17,7 +17,6 @@ export async function createTestArticle(userId: string) {
     .values({
       title,
       slug: await slugify(title, userId, getExistingSlugs),
-      content,
       excerpt: content,
       status,
       coverImage,

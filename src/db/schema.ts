@@ -138,7 +138,6 @@ export const article = pgTable(
       .unique(),
     title: varchar('title', { length: 255 }),
     slug: varchar('slug', { length: 255 }),
-    content: text('content'),
     contentJson: jsonb('content_json'),
     excerpt: varchar('excerpt', { length: 255 }),
     status: articleStatus('status').default('draft').notNull(),
