@@ -2,6 +2,7 @@
 
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
+import type { JSONContent } from '@tiptap/react';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -11,9 +12,9 @@ import { updateArticle } from '@/lib/article-actions';
 import { ArticleSettingsDialog } from './article-settings-dialog';
 
 interface SaveButtonProps
-  extends Omit<React.ComponentProps<typeof Button>, 'content' | 'title'> {
+  extends Omit<React.ComponentProps<typeof Button>, 'contentJson' | 'title'> {
   article: ArticleResponse;
-  content: string;
+  contentJson: JSONContent | undefined;
   isValid: boolean;
   onSaved: () => void;
   title: string;
@@ -21,7 +22,7 @@ interface SaveButtonProps
 
 export function SaveButton({
   article,
-  content,
+  contentJson,
   isValid,
   onSaved,
   title,
@@ -42,7 +43,7 @@ export function SaveButton({
     startTransition(async () => {
       const res = await updateArticle(article.publicId, {
         title,
-        content,
+        contentJson,
         excerpt: values.excerpt,
         status: 'published',
       });

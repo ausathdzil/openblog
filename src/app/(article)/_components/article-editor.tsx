@@ -107,7 +107,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
           selector={(state) => ({
             isValid: state.isValid,
             title: state.values.title,
-            contentJson: state.values.contentJson,
+            contentJson: state.values.contentJson as JSONContent,
             status: state.values.status,
           })}
         >
@@ -118,7 +118,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                 <SaveButton
                   article={article}
                   className="h-11 sm:h-8"
-                  content={formState.contentJson}
+                  contentJson={formState.contentJson as JSONContent}
                   isValid={formState.isValid}
                   onSaved={() => {
                     form.reset({
@@ -134,7 +134,10 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               ) : (
                 <PublishButton
                   className="h-11 sm:h-8"
-                  isContentEmpty={isContentEmpty(formState.contentJson)}
+                  contentJson={formState.contentJson as JSONContent}
+                  isContentEmpty={isContentEmpty(
+                    formState.contentJson as JSONContent
+                  )}
                   isTitleEmpty={formState.title.trim().length === 0}
                   isValid={formState.isValid}
                   onPublished={() => {
@@ -148,6 +151,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   }}
                   publicId={article.publicId}
                   status={formState.status}
+                  title={formState.title}
                 />
               )}
             </div>
@@ -220,7 +224,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               <ContentEditor
                 onBlur={field.handleBlur}
                 onChange={field.handleChange}
-                value={field.state.value}
+                value={field.state.value as JSONContent}
               />
             )}
           </form.Field>
@@ -230,12 +234,24 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
   );
 }
 
-function isContentEmpty(content: string): boolean {
-  const normalized = content
-    .replace(/\u00A0/g, '') // Remove the non-breaking space character
-    .replace(/&nbsp;/gi, '') // Remove the literal "&nbsp;" string
-    .trim();
-  return normalized.length === 0;
+function isContentEmpty(contentJson: JSONContent | undefined): boolean {
+  if (!contentJson) {
+    return true;
+  }
+  if (
+    contentJson.type === 'doc' &&
+    contentJson.content &&
+    contentJson.content.length === 1
+  ) {
+    const first = contentJson.content[0];
+    if (first && first.type === 'paragraph' && !first.content) {
+      return true;
+    }
+  }
+  if (contentJson.content && contentJson.content.length === 0) {
+    return true;
+  }
+  return false;
 }
 
 function handleTitleEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
