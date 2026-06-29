@@ -2,6 +2,7 @@
 
 import { QuillWrite01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
+import type { JSONContent } from '@tiptap/react';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -10,15 +11,19 @@ import { updateArticle } from '@/lib/article-actions';
 import { ArticleSettingsDialog } from './article-settings-dialog';
 
 interface PublishButtonProps extends React.ComponentProps<typeof Button> {
+  contentJson: JSONContent | undefined;
   isContentEmpty: boolean;
   isTitleEmpty: boolean;
   isValid: boolean;
   onPublished: () => void;
   publicId: string;
   status: string | null;
+  title: string;
 }
 
 export function PublishButton({
+  contentJson,
+  title,
   isValid,
   isTitleEmpty,
   isContentEmpty,
@@ -64,6 +69,8 @@ export function PublishButton({
   const handleSubmit = (values: { excerpt: string }) => {
     startTransition(async () => {
       const res = await updateArticle(publicId, {
+        title,
+        contentJson,
         status: 'published',
         excerpt: values.excerpt,
       });

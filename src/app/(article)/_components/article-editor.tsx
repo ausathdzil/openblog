@@ -3,6 +3,7 @@
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
+import type { JSONContent } from '@tiptap/react';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
@@ -27,7 +28,7 @@ const articleSchema = z.object({
       z.trim(),
       z.maxLength(255, 'Title must be 255 characters or fewer.')
     ),
-  content: z.string().check(z.trim()),
+  contentJson: z.any(),
   status: z.literal(
     ['draft', 'published', 'archived'],
     'Status must be either draft, published, or archived.'
@@ -35,7 +36,7 @@ const articleSchema = z.object({
 });
 
 interface HeaderFormSelection {
-  content: string;
+  contentJson: JSONContent;
   isValid: boolean;
   status: 'archived' | 'draft' | 'published';
   title: string;
@@ -48,7 +49,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
   const form = useForm({
     defaultValues: {
       title: article.title ?? '',
-      content: article.content ?? '',
+      contentJson: article.contentJson ?? {},
       status: article.status,
     },
     validators: {
@@ -69,7 +70,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       startTransition(async () => {
         const res = await updateArticle(article.publicId, {
           title: value.title,
-          content: value.content,
+          contentJson: value.contentJson,
         });
 
         if (res?.error) {
@@ -106,7 +107,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
           selector={(state) => ({
             isValid: state.isValid,
             title: state.values.title,
-            content: state.values.content,
+            contentJson: state.values.contentJson as JSONContent,
             status: state.values.status,
           })}
         >
@@ -117,7 +118,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                 <SaveButton
                   article={article}
                   className="h-11 sm:h-8"
-                  content={formState.content}
+                  contentJson={formState.contentJson as JSONContent}
                   isValid={formState.isValid}
                   onSaved={() => {
                     form.reset({
@@ -133,7 +134,10 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               ) : (
                 <PublishButton
                   className="h-11 sm:h-8"
-                  isContentEmpty={isContentEmpty(formState.content)}
+                  contentJson={formState.contentJson as JSONContent}
+                  isContentEmpty={isContentEmpty(
+                    formState.contentJson as JSONContent
+                  )}
                   isTitleEmpty={formState.title.trim().length === 0}
                   isValid={formState.isValid}
                   onPublished={() => {
@@ -147,6 +151,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                   }}
                   publicId={article.publicId}
                   status={formState.status}
+                  title={formState.title}
                 />
               )}
             </div>
@@ -214,12 +219,12 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               );
             }}
           </form.Field>
-          <form.Field name="content">
+          <form.Field name="contentJson">
             {(field) => (
               <ContentEditor
                 onBlur={field.handleBlur}
                 onChange={field.handleChange}
-                value={field.state.value}
+                value={field.state.value as JSONContent}
               />
             )}
           </form.Field>
@@ -229,12 +234,24 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
   );
 }
 
-function isContentEmpty(content: string): boolean {
-  const normalized = content
-    .replace(/\u00A0/g, '') // Remove the non-breaking space character
-    .replace(/&nbsp;/gi, '') // Remove the literal "&nbsp;" string
-    .trim();
-  return normalized.length === 0;
+function isContentEmpty(contentJson: JSONContent | undefined): boolean {
+  if (!contentJson) {
+    return true;
+  }
+  if (
+    contentJson.type === 'doc' &&
+    contentJson.content &&
+    contentJson.content.length === 1
+  ) {
+    const first = contentJson.content[0];
+    if (first && first.type === 'paragraph' && !first.content) {
+      return true;
+    }
+  }
+  if (contentJson.content && contentJson.content.length === 0) {
+    return true;
+  }
+  return false;
 }
 
 function handleTitleEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
