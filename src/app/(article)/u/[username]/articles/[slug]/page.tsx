@@ -68,7 +68,7 @@ async function Article({ params }: ArticleProps) {
     ? String(
         await unified()
           .use(rehypeParse, { fragment: true })
-          .use(rehypeHighlight)
+          .use(rehypeHighlight, { detect: true })
           .use(rehypeStringify)
           .process(rawHtml)
       )
