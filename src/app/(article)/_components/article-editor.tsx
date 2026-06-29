@@ -70,7 +70,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       startTransition(async () => {
         const res = await updateArticle(article.publicId, {
           title: value.title,
-          contentJson: value.contentJson,
+          contentJson: JSON.parse(JSON.stringify(value.contentJson)),
         });
 
         if (res?.error) {

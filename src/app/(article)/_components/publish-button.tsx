@@ -70,7 +70,9 @@ export function PublishButton({
     startTransition(async () => {
       const res = await updateArticle(publicId, {
         title,
-        contentJson,
+        contentJson: contentJson
+          ? JSON.parse(JSON.stringify(contentJson))
+          : undefined,
         status: 'published',
         excerpt: values.excerpt,
       });

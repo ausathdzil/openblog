@@ -43,7 +43,9 @@ export function SaveButton({
     startTransition(async () => {
       const res = await updateArticle(article.publicId, {
         title,
-        contentJson,
+        contentJson: contentJson
+          ? JSON.parse(JSON.stringify(contentJson))
+          : undefined,
         excerpt: values.excerpt,
         status: 'published',
       });
