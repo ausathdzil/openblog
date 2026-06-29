@@ -51,7 +51,7 @@ interface ArticleProps {
   params: Promise<{ username: string; slug: string }>;
 }
 
-const extensions = [StarterKit.configure({ codeBlock: false })];
+const extensions = [StarterKit];
 
 async function Article({ params }: ArticleProps) {
   const { username, slug } = await params;
