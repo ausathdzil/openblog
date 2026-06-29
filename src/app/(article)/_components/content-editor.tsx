@@ -2,8 +2,12 @@
 
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Placeholder } from '@tiptap/extensions';
-import { Markdown } from '@tiptap/markdown';
-import { EditorContent, ReactNodeViewRenderer, useEditor } from '@tiptap/react';
+import {
+  EditorContent,
+  type JSONContent,
+  ReactNodeViewRenderer,
+  useEditor,
+} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import css from 'highlight.js/lib/languages/css';
 import js from 'highlight.js/lib/languages/javascript';
@@ -23,8 +27,8 @@ lowlight.register('json', json);
 
 interface ContentEditorProps {
   onBlur: () => void;
-  onChange: (value: string) => void;
-  value: string;
+  onChange: (value: JSONContent) => void;
+  value: JSONContent;
 }
 
 export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
@@ -42,11 +46,6 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
         enableTabIndentation: true,
         lowlight,
         tabSize: 2,
-      }),
-      Markdown.configure({
-        markedOptions: {
-          gfm: true,
-        },
       }),
       Placeholder.configure({
         placeholder: ({ node }) => {
@@ -70,7 +69,6 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
       }),
     ],
     content: value,
-    contentType: 'markdown',
     editorProps: {
       attributes: {
         'aria-label': 'content',
@@ -79,8 +77,8 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
     },
     onBlur,
     onUpdate: ({ editor }) => {
-      const markdown = editor.getMarkdown();
-      onChange(markdown);
+      const json = editor.getJSON();
+      onChange(json);
     },
     immediatelyRender: false,
   });

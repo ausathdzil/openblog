@@ -10,6 +10,7 @@ const { updateArticle } = validation.update;
 export const createArticleBody = t.Object({
   title: createArticle.title,
   content: createArticle.content,
+  contentJson: createArticle.contentJson,
   excerpt: createArticle.excerpt,
   status: createArticle.status,
   coverImage: createArticle.coverImage,
@@ -31,6 +32,7 @@ export const articleResponse = t.Object({
   title: articles.title,
   slug: articles.slug,
   content: articles.content,
+  contentJson: articles.contentJson,
   excerpt: articles.excerpt,
   status: articles.status,
   coverImage: articles.coverImage,
@@ -76,6 +78,7 @@ export const updateArticleBody = t.Object({
   title: updateArticle.title,
   slug: updateArticle.slug,
   content: updateArticle.content,
+  contentJson: updateArticle.contentJson,
   excerpt: updateArticle.excerpt,
   coverImage: updateArticle.coverImage,
 });
