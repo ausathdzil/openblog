@@ -7,7 +7,6 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeParse from 'rehype-parse';
-import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
 import { unified } from 'unified';
 
@@ -69,7 +68,6 @@ async function Article({ params }: ArticleProps) {
     ? String(
         await unified()
           .use(rehypeParse, { fragment: true })
-          .use(rehypeSanitize)
           .use(rehypeHighlight)
           .use(rehypeStringify)
           .process(rawHtml)
