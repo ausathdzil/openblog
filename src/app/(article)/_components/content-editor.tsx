@@ -9,21 +9,9 @@ import {
   useEditor,
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import css from 'highlight.js/lib/languages/css';
-import js from 'highlight.js/lib/languages/javascript';
-import json from 'highlight.js/lib/languages/json';
-import ts from 'highlight.js/lib/languages/typescript';
-import html from 'highlight.js/lib/languages/xml';
-import { createLowlight } from 'lowlight';
 
 import { CodeBlock } from './code-block';
-
-const lowlight = createLowlight();
-lowlight.register('html', html);
-lowlight.register('css', css);
-lowlight.register('js', js);
-lowlight.register('ts', ts);
-lowlight.register('json', json);
+import { lowlight } from './lowlight';
 
 interface ContentEditorProps {
   onBlur: () => void;
@@ -45,23 +33,12 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
       }).configure({
         enableTabIndentation: true,
         lowlight,
-        tabSize: 2,
+        tabSize: 4,
       }),
       Placeholder.configure({
         placeholder: ({ node }) => {
           if (node.type.name === 'heading') {
             return `Heading ${node.attrs.level}`;
-          }
-
-          if (node.type.name === 'blockquote') {
-            return 'Quote';
-          }
-
-          if (
-            node.type.name === 'bulletList' ||
-            node.type.name === 'orderedList'
-          ) {
-            return 'List';
           }
 
           return 'Start writing…';
