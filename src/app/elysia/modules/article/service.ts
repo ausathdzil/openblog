@@ -282,7 +282,7 @@ export async function updateArticle(
 
   return {
     ...updatedData,
-    author: articleData.author!,
+    author: articleData.author,
   } satisfies ArticleResponse;
 }
 
@@ -302,5 +302,5 @@ export async function deleteArticle(
 
   await db.delete(article).where(eq(article.publicId, articleData.publicId));
 
-  return { message: 'Article deleted' };
+  return { message: 'Article deleted.' };
 }

@@ -17,7 +17,7 @@ export async function deleteArticle(publicId: string, username: string) {
       error: {
         status: error.status || 500,
         message:
-          error.value?.message || 'An unknown error occurred, please try again',
+          error.value.message || 'An unknown error occurred. Please try again.',
       },
     };
   }
@@ -31,7 +31,7 @@ export async function deleteArticle(publicId: string, username: string) {
   return {
     error: {
       status: 500,
-      message: 'Unable to delete article, please try again',
+      message: 'Unable to delete article. Please try again.',
     },
   };
 }
@@ -46,7 +46,7 @@ export async function archiveArticle(publicId: string, username: string) {
       error: {
         status: error.status || 500,
         message:
-          error.value?.message || 'An unknown error occurred, please try again',
+          error.value.message || 'An unknown error occurred. Please try again.',
       },
     };
   }
@@ -61,7 +61,7 @@ export async function archiveArticle(publicId: string, username: string) {
   return {
     error: {
       status: 500,
-      message: 'Unable to archive article, please try again',
+      message: 'Unable to archive article. Please try again.',
     },
   };
 }
@@ -76,7 +76,7 @@ export async function moveArticleToDraft(publicId: string, username: string) {
       error: {
         status: error.status || 500,
         message:
-          error.value?.message || 'An unknown error occurred, please try again',
+          error.value.message || 'An unknown error occurred. Please try again.',
       },
     };
   }
@@ -91,7 +91,7 @@ export async function moveArticleToDraft(publicId: string, username: string) {
   return {
     error: {
       status: 500,
-      message: 'Unable to move article to draft, please try again',
+      message: 'Unable to move article to draft. Please try again.',
     },
   };
 }
@@ -118,7 +118,7 @@ export async function updateArticle(
       error: {
         status: error.status || 500,
         message:
-          error.value?.message || 'An unknown error occurred, please try again',
+          error.value.message || 'An unknown error occurred. Please try again.',
       },
     };
   }
@@ -148,7 +148,7 @@ export async function createDraft() {
       error: {
         status: error.status || 500,
         message:
-          error.value?.message || 'An unknown error occurred, please try again',
+          error.value.message || 'An unknown error occurred. Please try again.',
       },
     };
   }
@@ -163,7 +163,7 @@ export async function createDraft() {
   return {
     error: {
       status: 500,
-      message: 'Unable to create draft, please try again',
+      message: 'Unable to create draft. Please try again',
     },
   };
 }

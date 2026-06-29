@@ -69,14 +69,6 @@ export function Header({
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
           </button>
-          <Large
-            className={cn(
-              'line-clamp-1',
-              showTitle ? 'opacity-100' : 'opacity-0'
-            )}
-          >
-            {title}
-          </Large>
         </div>
         {children}
       </div>

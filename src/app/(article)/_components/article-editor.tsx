@@ -118,7 +118,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
                 <SaveButton
                   article={article}
                   className="h-11 sm:h-8"
-                  contentJson={formState.contentJson as JSONContent}
+                  contentJson={formState.contentJson}
                   isValid={formState.isValid}
                   onSaved={() => {
                     form.reset({
@@ -134,10 +134,8 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               ) : (
                 <PublishButton
                   className="h-11 sm:h-8"
-                  contentJson={formState.contentJson as JSONContent}
-                  isContentEmpty={isContentEmpty(
-                    formState.contentJson as JSONContent
-                  )}
+                  contentJson={formState.contentJson}
+                  isContentEmpty={isContentEmpty(formState.contentJson)}
                   isTitleEmpty={formState.title.trim().length === 0}
                   isValid={formState.isValid}
                   onPublished={() => {
@@ -159,7 +157,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
         </form.Subscribe>
       </Header>
       <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-6 sm:p-4">
-        <div className="pointer-events-none fixed right-6 bottom-6 z-20 gap-2">
+        <div className="pointer-events-none fixed right-6 bottom-6 z-20 hidden gap-2 sm:block">
           {isPending ? (
             <Marker role="status">
               <MarkerIcon>
