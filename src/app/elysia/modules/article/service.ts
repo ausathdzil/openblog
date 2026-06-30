@@ -1,12 +1,12 @@
-import { and, count, desc, eq, ilike } from 'drizzle-orm';
+import { and, count, desc, eq, ilike, inArray } from 'drizzle-orm';
 import { InternalServerError, NotFoundError } from 'elysia';
 
 import { db } from '@/db';
-import { article, user } from '@/db/schema';
+import { article, articleTags, tag, user } from '@/db/schema';
 import { getExistingSlugs } from '@/db/utils';
 import { AuthError } from '../auth';
 import { getAuthorById, getAuthorByUsername } from '../author/service';
-import { slugify } from '../utils';
+import { generateSlug, slugify } from '../utils';
 import type {
   ArticleResponse,
   ArticlesQuery,
@@ -16,7 +16,7 @@ import type {
 } from './model';
 
 export async function createArticle(
-  { title, contentJson, status, excerpt, coverImage }: CreateArticleBody,
+  { title, contentJson, status, excerpt, coverImage, tags }: CreateArticleBody,
   userId: string | undefined
 ) {
   if (!userId) {
@@ -37,6 +37,7 @@ export async function createArticle(
       authorId: author.id,
     })
     .returning({
+      id: article.id,
       publicId: article.publicId,
       title: article.title,
       slug: article.slug,
@@ -53,9 +54,37 @@ export async function createArticle(
     throw new InternalServerError('Failed to create article.');
   }
 
+  const finalTags: { id: string; name: string; slug: string }[] = [];
+  if (tags && tags.length > 0) {
+    for (const tagName of tags) {
+      const tagSlug = generateSlug(tagName);
+      let [existingTag] = await db
+        .select()
+        .from(tag)
+        .where(eq(tag.name, tagName));
+      if (!existingTag) {
+        const [newTag] = await db
+          .insert(tag)
+          .values({ name: tagName, slug: tagSlug })
+          .returning();
+        if (!newTag) {
+          throw new InternalServerError('Failed to create tag.');
+        }
+        existingTag = newTag;
+      }
+      finalTags.push(existingTag);
+      await db
+        .insert(articleTags)
+        .values({ articleId: articleData.id, tagId: existingTag.id });
+    }
+  }
+
+  const { id, ...restArticleData } = articleData;
+
   return {
-    ...articleData,
+    ...restArticleData,
     author,
+    tags: finalTags,
   } satisfies ArticleResponse;
 }
 
@@ -88,6 +117,7 @@ export async function getArticles(
         username: user.username,
         displayUsername: user.displayUsername,
       },
+      id: article.id,
     })
     .from(article)
     .leftJoin(user, eq(article.authorId, user.id))
@@ -108,11 +138,36 @@ export async function getArticles(
     await getAuthorByUsername(username); // throws NotFoundError if not found
   }
 
+  const articleIds = data.map((a) => a.id);
+  const allTags =
+    articleIds.length > 0
+      ? await db
+          .select({
+            articleId: articleTags.articleId,
+            id: tag.id,
+            name: tag.name,
+            slug: tag.slug,
+          })
+          .from(articleTags)
+          .innerJoin(tag, eq(tag.id, articleTags.tagId))
+          .where(inArray(articleTags.articleId, articleIds))
+      : [];
+
+  const dataWithTags = data.map((a) => {
+    const { id, ...rest } = a;
+    return {
+      ...rest,
+      tags: allTags
+        .filter((t) => t.articleId === a.id)
+        .map((t) => ({ id: t.id, name: t.name, slug: t.slug })),
+    };
+  });
+
   const total = totalResult[0]?.count ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   return {
-    data,
+    data: dataWithTags,
     pagination: {
       page,
       limit,
@@ -148,6 +203,7 @@ export async function getArticleByPublicId(
         username: user.username,
         displayUsername: user.displayUsername,
       },
+      id: article.id,
     })
     .from(article)
     .leftJoin(user, eq(article.authorId, user.id))
@@ -162,7 +218,22 @@ export async function getArticleByPublicId(
     throw new AuthError('You are not allowed to access this resource.', 403);
   }
 
-  return articleData satisfies ArticleResponse;
+  const allTags = await db
+    .select({
+      id: tag.id,
+      name: tag.name,
+      slug: tag.slug,
+    })
+    .from(articleTags)
+    .innerJoin(tag, eq(tag.id, articleTags.tagId))
+    .where(eq(articleTags.articleId, articleData.id));
+
+  const { id, ...rest } = articleData;
+
+  return {
+    ...rest,
+    tags: allTags,
+  } satisfies ArticleResponse;
 }
 
 export async function getArticleBySlug(slug: string, username: string) {
@@ -186,6 +257,7 @@ export async function getArticleBySlug(slug: string, username: string) {
         username: user.username,
         displayUsername: user.displayUsername,
       },
+      id: article.id,
     })
     .from(article)
     .innerJoin(user, eq(article.authorId, user.id))
@@ -202,7 +274,44 @@ export async function getArticleBySlug(slug: string, username: string) {
     throw new NotFoundError('Article not found.');
   }
 
-  return articleData satisfies ArticleResponse;
+  const allTags = await db
+    .select({
+      id: tag.id,
+      name: tag.name,
+      slug: tag.slug,
+    })
+    .from(articleTags)
+    .innerJoin(tag, eq(tag.id, articleTags.tagId))
+    .where(eq(articleTags.articleId, articleData.id));
+
+  const { id, ...rest } = articleData;
+
+  return {
+    ...rest,
+    tags: allTags,
+  } satisfies ArticleResponse;
+}
+
+async function syncArticleTags(articleId: number, tags: string[]) {
+  await db.delete(articleTags).where(eq(articleTags.articleId, articleId));
+  for (const tagName of tags) {
+    const tagSlug = generateSlug(tagName);
+    let [existingTag] = await db
+      .select()
+      .from(tag)
+      .where(eq(tag.name, tagName));
+    if (!existingTag) {
+      const [newTag] = await db
+        .insert(tag)
+        .values({ name: tagName, slug: tagSlug })
+        .returning();
+      if (!newTag) {
+        throw new InternalServerError('Failed to create tag.');
+      }
+      existingTag = newTag;
+    }
+    await db.insert(articleTags).values({ articleId, tagId: existingTag.id });
+  }
 }
 
 export async function updateArticle(
@@ -213,6 +322,7 @@ export async function updateArticle(
     excerpt,
     status: articleStatus,
     coverImage,
+    tags,
   }: UpdateArticleBody,
   userId: string | undefined
 ) {
@@ -255,8 +365,19 @@ export async function updateArticle(
     payload.coverImage = coverImage;
   }
 
+  if (tags !== undefined) {
+    const [intData] = await db
+      .select({ id: article.id })
+      .from(article)
+      .where(eq(article.publicId, publicId))
+      .limit(1);
+    if (intData) {
+      await syncArticleTags(intData.id, tags);
+    }
+  }
+
   if (Object.keys(payload).length === 0) {
-    return articleData satisfies ArticleResponse;
+    return articleData;
   }
 
   const [updatedData] = await db
@@ -264,6 +385,7 @@ export async function updateArticle(
     .set({ ...payload })
     .where(eq(article.publicId, publicId))
     .returning({
+      id: article.id,
       publicId: article.publicId,
       title: article.title,
       slug: article.slug,
@@ -280,9 +402,22 @@ export async function updateArticle(
     throw new InternalServerError('Failed to update article.');
   }
 
+  const allTags = await db
+    .select({
+      id: tag.id,
+      name: tag.name,
+      slug: tag.slug,
+    })
+    .from(articleTags)
+    .innerJoin(tag, eq(tag.id, articleTags.tagId))
+    .where(eq(articleTags.articleId, updatedData.id));
+
+  const { id, ...restUpdated } = updatedData;
+
   return {
-    ...updatedData,
+    ...restUpdated,
     author: articleData.author,
+    tags: allTags,
   } satisfies ArticleResponse;
 }
 

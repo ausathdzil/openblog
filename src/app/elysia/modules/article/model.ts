@@ -13,6 +13,7 @@ export const createArticleBody = t.Object({
   excerpt: createArticle.excerpt,
   status: createArticle.status,
   coverImage: createArticle.coverImage,
+  tags: t.Optional(t.Array(t.String())),
 });
 
 export type CreateArticleBody = typeof createArticleBody.static;
@@ -37,6 +38,9 @@ export const articleResponse = t.Object({
   createdAt: articles.createdAt,
   updatedAt: articles.updatedAt,
   author: t.Nullable(authorResponse),
+  tags: t.Optional(
+    t.Array(t.Object({ id: t.String(), name: t.String(), slug: t.String() }))
+  ),
 });
 
 export type ArticleResponse = typeof articleResponse.static;
@@ -78,6 +82,7 @@ export const updateArticleBody = t.Object({
   contentJson: updateArticle.contentJson,
   excerpt: updateArticle.excerpt,
   coverImage: updateArticle.coverImage,
+  tags: t.Optional(t.Array(t.String())),
 });
 
 export type UpdateArticleBody = typeof updateArticleBody.static;

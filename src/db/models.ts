@@ -1,12 +1,12 @@
 import { createInsertSchema, createUpdateSchema } from 'drizzle-typebox';
 import { t } from 'elysia';
 
-import { article, user } from './schema';
+import { article, articleTags, tag, user } from './schema';
 import { spreads } from './utils';
 
 /** Drizzle→TypeBox field fragments for Elysia `t.Object` / OpenAPI (not the SQL client; see `@/db`). */
 export const validation = {
-  select: spreads({ articles: article, user }, 'select'),
+  select: spreads({ articles: article, user, tag, articleTags }, 'select'),
   insert: spreads(
     {
       createArticle: createInsertSchema(article, {

@@ -7,6 +7,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -167,6 +168,27 @@ export const article = pgTable(
   ]
 );
 
+export const tag = pgTable('tag', {
+  id: text('id')
+    .$defaultFn(() => nanoid())
+    .primaryKey(),
+  name: varchar('name', { length: 50 }).notNull().unique(),
+  slug: varchar('slug', { length: 50 }).notNull().unique(),
+});
+
+export const articleTags = pgTable(
+  'article_tags',
+  {
+    articleId: bigint('article_id', { mode: 'number' })
+      .notNull()
+      .references(() => article.id, { onDelete: 'cascade' }),
+    tagId: text('tag_id')
+      .notNull()
+      .references(() => tag.id, { onDelete: 'cascade' }),
+  },
+  (table) => [primaryKey({ columns: [table.articleId, table.tagId] })]
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
@@ -195,9 +217,25 @@ export const passkeyRelations = relations(passkey, ({ one }) => ({
   }),
 }));
 
-export const articleRelations = relations(article, ({ one }) => ({
+export const articleRelations = relations(article, ({ one, many }) => ({
   author: one(user, {
     fields: [article.authorId],
     references: [user.id],
+  }),
+  articleTags: many(articleTags),
+}));
+
+export const tagRelations = relations(tag, ({ many }) => ({
+  articleTags: many(articleTags),
+}));
+
+export const articleTagsRelations = relations(articleTags, ({ one }) => ({
+  article: one(article, {
+    fields: [articleTags.articleId],
+    references: [article.id],
+  }),
+  tag: one(tag, {
+    fields: [articleTags.tagId],
+    references: [tag.id],
   }),
 }));
