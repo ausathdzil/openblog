@@ -1,6 +1,6 @@
 import { t } from 'elysia';
 
-import { validation } from '@/db/models';
+import { validation } from '@/app/elysia/modules/article/validation';
 import { authorResponse } from '../author/model';
 
 const { articles } = validation.select;

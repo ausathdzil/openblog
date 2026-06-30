@@ -1,6 +1,6 @@
 import { t } from 'elysia';
 
-import { validation } from '@/db/models';
+import { validation } from '../article/validation';
 
 const { user: authors } = validation.select;
 

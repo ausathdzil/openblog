@@ -1,8 +1,8 @@
 import { createInsertSchema, createUpdateSchema } from 'drizzle-typebox';
 import { t } from 'elysia';
 
-import { article, articleTags, tag, user } from './schema';
-import { spreads } from './utils';
+import { article, articleTags, tag, user } from '@/db/schema';
+import { spreads } from '@/db/utils';
 
 /** Drizzle→TypeBox field fragments for Elysia `t.Object` / OpenAPI (not the SQL client; see `@/db`). */
 export const validation = {
