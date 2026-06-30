@@ -10,6 +10,10 @@ export const authorResponse = t.Object({
   createdAt: authors.createdAt,
   username: authors.username,
   displayUsername: authors.displayUsername,
+  bio: t.Optional(t.Nullable(t.String())),
+  website: t.Optional(t.Nullable(t.String())),
+  twitter: t.Optional(t.Nullable(t.String())),
+  facebook: t.Optional(t.Nullable(t.String())),
 });
 
 export type AuthorResponse = typeof authorResponse.static;

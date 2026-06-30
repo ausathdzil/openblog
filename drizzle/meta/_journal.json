@@ -71,6 +71,13 @@
       "when": 1782788309534,
       "tag": "0009_productive_the_anarchist",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782802447169,
+      "tag": "0010_superb_the_order",
+      "breakpoints": true
     }
   ]
 }
