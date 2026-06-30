@@ -30,13 +30,7 @@ export function ArticleStatusActionsMenu({
   return (
     <>
       <DropdownMenuItem
-        render={
-          <Link
-            href={`/preview/${publicId}`}
-            rel="noopener noreferrer"
-            target="_blank"
-          />
-        }
+        render={<Link href={`/preview/${publicId}`} />}
       >
         Preview
         <HugeiconsIcon className="ml-auto" icon={ViewIcon} strokeWidth={2} />
