@@ -95,6 +95,7 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
             onArchive={() => setArchiveDialogOpen(true)}
             onDelete={() => setDeleteDialogOpen(true)}
             onMoveToDraft={handleMoveToDraft}
+            publicId={article.publicId}
             status={article.status}
           />
         </DropdownMenuContent>

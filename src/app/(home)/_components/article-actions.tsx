@@ -132,6 +132,7 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
               onArchive={() => setArchiveDialogOpen(true)}
               onDelete={() => setDeleteDialogOpen(true)}
               onMoveToDraft={handleMoveToDraft}
+              publicId={article.publicId}
               status={article.status}
             />
           </DropdownMenuGroup>
