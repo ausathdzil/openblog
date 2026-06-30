@@ -250,6 +250,22 @@ export async function getArticleBySlug(slug: string, username: string) {
   } satisfies ArticleResponse;
 }
 
+async function syncTagsAndGetId(publicId: string, tags?: string[]) {
+  if (tags === undefined) {
+    return;
+  }
+  const [intData] = await db
+    .select({ id: article.id })
+    .from(article)
+    .where(eq(article.publicId, publicId))
+    .limit(1);
+  if (intData) {
+    await syncArticleTags(intData.id, tags);
+    return intData.id;
+  }
+  return;
+}
+
 export async function updateArticle(
   publicId: string,
   {
@@ -301,21 +317,10 @@ export async function updateArticle(
     payload.coverImage = coverImage;
   }
 
-  let internalId: number | undefined;
-  if (tags !== undefined) {
-    const [intData] = await db
-      .select({ id: article.id })
-      .from(article)
-      .where(eq(article.publicId, publicId))
-      .limit(1);
-    if (intData) {
-      internalId = intData.id;
-      await syncArticleTags(internalId, tags);
-    }
-  }
+  const internalId = await syncTagsAndGetId(publicId, tags);
 
   if (Object.keys(payload).length === 0) {
-    if (tags !== undefined && internalId !== undefined) {
+    if (internalId !== undefined) {
       const allTags = await getTagsForArticle(internalId);
       return {
         ...articleData,
