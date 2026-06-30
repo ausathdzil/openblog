@@ -29,9 +29,7 @@ export function ArticleStatusActionsMenu({
 }: ArticleStatusActionsMenuProps) {
   return (
     <>
-      <DropdownMenuItem
-        render={<Link href={`/preview/${publicId}`} />}
-      >
+      <DropdownMenuItem render={<Link href={`/preview/${publicId}`} />}>
         Preview
         <HugeiconsIcon className="ml-auto" icon={ViewIcon} strokeWidth={2} />
       </DropdownMenuItem>
