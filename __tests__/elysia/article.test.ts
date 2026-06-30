@@ -49,6 +49,30 @@ describe('Article', () => {
         createdArticles.push(data.publicId);
       }
     });
+    test('return 201 and create an article with tags', async () => {
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
+      });
+
+      const { data, status } = await elysia.articles.post(
+        {
+          title: 'Test article with tags',
+          status: 'draft',
+          tags: ['test-tag-1', 'test-tag-2'],
+        },
+        { headers }
+      );
+
+      expect(status).toBe(201);
+      expect(data).not.toBeNull();
+      expect(data?.tags).toBeArray();
+      expect(data?.tags?.length).toBe(2);
+      expect(data?.tags?.map((t: any) => t.name)).toContain('test-tag-1');
+
+      if (data?.publicId) {
+        createdArticles.push(data.publicId);
+      }
+    });
   });
 
   describe('Get all articles', () => {
@@ -184,6 +208,21 @@ describe('Article', () => {
       expect(status).toBe(200);
       expect(data?.slug).not.toBe(article.slug);
       expect(data?.slug).toInclude('new-title-for-draft');
+    });
+    test('updates tags correctly', async () => {
+      const article = ctx.article;
+      const headers = await authContext.authTest.getAuthHeaders({
+        userId: authContext.testUser.id,
+      });
+
+      const { data, status } = await elysia
+        .articles({ publicId: article.publicId })
+        .patch({ tags: ['updated-tag-1'] }, { headers });
+
+      expect(status).toBe(200);
+      expect(data?.tags).toBeArray();
+      expect(data?.tags?.length).toBe(1);
+      expect(data?.tags?.[0]?.name).toBe('updated-tag-1');
     });
   });
 

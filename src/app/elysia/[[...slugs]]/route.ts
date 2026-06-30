@@ -5,6 +5,7 @@ import { article } from '../modules/article';
 import { auth } from '../modules/auth';
 import { author } from '../modules/author';
 import { me } from '../modules/me';
+import { tag } from '../modules/tag';
 
 export const app = new Elysia({ prefix: '/elysia' })
   .use(
@@ -21,6 +22,7 @@ export const app = new Elysia({ prefix: '/elysia' })
   .use(article)
   .use(author)
   .use(me)
+  .use(tag)
   .get('/', 'Hello, World!', { tags: ['Root'] });
 
 export const GET = app.fetch;
