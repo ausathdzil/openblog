@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { user } from '@/db/schema';
-import type { UpdateProfileBody } from './validation';
+import type { UpdateProfileBody } from './model';
 
 export async function updateProfile(
   userId: string,

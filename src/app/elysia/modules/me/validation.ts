@@ -3,13 +3,39 @@ import { t } from 'elysia';
 
 import { user } from '@/db/schema';
 
-const baseSchema = createUpdateSchema(user);
-
-export const updateProfileBody = t.Object({
-  bio: baseSchema.properties.bio,
-  website: baseSchema.properties.website,
-  twitter: baseSchema.properties.twitter,
-  facebook: baseSchema.properties.facebook,
-});
-
-export type UpdateProfileBody = typeof updateProfileBody.static;
+export const validation = {
+  updateProfile: createUpdateSchema(user, {
+    bio: t.Optional(
+      t.Nullable(
+        t.String({
+          maxLength: 500,
+          error: 'Bio must be 500 characters or fewer.',
+        })
+      )
+    ),
+    website: t.Optional(
+      t.Nullable(
+        t.String({
+          maxLength: 255,
+          error: 'Website URL must be 255 characters or fewer.',
+        })
+      )
+    ),
+    twitter: t.Optional(
+      t.Nullable(
+        t.String({
+          maxLength: 15,
+          error: 'Twitter handle must be 15 characters or fewer.',
+        })
+      )
+    ),
+    facebook: t.Optional(
+      t.Nullable(
+        t.String({
+          maxLength: 50,
+          error: 'Facebook handle must be 50 characters or fewer.',
+        })
+      )
+    ),
+  }),
+};

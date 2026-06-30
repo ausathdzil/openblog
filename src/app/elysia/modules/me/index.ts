@@ -8,9 +8,12 @@ import {
 } from '../article/model';
 import { getArticles } from '../article/service';
 import { AuthError, auth } from '../auth';
-import { updateProfileInvalid, updateProfileResponse } from './model';
+import {
+  updateProfileBody,
+  updateProfileInvalid,
+  updateProfileResponse,
+} from './model';
 import { updateProfile } from './service';
-import { updateProfileBody } from './validation';
 
 export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
   .use(auth)
