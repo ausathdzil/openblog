@@ -23,6 +23,10 @@ export async function getAuthors({ q, page = 1, limit = 20 }: AuthorsQuery) {
       createdAt: user.createdAt,
       username: user.username,
       displayUsername: user.displayUsername,
+      bio: user.bio,
+      website: user.website,
+      twitter: user.twitter,
+      facebook: user.facebook,
     })
     .from(user)
     .where(whereConditions)
@@ -62,6 +66,10 @@ export async function getAuthorByUsername(username: string) {
       createdAt: user.createdAt,
       username: user.username,
       displayUsername: user.displayUsername,
+      bio: user.bio,
+      website: user.website,
+      twitter: user.twitter,
+      facebook: user.facebook,
     })
     .from(user)
     .where(eq(user.username, username))
@@ -83,6 +91,10 @@ export async function getAuthorById(id: string) {
       createdAt: user.createdAt,
       username: user.username,
       displayUsername: user.displayUsername,
+      bio: user.bio,
+      website: user.website,
+      twitter: user.twitter,
+      facebook: user.facebook,
     })
     .from(user)
     .where(eq(user.id, id))

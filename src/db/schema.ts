@@ -32,6 +32,10 @@ export const user = pgTable(
       .notNull(),
     username: text('username').unique(),
     displayUsername: text('display_username'),
+    bio: varchar('bio', { length: 500 }),
+    website: varchar('website', { length: 255 }),
+    twitter: varchar('twitter', { length: 15 }),
+    facebook: varchar('facebook', { length: 50 }),
   },
   (table) => [index('user_email_idx').on(table.email)]
 );
