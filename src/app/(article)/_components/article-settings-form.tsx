@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
+import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
@@ -26,7 +27,7 @@ const excerptSchema = z.object({
 });
 
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
-  const router = useRouter();
+  const { replace, push } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm({
@@ -46,7 +47,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         if (res?.error) {
           toast.error(res.error.message, { position: 'top-center' });
         } else {
-          router.push(
+          push(
             `/@${article.author?.username}/articles/${article.slug}` as Route
           );
         }
@@ -71,6 +72,14 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         form.handleSubmit();
       }}
     >
+      <div className="space-y-1.5">
+        <Heading>Article Settings</Heading>
+        <Muted>
+          Changing these details will affect how your article appears in search
+          engine results and social previews.
+        </Muted>
+      </div>
+
       <form.Field name="excerpt">
         {(field) => {
           const isInvalid =
@@ -97,7 +106,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
       <div className="flex justify-end gap-2 pt-4">
         <Button
           disabled={isPending}
-          onClick={() => router.back()}
+          onClick={() => replace(`/editor/${article.publicId}`)}
           type="button"
           variant="outline"
         >

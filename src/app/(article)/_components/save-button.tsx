@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { updateArticle } from '@/lib/article-actions';
 
 interface SaveButtonProps
@@ -27,7 +26,7 @@ export function SaveButton({
   title,
   ...props
 }: SaveButtonProps) {
-  const router = useRouter();
+  const { replace } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const handleClick = () => {
@@ -50,7 +49,7 @@ export function SaveButton({
         return;
       }
 
-      router.push(`/editor/${article.publicId}/settings`);
+      replace(`/editor/${article.publicId}/settings`);
     });
   };
 
@@ -62,7 +61,7 @@ export function SaveButton({
       type="button"
       {...props}
     >
-      {isPending ? <Spinner /> : 'Save'}
+      Save
     </Button>
   );
 }

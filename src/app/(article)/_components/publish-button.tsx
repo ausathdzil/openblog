@@ -6,7 +6,6 @@ import { useTransition } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { updateArticle } from '@/lib/article-actions';
 
 interface PublishButtonProps extends React.ComponentProps<typeof Button> {
@@ -31,7 +30,7 @@ export function PublishButton({
   onPublished,
   ...props
 }: PublishButtonProps) {
-  const router = useRouter();
+  const { replace } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   if (status === 'published') {
@@ -74,7 +73,7 @@ export function PublishButton({
         return;
       }
 
-      router.push(`/editor/${publicId}/settings`);
+      replace(`/editor/${publicId}/settings`);
     });
   };
 
@@ -85,7 +84,7 @@ export function PublishButton({
       size="pill-sm"
       {...props}
     >
-      {isPending ? <Spinner /> : 'Publish'}
+      Publish
     </Button>
   );
 }
