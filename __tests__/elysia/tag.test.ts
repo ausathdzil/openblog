@@ -22,13 +22,17 @@ describe('Tag', () => {
 
   describe('Get tag by slug', () => {
     test('return 404 if tag not found', async () => {
-      const { status } = await elysia.tags({ slug: 'non-existent-tag-123' }).get();
+      const { status } = await elysia
+        .tags({ slug: 'non-existent-tag-123' })
+        .get();
 
       expect(status).toBe(404);
     });
 
     test('return 200 and the tag', async () => {
-      const { data, status } = await elysia.tags({ slug: tagContext.tag.slug }).get();
+      const { data, status } = await elysia
+        .tags({ slug: tagContext.tag.slug })
+        .get();
 
       expect(status).toBe(200);
       expect(data?.slug).toBe(tagContext.tag.slug);
