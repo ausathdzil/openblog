@@ -7,7 +7,7 @@ import { setupAuthContext } from './setup-auth';
 const authContext = setupAuthContext();
 
 describe('Me', () => {
-  describe('Articles', () => {
+  describe('Article', () => {
     setupTestArticle(() => authContext.testUser.id);
 
     test('return 401 if not authenticated', async () => {
