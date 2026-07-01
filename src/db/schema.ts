@@ -15,30 +15,24 @@ import {
 } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 
-export const user = pgTable(
-  'user',
-  {
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    email: text('email').notNull().unique(),
-    emailVerified: boolean('email_verified').default(false).notNull(),
-    image: text('image'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
-    username: text('username').unique(),
-    displayUsername: text('display_username'),
-    bio: varchar('bio', { length: 500 }),
-    website: varchar('website', { length: 255 }),
-    twitter: varchar('twitter', { length: 15 }),
-    facebook: varchar('facebook', { length: 50 }),
-  },
-  (table) => [index('user_email_idx').on(table.email)]
-);
+export const user = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  image: text('image'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  username: text('username').unique(),
+  displayUsername: text('display_username'),
+  bio: varchar('bio', { length: 500 }),
+  website: varchar('website', { length: 255 }),
+  twitter: varchar('twitter', { length: 15 }),
+  facebook: varchar('facebook', { length: 50 }),
+});
 
 export const session = pgTable(
   'session',
@@ -56,10 +50,7 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
   },
-  (table) => [
-    index('session_userId_idx').on(table.userId),
-    index('session_token_idx').on(table.token),
-  ]
+  (table) => [index('session_userId_idx').on(table.userId)]
 );
 
 export const account = pgTable(
@@ -173,24 +164,27 @@ export const article = pgTable(
 );
 
 export const tag = pgTable('tag', {
-  id: text('id')
-    .$defaultFn(() => nanoid())
+  id: varchar('id', { length: 12 })
+    .$defaultFn(() => nanoid(12))
     .primaryKey(),
   name: varchar('name', { length: 50 }).notNull().unique(),
   slug: varchar('slug', { length: 50 }).notNull().unique(),
 });
 
-export const articleTags = pgTable(
-  'article_tags',
+export const articleTag = pgTable(
+  'article_tag',
   {
     articleId: bigint('article_id', { mode: 'number' })
       .notNull()
       .references(() => article.id, { onDelete: 'cascade' }),
-    tagId: text('tag_id')
+    tagId: varchar('tag_id', { length: 12 })
       .notNull()
       .references(() => tag.id, { onDelete: 'cascade' }),
   },
-  (table) => [primaryKey({ columns: [table.articleId, table.tagId] })]
+  (table) => [
+    primaryKey({ columns: [table.articleId, table.tagId] }),
+    index('article_tag_tag_id_idx').on(table.tagId),
+  ]
 );
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -226,20 +220,20 @@ export const articleRelations = relations(article, ({ one, many }) => ({
     fields: [article.authorId],
     references: [user.id],
   }),
-  articleTags: many(articleTags),
+  articleTags: many(articleTag),
 }));
 
 export const tagRelations = relations(tag, ({ many }) => ({
-  articleTags: many(articleTags),
+  articleTags: many(articleTag),
 }));
 
-export const articleTagsRelations = relations(articleTags, ({ one }) => ({
+export const articleTagsRelations = relations(articleTag, ({ one }) => ({
   article: one(article, {
-    fields: [articleTags.articleId],
+    fields: [articleTag.articleId],
     references: [article.id],
   }),
   tag: one(tag, {
-    fields: [articleTags.tagId],
+    fields: [articleTag.tagId],
     references: [tag.id],
   }),
 }));

@@ -2,7 +2,7 @@ import { eq, inArray } from 'drizzle-orm';
 import { InternalServerError, NotFoundError } from 'elysia';
 
 import { db } from '@/db';
-import { articleTags, tag } from '@/db/schema';
+import { articleTag, tag } from '@/db/schema';
 import { generateSlug } from '../utils';
 
 export async function getTags() {
@@ -25,7 +25,7 @@ export async function getTagBySlug(slug: string) {
 }
 
 export async function syncArticleTags(articleId: number, tags: string[]) {
-  await db.delete(articleTags).where(eq(articleTags.articleId, articleId));
+  await db.delete(articleTag).where(eq(articleTag.articleId, articleId));
   for (const tagName of tags) {
     const tagSlug = generateSlug(tagName);
     let [existingTag] = await db
@@ -42,7 +42,7 @@ export async function syncArticleTags(articleId: number, tags: string[]) {
       }
       existingTag = newTag;
     }
-    await db.insert(articleTags).values({ articleId, tagId: existingTag.id });
+    await db.insert(articleTag).values({ articleId, tagId: existingTag.id });
   }
 }
 
@@ -53,9 +53,9 @@ export async function getTagsForArticle(articleId: number) {
       name: tag.name,
       slug: tag.slug,
     })
-    .from(articleTags)
-    .innerJoin(tag, eq(tag.id, articleTags.tagId))
-    .where(eq(articleTags.articleId, articleId));
+    .from(articleTag)
+    .innerJoin(tag, eq(tag.id, articleTag.tagId))
+    .where(eq(articleTag.articleId, articleId));
 
   return allTags;
 }
@@ -67,14 +67,14 @@ export async function getTagsForArticles(articleIds: number[]) {
 
   const allTags = await db
     .select({
-      articleId: articleTags.articleId,
+      articleId: articleTag.articleId,
       id: tag.id,
       name: tag.name,
       slug: tag.slug,
     })
-    .from(articleTags)
-    .innerJoin(tag, eq(tag.id, articleTags.tagId))
-    .where(inArray(articleTags.articleId, articleIds));
+    .from(articleTag)
+    .innerJoin(tag, eq(tag.id, articleTag.tagId))
+    .where(inArray(articleTag.articleId, articleIds));
 
   return allTags;
 }
