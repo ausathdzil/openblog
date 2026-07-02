@@ -24,7 +24,11 @@ async function HeaderActionsContent() {
 
   return (
     <>
+      {session?.user && (
+        <CreateArticleButton className="hidden h-9 px-4 sm:flex" />
+      )}
       <UserButton className="hidden sm:flex" session={session} />
+
       <div className="flex items-center gap-2 sm:hidden">
         {session?.user ? (
           <CreateArticleButton className="h-11 px-3" />
@@ -47,7 +51,10 @@ async function HeaderActionsContent() {
 function HeaderActionsFallback() {
   return (
     <>
-      <Skeleton className="hidden h-8 w-51 rounded-full sm:block" />
+      <div className="hidden items-center gap-4 sm:flex">
+        <Skeleton className="h-9 w-28 rounded-full" />
+        <Skeleton className="h-8 w-51 rounded-full" />
+      </div>
       <div className="flex items-center gap-2 sm:hidden">
         <Skeleton className="h-11 w-27 rounded-full" />
         <Skeleton className="size-11 rounded-md" />

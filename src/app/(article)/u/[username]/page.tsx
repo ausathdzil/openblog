@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
@@ -19,7 +20,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAuthor, getUserArticles } from '@/lib/article-data';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
-import { Header } from '../../_components/header';
 
 interface UserPageProps {
   params: Promise<{ username: string }>;
@@ -48,7 +48,9 @@ export default function UserPage({ params, searchParams }: UserPageProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header>
-        <HeaderActions />
+        <Header.Actions>
+          <HeaderActions />
+        </Header.Actions>
       </Header>
       <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
         <Suspense fallback={<ProfileSkeleton />}>

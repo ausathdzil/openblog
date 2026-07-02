@@ -5,18 +5,24 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { JSONContent } from '@tiptap/react';
 import type { Route } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useSyncExternalStore, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
+import openblog from '@/../public/openblog.png';
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
+import { Header } from '@/components/header';
+import { Large } from '@/components/typography';
+import { Button } from '@/components/ui/button';
 import { Marker, MarkerContent, MarkerIcon } from '@/components/ui/marker';
 import { updateArticle } from '@/lib/article-actions';
+import { cn } from '@/lib/utils';
 import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
 import { EditorActions } from './editor-actions';
-import { Header } from './header';
 import { PublishButton } from './publish-button';
 import { ResizableTextarea } from './resizable-textarea';
 import { SaveButton } from './save-button';
@@ -45,6 +51,12 @@ interface HeaderFormSelection {
 export function ArticleEditor({ article }: { article: ArticleResponse }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const isScrolled = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
 
   const form = useForm({
     defaultValues: {
@@ -82,79 +94,94 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
     },
   });
 
-  const handleBack = () => {
-    if (form.state.isDirty) {
-      // biome-ignore lint/suspicious/noAlert: native confirm for unsaved-changes
-      const leave = window.confirm('You have unsaved changes. Leave anyway?');
-      if (!leave) {
-        return;
-      }
-      form.reset();
-    }
-    router.back();
-  };
-
   return (
     <>
       <form.Subscribe<boolean> selector={(state) => state.isDirty}>
         {(isDirty) => <BeforeUnloadGuard isDirty={isDirty} />}
       </form.Subscribe>
-      <Header
-        onBackClick={handleBack}
-        title={article.title || 'Untitled Draft'}
-      >
-        <form.Subscribe<HeaderFormSelection>
-          selector={(state) => ({
-            isValid: state.isValid,
-            title: state.values.title,
-            contentJson: state.values.contentJson as JSONContent,
-            status: state.values.status,
-          })}
-        >
-          {(formState) => (
-            <div className="flex items-center gap-2">
-              <EditorActions article={article} />
-              {formState.status === 'published' ? (
-                <SaveButton
-                  article={article}
-                  className="h-11 sm:h-8"
-                  contentJson={formState.contentJson}
-                  isValid={formState.isValid}
-                  onSaved={() => {
-                    form.reset({
-                      ...form.state.values,
-                      status: 'published',
-                    });
-                    router.push(
-                      `/@${article.author?.username}/articles/${article.slug}` as Route
-                    );
-                  }}
-                  title={formState.title}
-                />
-              ) : (
-                <PublishButton
-                  className="h-11 sm:h-8"
-                  contentJson={formState.contentJson}
-                  isContentEmpty={isContentEmpty(formState.contentJson)}
-                  isTitleEmpty={formState.title.trim().length === 0}
-                  isValid={formState.isValid}
-                  onPublished={() => {
-                    form.reset({
-                      ...form.state.values,
-                      status: 'published',
-                    });
-                    router.push(
-                      `/@${article.author?.username}/articles/${article.slug}` as Route
-                    );
-                  }}
-                  publicId={article.publicId}
-                  status={formState.status}
-                  title={formState.title}
-                />
-              )}
-            </div>
+      <Header>
+        <Header.Nav>
+          <Button
+            className="gap-2"
+            nativeButton={false}
+            render={<Link href="/" />}
+            size="sm"
+            variant="ghost"
+          >
+            <Image
+              alt="OpenBlog"
+              className="dark:invert"
+              height={12}
+              src={openblog}
+              width={12}
+            />
+            OpenBlog
+          </Button>
+        </Header.Nav>
+        <Header.Center
+          className={cn(
+            'hidden transition-opacity sm:block',
+            isScrolled ? 'opacity-100' : 'opacity-0'
           )}
-        </form.Subscribe>
+        >
+          <Large className="line-clamp-1">
+            {article.title || 'Untitled Draft'}
+          </Large>
+        </Header.Center>
+        <Header.Actions>
+          <form.Subscribe<HeaderFormSelection>
+            selector={(state) => ({
+              isValid: state.isValid,
+              title: state.values.title,
+              contentJson: state.values.contentJson as JSONContent,
+              status: state.values.status,
+            })}
+          >
+            {(formState) => (
+              <div className="flex items-center gap-2">
+                <EditorActions article={article} />
+                {formState.status === 'published' ? (
+                  <SaveButton
+                    article={article}
+                    className="h-11 sm:h-8"
+                    contentJson={formState.contentJson}
+                    isValid={formState.isValid}
+                    onSaved={() => {
+                      form.reset({
+                        ...form.state.values,
+                        status: 'published',
+                      });
+                      router.push(
+                        `/@${article.author?.username}/articles/${article.slug}` as Route
+                      );
+                    }}
+                    title={formState.title}
+                  />
+                ) : (
+                  <PublishButton
+                    className="h-11 sm:h-8"
+                    contentJson={formState.contentJson}
+                    isContentEmpty={isContentEmpty(formState.contentJson)}
+                    isTitleEmpty={formState.title.trim().length === 0}
+                    isValid={formState.isValid}
+                    onPublished={() => {
+                      form.reset({
+                        ...form.state.values,
+                        status: 'published',
+                      });
+                      router.push(
+                        `/@${article.author?.username}/articles/${article.slug}` as Route
+                      );
+                    }}
+                    publicId={article.publicId}
+                    status={formState.status}
+                    title={formState.title}
+                  />
+                )}
+              </div>
+            )}
+          </form.Subscribe>
+        </Header.Actions>
       </Header>
       <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-6 sm:p-4">
         <div className="pointer-events-none fixed right-6 bottom-6 z-20 hidden gap-2 sm:block">
@@ -260,4 +287,32 @@ function handleTitleEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
       editorEl?.focus();
     }, 0);
   }
+}
+
+function subscribe(callback: () => void) {
+  if (typeof window === 'undefined') {
+    return () => {
+      // no-op
+    };
+  }
+  window.addEventListener('scroll', callback, { passive: true });
+  return () => {
+    window.removeEventListener('scroll', callback);
+  };
+}
+
+function getSnapshot() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  const y =
+    window.scrollY ||
+    document.documentElement.scrollTop ||
+    document.body.scrollTop ||
+    0;
+  return y > 80;
+}
+
+function getServerSnapshot() {
+  return false;
 }

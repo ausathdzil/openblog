@@ -5,7 +5,6 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
-import { CreateArticleButton } from './create-article-button';
 import { UserDropdown } from './user-dropdown';
 
 interface UserButtonProps extends React.ComponentProps<'div'> {
@@ -23,11 +22,9 @@ export async function UserButton({
       headers: await headers(),
     });
   }
-  const hasUser = Boolean(resolvedSession?.user);
 
   return (
     <div className={cn('flex items-center gap-4', className)} {...props}>
-      {hasUser ? <CreateArticleButton /> : null}
       {resolvedSession?.user ? (
         <UserDropdown user={resolvedSession.user} />
       ) : (
