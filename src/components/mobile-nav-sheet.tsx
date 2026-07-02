@@ -90,7 +90,7 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
         className="w-[min(88vw,22rem)] max-w-none gap-0 p-0 pt-safe-top"
         side="right"
       >
-        <SheetHeader className="border-b p-4 pr-14">
+        <SheetHeader className="border-b">
           <SheetTitle>Menu</SheetTitle>
           <SheetDescription>Browse pages and account actions.</SheetDescription>
         </SheetHeader>
@@ -110,7 +110,7 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
           ))}
         </nav>
         <div className="mt-auto flex items-center gap-3 border-t p-4">
-          <ModeToggle className="size-11" />
+          <ModeToggle align="start" className="size-11" />
           {isSignedIn ? (
             <MobileSignOutButton
               className="h-11 flex-1"

@@ -16,7 +16,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export function ModeToggle(props: React.ComponentProps<typeof Button>) {
+interface ModeToggleProps extends React.ComponentProps<typeof Button> {
+  align?: 'start' | 'center' | 'end';
+}
+
+export function ModeToggle({ align = 'end', ...props }: ModeToggleProps) {
   const { setTheme } = useTheme();
 
   return (
@@ -43,7 +47,7 @@ export function ModeToggle(props: React.ComponentProps<typeof Button>) {
           strokeWidth={2}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align={align}>
         <DropdownMenuItem onClick={() => setTheme('light')}>
           <HugeiconsIcon icon={Sun02Icon} strokeWidth={2} />
           Light
