@@ -13,6 +13,9 @@ import { unified } from 'unified';
 
 import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
+import { HeaderTitle } from '@/components/header-title';
+import { OpenBlogButton } from '@/components/openblog-button';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { getArticleByPublicId } from '@/lib/article-data';
 import { auth } from '@/lib/auth';
@@ -108,11 +111,19 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   return (
     <>
       <Header>
-        <Header.Center className="hidden sm:block">
-          <span className="font-semibold">
-            {article.title || 'Untitled Draft'}
-          </span>
-        </Header.Center>
+        <Header.Nav>
+          <OpenBlogButton />
+          <Button
+            className="hidden sm:inline-flex"
+            nativeButton={false}
+            render={<Link href="/explore" />}
+            size="sm"
+            variant="ghost"
+          >
+            Explore
+          </Button>
+        </Header.Nav>
+        <HeaderTitle>{article.title || 'Untitled Draft'}</HeaderTitle>
         <Header.Actions>
           <HeaderActions />
         </Header.Actions>

@@ -5,21 +5,19 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { JSONContent } from '@tiptap/react';
 import type { Route } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSyncExternalStore, useTransition } from 'react';
+import { useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
-import openblog from '@/../public/openblog.png';
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Header } from '@/components/header';
-import { Large } from '@/components/typography';
+import { HeaderTitle } from '@/components/header-title';
+import { OpenBlogButton } from '@/components/openblog-button';
 import { Button } from '@/components/ui/button';
 import { Marker, MarkerContent, MarkerIcon } from '@/components/ui/marker';
 import { updateArticle } from '@/lib/article-actions';
-import { cn } from '@/lib/utils';
 import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
 import { EditorActions } from './editor-actions';
@@ -51,12 +49,6 @@ interface HeaderFormSelection {
 export function ArticleEditor({ article }: { article: ArticleResponse }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-
-  const isScrolled = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot
-  );
 
   const form = useForm({
     defaultValues: {
@@ -101,33 +93,18 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       </form.Subscribe>
       <Header>
         <Header.Nav>
+          <OpenBlogButton />
           <Button
-            className="gap-2"
+            className="hidden sm:inline-flex"
             nativeButton={false}
-            render={<Link href="/" />}
+            render={<Link href="/explore" />}
             size="sm"
             variant="ghost"
           >
-            <Image
-              alt="OpenBlog"
-              className="dark:invert"
-              height={12}
-              src={openblog}
-              width={12}
-            />
-            OpenBlog
+            Explore
           </Button>
         </Header.Nav>
-        <Header.Center
-          className={cn(
-            'hidden transition-opacity sm:block',
-            isScrolled ? 'opacity-100' : 'opacity-0'
-          )}
-        >
-          <Large className="line-clamp-1">
-            {article.title || 'Untitled Draft'}
-          </Large>
-        </Header.Center>
+        <HeaderTitle>{article.title || 'Untitled Draft'}</HeaderTitle>
         <Header.Actions>
           <form.Subscribe<HeaderFormSelection>
             selector={(state) => ({
@@ -287,32 +264,4 @@ function handleTitleEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
       editorEl?.focus();
     }, 0);
   }
-}
-
-function subscribe(callback: () => void) {
-  if (typeof window === 'undefined') {
-    return () => {
-      // no-op
-    };
-  }
-  window.addEventListener('scroll', callback, { passive: true });
-  return () => {
-    window.removeEventListener('scroll', callback);
-  };
-}
-
-function getSnapshot() {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  const y =
-    window.scrollY ||
-    document.documentElement.scrollTop ||
-    document.body.scrollTop ||
-    0;
-  return y > 80;
-}
-
-function getServerSnapshot() {
-  return false;
 }

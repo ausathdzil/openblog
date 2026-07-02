@@ -1,9 +1,8 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
-import openblog from '@/../public/openblog.png';
 import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
+import { OpenBlogButton } from '@/components/openblog-button';
 import { Button } from '@/components/ui/button';
 
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
@@ -19,22 +18,7 @@ function HomeHeader() {
   return (
     <Header>
       <Header.Nav>
-        <Button
-          className="gap-2"
-          nativeButton={false}
-          render={<Link href="/" />}
-          size="sm"
-          variant="ghost"
-        >
-          <Image
-            alt="OpenBlog"
-            className="dark:invert"
-            height={12}
-            src={openblog}
-            width={12}
-          />
-          OpenBlog
-        </Button>
+        <OpenBlogButton />
         <Button
           className="hidden sm:inline-flex"
           nativeButton={false}

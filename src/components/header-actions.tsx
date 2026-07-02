@@ -1,8 +1,6 @@
 import { headers } from 'next/headers';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { CreateArticleButton } from './create-article-button';
@@ -24,24 +22,13 @@ async function HeaderActionsContent() {
 
   return (
     <>
-      {session?.user && (
-        <CreateArticleButton className="hidden h-9 px-4 sm:flex" />
-      )}
-      <UserButton className="hidden sm:flex" session={session} />
+      <div className="hidden items-center gap-4 sm:flex">
+        {session?.user ? <CreateArticleButton /> : null}
+        <UserButton className="" session={session} />
+      </div>
 
-      <div className="flex items-center gap-2 sm:hidden">
-        {session?.user ? (
-          <CreateArticleButton className="h-11 px-3" />
-        ) : (
-          <Button
-            className="h-11 px-4"
-            nativeButton={false}
-            render={<Link href="/sign-in" />}
-            size="pill-sm"
-          >
-            Get Started
-          </Button>
-        )}
+      <div className="-mr-3 flex items-center gap-2 sm:hidden">
+        {session?.user ? <CreateArticleButton className="h-11" /> : null}
         <MobileNavSheet isSignedIn={Boolean(session?.user)} />
       </div>
     </>

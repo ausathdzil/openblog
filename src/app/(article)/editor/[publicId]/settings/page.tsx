@@ -5,7 +5,6 @@ import { Suspense } from 'react';
 import { ArticleSettingsForm } from '@/app/(article)/_components/article-settings-form';
 import { SettingsHeader } from '@/app/(article)/_components/settings-header';
 import { Spinner } from '@/components/ui/spinner';
-import { UserButton } from '@/components/user-button';
 import { getArticleByPublicId } from '@/lib/article-data';
 import { auth } from '@/lib/auth';
 
@@ -49,9 +48,7 @@ async function Settings({ params }: { params: Promise<{ publicId: string }> }) {
 
   return (
     <>
-      <SettingsHeader publicId={publicId}>
-        <UserButton session={session} />
-      </SettingsHeader>
+      <SettingsHeader publicId={publicId} />
       <main className="p-6 sm:p-4">
         <ArticleSettingsForm article={article} />
       </main>
