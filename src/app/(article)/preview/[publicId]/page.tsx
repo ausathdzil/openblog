@@ -11,7 +11,7 @@ import rehypeParse from 'rehype-parse';
 import rehypeStringify from 'rehype-stringify';
 import { unified } from 'unified';
 
-import { Header } from '@/app/(article)/_components/header';
+import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
 import { Spinner } from '@/components/ui/spinner';
 import { getArticleByPublicId } from '@/lib/article-data';
@@ -107,8 +107,15 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
 
   return (
     <>
-      <Header title={article.title || 'Untitled Draft'}>
-        <HeaderActions />
+      <Header>
+        <Header.Center className="hidden sm:block">
+          <span className="font-semibold">
+            {article.title || 'Untitled Draft'}
+          </span>
+        </Header.Center>
+        <Header.Actions>
+          <HeaderActions />
+        </Header.Actions>
       </Header>
       <main className="grid min-h-screen">
         <article className="prose prose-neutral dark:prose-invert mx-auto size-full min-w-0 p-6 sm:p-4">
