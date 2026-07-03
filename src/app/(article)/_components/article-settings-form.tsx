@@ -195,18 +195,18 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
               </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
               <form.Subscribe selector={(state) => state.fieldMeta}>
-                {(fieldMeta) =>
-                  Object.entries(fieldMeta || {})
-                    .filter(
-                      ([name, meta]) =>
-                        name.startsWith('tags[') &&
-                        meta?.isTouched &&
-                        !meta?.isValid
-                    )
-                    .map(([name, meta]) => (
-                      <FieldError errors={meta?.errors} key={name} />
-                    ))
-                }
+                {(fieldMeta) => {
+                  const firstErrorMeta = Object.entries(fieldMeta || {}).find(
+                    ([name, meta]) =>
+                      name.startsWith('tags[') &&
+                      meta?.errors &&
+                      meta.errors.length > 0
+                  )?.[1];
+
+                  return firstErrorMeta ? (
+                    <FieldError errors={firstErrorMeta.errors} />
+                  ) : null;
+                }}
               </form.Subscribe>
             </Field>
           );
