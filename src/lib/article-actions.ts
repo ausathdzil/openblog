@@ -98,7 +98,7 @@ export async function moveArticleToDraft(publicId: string, username: string) {
 
 export async function updateArticle(
   publicId: string,
-  { title, contentJson, excerpt, coverImage, status }: UpdateArticleBody
+  { title, contentJson, excerpt, coverImage, status, tags }: UpdateArticleBody
 ) {
   const { data, error } = await elysia.articles({ publicId }).patch(
     {
@@ -107,6 +107,7 @@ export async function updateArticle(
       excerpt,
       coverImage,
       status,
+      tags,
     },
     {
       headers: await headers(),

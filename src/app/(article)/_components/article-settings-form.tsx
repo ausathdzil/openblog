@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: TanStack Form array mode */
 'use client';
 
 import { QuillWrite01Icon } from '@hugeicons/core-free-icons';
@@ -5,14 +6,28 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxValue,
+} from '@/components/ui/combobox';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+import { Kbd } from '@/components/ui/kbd';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { updateArticle } from '@/lib/article-actions';
@@ -24,15 +39,27 @@ const excerptSchema = z.object({
       z.trim(),
       z.maxLength(255, 'Excerpt must be 255 characters or fewer.')
     ),
+  tags: z
+    .array(
+      z
+        .string()
+        .check(
+          z.trim(),
+          z.maxLength(15, 'Each tag must be 15 characters or fewer.')
+        )
+    )
+    .check(z.maxLength(5, 'You can only add up to 5 tags.')),
 });
 
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   const { replace, push } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [tagInputValue, setTagInputValue] = useState('');
 
   const form = useForm({
     defaultValues: {
       excerpt: article.excerpt ?? '',
+      tags: article.tags?.map((t) => t.name) ?? [],
     },
     validators: {
       onChange: excerptSchema,
@@ -41,6 +68,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
       startTransition(async () => {
         const res = await updateArticle(article.publicId, {
           excerpt: value.excerpt,
+          tags: value.tags,
           status: 'published',
         });
 
@@ -64,11 +92,9 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
 
   return (
     <form
-      className="mx-auto max-w-2xl space-y-4"
-      id="article-settings-form"
+      className="mx-auto max-w-2xl space-y-6"
       onSubmit={(e) => {
         e.preventDefault();
-        e.stopPropagation();
         form.handleSubmit();
       }}
     >
@@ -80,47 +106,137 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         </Muted>
       </div>
 
-      <form.Field name="excerpt">
-        {(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid ? true : undefined}>
-              <FieldLabel htmlFor={field.name}>Excerpt</FieldLabel>
-              <Textarea
-                className="min-h-32"
-                data-invalid={isInvalid ? true : undefined}
-                id={field.name}
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="A brief summary of your article..."
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      </form.Field>
+      <FieldGroup>
+        <form.Field name="excerpt">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Summary</FieldLabel>
+                <Textarea
+                  className="min-h-32"
+                  data-invalid={isInvalid}
+                  id={field.name}
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="What is this article about?"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button
-          disabled={isPending}
-          onClick={() => replace(`/editor/${article.publicId}`)}
-          type="button"
-          variant="outline"
-        >
-          Cancel
-        </Button>
-        <Button disabled={isPending} form="article-settings-form" type="submit">
-          {isPending ? (
-            <Spinner />
-          ) : (
-            <HugeiconsIcon icon={QuillWrite01Icon} strokeWidth={2} />
-          )}
-          Publish
-        </Button>
-      </div>
+        <form.Field mode="array" name="tags">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
+                <Combobox
+                  id={field.name}
+                  multiple
+                  name={field.name}
+                  onValueChange={(val) => field.handleChange(val)}
+                  value={field.state.value}
+                >
+                  <ComboboxChips>
+                    <ComboboxValue>
+                      {field.state.value.map((_, index) => (
+                        <form.Field key={index} name={`tags[${index}]`}>
+                          {(subField) => {
+                            const isSubFieldInvalid =
+                              subField.state.meta.isTouched &&
+                              !subField.state.meta.isValid;
+                            return (
+                              <ComboboxChip
+                                aria-invalid={isSubFieldInvalid}
+                                className="aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
+                              >
+                                {subField.state.value}
+                              </ComboboxChip>
+                            );
+                          }}
+                        </form.Field>
+                      ))}
+                      <ComboboxChipsInput
+                        aria-invalid={isInvalid}
+                        id={field.name}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => setTagInputValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ',') {
+                            e.preventDefault();
+                            const val = tagInputValue.trim();
+                            if (
+                              val !== '' &&
+                              !field.state.value.includes(val)
+                            ) {
+                              field.pushValue(val);
+                            }
+                            setTagInputValue('');
+                          }
+
+                          if (e.key === 'Backspace' && tagInputValue === '') {
+                            field.removeValue(field.state.value.length - 1);
+                          }
+                        }}
+                        placeholder="e.g. tutorial, productivity, design"
+                        value={tagInputValue}
+                      />
+                    </ComboboxValue>
+                  </ComboboxChips>
+                </Combobox>
+                <FieldDescription>
+                  Press <Kbd>Enter</Kbd> or <Kbd>,</Kbd> to add a tag. Helps
+                  readers discover your article.
+                </FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                <div className="[&>*:not(:first-child)]:hidden">
+                  {field.state.value.map((_, index) => (
+                    <form.Field
+                      key={`tags-error-${index}`}
+                      name={`tags[${index}]`}
+                    >
+                      {(subField) => {
+                        const isSubFieldInvalid =
+                          subField.state.meta.errors.length > 0;
+                        return isSubFieldInvalid ? (
+                          <FieldError errors={subField.state.meta.errors} />
+                        ) : null;
+                      }}
+                    </form.Field>
+                  ))}
+                </div>
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <Field className="justify-end" orientation="horizontal">
+          <Button
+            disabled={isPending}
+            onClick={() => replace(`/editor/${article.publicId}`)}
+            type="button"
+            variant="outline"
+          >
+            Cancel
+          </Button>
+          <Button disabled={isPending} type="submit">
+            {isPending ? (
+              <Spinner />
+            ) : (
+              <HugeiconsIcon icon={QuillWrite01Icon} strokeWidth={2} />
+            )}
+            Publish
+          </Button>
+        </Field>
+      </FieldGroup>
     </form>
   );
 }
