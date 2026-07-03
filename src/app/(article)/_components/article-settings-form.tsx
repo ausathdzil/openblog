@@ -111,7 +111,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
             field.state.meta.isTouched && !field.state.meta.isValid;
           return (
             <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor={field.name}>Excerpt</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Summary</FieldLabel>
               <Textarea
                 className="min-h-32"
                 data-invalid={isInvalid}
@@ -119,12 +119,9 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 name={field.name}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="A brief summary of your article…"
+                placeholder="What is this article about?"
                 value={field.state.value}
               />
-              <FieldDescription>
-                A short summary of your article for social previews.
-              </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
             </Field>
           );
@@ -184,14 +181,15 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                           field.removeValue(field.state.value.length - 1);
                         }
                       }}
-                      placeholder="Add a tag…"
+                      placeholder="e.g. tutorial, productivity, design"
                       value={tagInputValue}
                     />
                   </ComboboxValue>
                 </ComboboxChips>
               </Combobox>
               <FieldDescription>
-                Press Enter to add a tag. Helps readers discover your article.
+                Press Enter or Comma to add a tag. Helps readers discover your
+                article.
               </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
               <div className="[&>*:not(:first-child)]:hidden">
