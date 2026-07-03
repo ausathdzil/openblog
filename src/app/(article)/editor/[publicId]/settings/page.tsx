@@ -13,7 +13,7 @@ export default function ArticleSettingsPage(props: {
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Suspense fallback={<Spinner className="m-auto mt-20" />}>
+      <Suspense fallback={<Spinner className="m-auto" />}>
         <Settings params={props.params} />
       </Suspense>
     </div>

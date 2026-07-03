@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: TanStack Form array mode */
 'use client';
 
 import { QuillWrite01Icon } from '@hugeicons/core-free-icons';
@@ -5,7 +6,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -17,6 +18,7 @@ import {
   ComboboxChip,
   ComboboxChips,
   ComboboxChipsInput,
+  ComboboxValue,
 } from '@/components/ui/combobox';
 import {
   Field,
@@ -35,19 +37,22 @@ const excerptSchema = z.object({
       z.trim(),
       z.maxLength(255, 'Excerpt must be 255 characters or fewer.')
     ),
-  tags: z.array(
-    z
-      .string()
-      .check(
-        z.trim(),
-        z.maxLength(30, 'Each tag must be 30 characters or fewer.')
-      )
-  ),
+  tags: z
+    .array(
+      z
+        .string()
+        .check(
+          z.trim(),
+          z.maxLength(30, 'Each tag must be 30 characters or fewer.')
+        )
+    )
+    .check(z.maxLength(5, 'You can only add up to 5 tags.')),
 });
 
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   const { replace, push } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [tagInputValue, setTagInputValue] = useState('');
 
   const form = useForm({
     defaultValues: {
@@ -89,7 +94,6 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
       id="article-settings-form"
       onSubmit={(e) => {
         e.preventDefault();
-        e.stopPropagation();
         form.handleSubmit();
       }}
     >
@@ -131,64 +135,66 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         {(field) => {
           const isInvalid =
             field.state.meta.isTouched && !field.state.meta.isValid;
-
-          const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault();
-              const newTag = e.currentTarget.value.trim();
-              if (newTag && !field.state.value.includes(newTag)) {
-                field.pushValue(newTag);
-              }
-              e.currentTarget.value = '';
-            }
-          };
-
           return (
-            <Field data-invalid={isInvalid ? true : undefined}>
+            <Field data-invalid={isInvalid}>
               <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
               <Combobox
+                id={field.name}
                 multiple
-                onOpenChange={() => undefined}
-                onValueChange={(val) => {
-                  field.handleChange(val as string[]);
-                }}
-                open={false}
+                name={field.name}
+                onValueChange={(val) => field.handleChange(val as string[])}
                 value={field.state.value}
               >
                 <ComboboxChips>
-                  {field.state.value.map((_, index) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: Tanstack form array fields require index mapping
-                    <form.Field key={`tags-${index}`} name={`tags[${index}]`}>
-                      {(subField) => {
-                        const isSubFieldInvalid =
-                          subField.state.meta.isTouched &&
-                          !subField.state.meta.isValid;
-                        return (
-                          <ComboboxChip
-                            data-invalid={isSubFieldInvalid ? true : undefined}
-                          >
-                            {subField.state.value}
-                          </ComboboxChip>
-                        );
+                  <ComboboxValue>
+                    {field.state.value.map((_, index) => (
+                      <form.Field key={index} name={`tags[${index}]`}>
+                        {(subField) => {
+                          const isSubFieldInvalid =
+                            subField.state.meta.isTouched &&
+                            !subField.state.meta.isValid;
+                          return (
+                            <ComboboxChip
+                              aria-invalid={isSubFieldInvalid}
+                              className="aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
+                            >
+                              {subField.state.value}
+                            </ComboboxChip>
+                          );
+                        }}
+                      </form.Field>
+                    ))}
+                    <ComboboxChipsInput
+                      aria-invalid={isInvalid}
+                      id={field.name}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => setTagInputValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ',') {
+                          e.preventDefault();
+                          const val = tagInputValue.trim();
+                          if (val !== '' && !field.state.value.includes(val)) {
+                            field.pushValue(val);
+                          }
+                          setTagInputValue('');
+                        }
+
+                        if (e.key === 'Backspace' && tagInputValue === '') {
+                          field.removeValue(field.state.value.length - 1);
+                        }
                       }}
-                    </form.Field>
-                  ))}
-                  <ComboboxChipsInput
-                    id={field.name}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Add a tag…"
-                  />
+                      placeholder="Add a tag…"
+                      value={tagInputValue}
+                    />
+                  </ComboboxValue>
                 </ComboboxChips>
               </Combobox>
               <FieldDescription>
-                Press Enter or comma to add a tag. Helps readers discover your
-                article.
+                Press Enter to add a tag. Helps readers discover your article.
               </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
               {field.state.value.map((_, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: Tanstack form array fields require index mapping
                 <form.Field key={`tags-error-${index}`} name={`tags[${index}]`}>
                   {(subField) => {
                     const isSubFieldInvalid =
