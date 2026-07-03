@@ -43,7 +43,7 @@ const excerptSchema = z.object({
         .string()
         .check(
           z.trim(),
-          z.maxLength(30, 'Each tag must be 30 characters or fewer.')
+          z.maxLength(15, 'Each tag must be 15 characters or fewer.')
         )
     )
     .check(z.maxLength(5, 'You can only add up to 5 tags.')),
@@ -110,11 +110,11 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
           const isInvalid =
             field.state.meta.isTouched && !field.state.meta.isValid;
           return (
-            <Field data-invalid={isInvalid ? true : undefined}>
+            <Field data-invalid={isInvalid}>
               <FieldLabel htmlFor={field.name}>Excerpt</FieldLabel>
               <Textarea
                 className="min-h-32"
-                data-invalid={isInvalid ? true : undefined}
+                data-invalid={isInvalid}
                 id={field.name}
                 name={field.name}
                 onBlur={field.handleBlur}
@@ -142,7 +142,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 id={field.name}
                 multiple
                 name={field.name}
-                onValueChange={(val) => field.handleChange(val as string[])}
+                onValueChange={(val) => field.handleChange(val)}
                 value={field.state.value}
               >
                 <ComboboxChips>
@@ -194,18 +194,20 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 Press Enter to add a tag. Helps readers discover your article.
               </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              {field.state.value.map((_, index) => (
-                <form.Field key={`tags-error-${index}`} name={`tags[${index}]`}>
-                  {(subField) => {
-                    const isSubFieldInvalid =
-                      subField.state.meta.isTouched &&
-                      !subField.state.meta.isValid;
-                    return isSubFieldInvalid ? (
-                      <FieldError errors={subField.state.meta.errors} />
-                    ) : null;
-                  }}
-                </form.Field>
-              ))}
+              <form.Subscribe selector={(state) => state.fieldMeta}>
+                {(fieldMeta) =>
+                  Object.entries(fieldMeta || {})
+                    .filter(
+                      ([name, meta]) =>
+                        name.startsWith('tags[') &&
+                        meta?.isTouched &&
+                        !meta?.isValid
+                    )
+                    .map(([name, meta]) => (
+                      <FieldError errors={meta?.errors} key={name} />
+                    ))
+                }
+              </form.Subscribe>
             </Field>
           );
         }}
