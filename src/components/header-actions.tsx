@@ -41,12 +41,7 @@ async function HeaderActionsContent() {
         <MobileNavSheet
           footerAction={
             session?.user ? (
-              <MobileSignOutButton
-                className="h-11 flex-1"
-                onSignedOut={() => {
-                  /* noop */
-                }}
-              />
+              <MobileSignOutButton className="h-11 flex-1" />
             ) : (
               <Button
                 className="h-11 flex-1"
