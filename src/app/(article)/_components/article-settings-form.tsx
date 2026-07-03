@@ -5,7 +5,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -22,10 +22,7 @@ import {
   Field,
   FieldDescription,
   FieldError,
-  FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSet,
 } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
@@ -51,7 +48,6 @@ const excerptSchema = z.object({
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   const { replace, push } = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [tagInputValue, setTagInputValue] = useState('');
 
   const form = useForm({
     defaultValues: {
@@ -139,73 +135,72 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
           const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter' || e.key === ',') {
               e.preventDefault();
-              const newTag = tagInputValue.trim();
+              const newTag = e.currentTarget.value.trim();
               if (newTag && !field.state.value.includes(newTag)) {
-                field.handleChange([...field.state.value, newTag]);
+                field.pushValue(newTag);
               }
-              setTagInputValue('');
+              e.currentTarget.value = '';
             }
           };
 
           return (
-            <FieldSet
-              className="space-y-1.5"
-              data-invalid={isInvalid ? true : undefined}
-            >
-              <FieldLegend variant="label">Tags</FieldLegend>
+            <Field data-invalid={isInvalid ? true : undefined}>
+              <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
+              <Combobox
+                multiple
+                onOpenChange={() => undefined}
+                onValueChange={(val) => {
+                  field.handleChange(val as string[]);
+                }}
+                open={false}
+                value={field.state.value}
+              >
+                <ComboboxChips>
+                  {field.state.value.map((_, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: Tanstack form array fields require index mapping
+                    <form.Field key={`tags-${index}`} name={`tags[${index}]`}>
+                      {(subField) => {
+                        const isSubFieldInvalid =
+                          subField.state.meta.isTouched &&
+                          !subField.state.meta.isValid;
+                        return (
+                          <ComboboxChip
+                            data-invalid={isSubFieldInvalid ? true : undefined}
+                          >
+                            {subField.state.value}
+                          </ComboboxChip>
+                        );
+                      }}
+                    </form.Field>
+                  ))}
+                  <ComboboxChipsInput
+                    id={field.name}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Add a tag…"
+                  />
+                </ComboboxChips>
+              </Combobox>
               <FieldDescription>
                 Press Enter or comma to add a tag. Helps readers discover your
                 article.
               </FieldDescription>
-              <FieldGroup>
-                <Combobox
-                  multiple
-                  onOpenChange={() => undefined}
-                  onValueChange={(val) => {
-                    field.handleChange(val as string[]);
-                  }}
-                  open={false}
-                  value={field.state.value}
-                >
-                  <ComboboxChips>
-                    {field.state.value.map((tag, index) => (
-                      // biome-ignore lint/suspicious/noArrayIndexKey: Tanstack form array fields require index mapping
-                      <form.Field key={`tags-${index}`} name={`tags[${index}]`}>
-                        {(subField) => {
-                          const isSubFieldInvalid =
-                            subField.state.meta.isTouched &&
-                            !subField.state.meta.isValid;
-                          return (
-                            <Field
-                              data-invalid={
-                                isSubFieldInvalid ? true : undefined
-                              }
-                            >
-                              <ComboboxChip>{tag}</ComboboxChip>
-                              {isSubFieldInvalid && (
-                                <FieldError
-                                  errors={subField.state.meta.errors}
-                                />
-                              )}
-                            </Field>
-                          );
-                        }}
-                      </form.Field>
-                    ))}
-                    <ComboboxChipsInput
-                      id={field.name}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => setTagInputValue(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Add a tag…"
-                      value={tagInputValue}
-                    />
-                  </ComboboxChips>
-                </Combobox>
-              </FieldGroup>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </FieldSet>
+              {field.state.value.map((_, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Tanstack form array fields require index mapping
+                <form.Field key={`tags-error-${index}`} name={`tags[${index}]`}>
+                  {(subField) => {
+                    const isSubFieldInvalid =
+                      subField.state.meta.isTouched &&
+                      !subField.state.meta.isValid;
+                    return isSubFieldInvalid ? (
+                      <FieldError errors={subField.state.meta.errors} />
+                    ) : null;
+                  }}
+                </form.Field>
+              ))}
+            </Field>
           );
         }}
       </form.Field>
