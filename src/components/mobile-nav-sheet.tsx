@@ -22,20 +22,20 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { MobileSignOutButton } from './mobile-sign-out-button';
 
 interface MobileNavSheetProps {
-  isSignedIn: boolean;
+  footerAction?: React.ReactNode;
+  links: MobileNavLink[];
 }
 
-interface MobileNavLink {
+export interface MobileNavLink {
   href: Route;
   icon: React.ReactNode;
   label: string;
   variant?: 'default' | 'outline';
 }
 
-const userLinks: MobileNavLink[] = [
+export const userLinks: MobileNavLink[] = [
   {
     href: '/',
     label: 'Home',
@@ -53,7 +53,7 @@ const userLinks: MobileNavLink[] = [
   },
 ];
 
-const guestLinks: MobileNavLink[] = [
+export const guestLinks: MobileNavLink[] = [
   {
     href: '/',
     label: 'Home',
@@ -74,7 +74,7 @@ const guestLinks: MobileNavLink[] = [
   },
 ];
 
-export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
+export function MobileNavSheet({ links, footerAction }: MobileNavSheetProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -95,7 +95,7 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
           <SheetDescription>Browse pages and account actions.</SheetDescription>
         </SheetHeader>
         <nav className="flex flex-col gap-2 p-4">
-          {(isSignedIn ? userLinks : guestLinks).map((link) => (
+          {links.map((link) => (
             <Button
               className={cn('h-11 justify-start')}
               key={link.href}
@@ -111,12 +111,7 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
         </nav>
         <div className="mt-auto flex items-center gap-3 border-t p-4">
           <ModeToggle align="start" className="size-11" />
-          {isSignedIn ? (
-            <MobileSignOutButton
-              className="h-11 flex-1"
-              onSignedOut={() => setOpen(false)}
-            />
-          ) : null}
+          {footerAction}
         </div>
       </SheetContent>
     </Sheet>
