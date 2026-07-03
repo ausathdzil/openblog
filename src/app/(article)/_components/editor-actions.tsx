@@ -84,7 +84,7 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
         <DropdownMenuTrigger
           aria-label="Actions"
           render={
-            <Button className="size-11 sm:size-9" size="icon" variant="ghost" />
+            <Button className="size-11 sm:size-8" size="icon" variant="ghost" />
           }
           title="Actions"
         >

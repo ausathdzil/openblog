@@ -1,12 +1,7 @@
 'use client';
 
-import {
-  HomeIcon,
-  Menu01Icon,
-  SearchIcon,
-  UserCircleIcon,
-} from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { Menu01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -22,59 +17,18 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { MobileSignOutButton } from './mobile-sign-out-button';
 
 interface MobileNavSheetProps {
-  isSignedIn: boolean;
+  footerAction?: React.ReactNode;
+  links: {
+    href: Route;
+    icon: IconSvgElement;
+    label: string;
+    variant?: 'default' | 'outline';
+  }[];
 }
 
-interface MobileNavLink {
-  href: Route;
-  icon: React.ReactNode;
-  label: string;
-  variant?: 'default' | 'outline';
-}
-
-const userLinks: MobileNavLink[] = [
-  {
-    href: '/',
-    label: 'Home',
-    icon: <HugeiconsIcon icon={HomeIcon} strokeWidth={2} />,
-  },
-  {
-    href: '/explore',
-    label: 'Explore',
-    icon: <HugeiconsIcon icon={SearchIcon} strokeWidth={2} />,
-  },
-  {
-    href: '/profile',
-    label: 'Profile',
-    icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,
-  },
-];
-
-const guestLinks: MobileNavLink[] = [
-  {
-    href: '/',
-    label: 'Home',
-    icon: <HugeiconsIcon icon={HomeIcon} strokeWidth={2} />,
-    variant: 'outline',
-  },
-  {
-    href: '/explore',
-    label: 'Explore',
-    icon: <HugeiconsIcon icon={SearchIcon} strokeWidth={2} />,
-    variant: 'outline',
-  },
-  {
-    href: '/sign-in',
-    label: 'Get Started',
-    icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,
-    variant: 'default',
-  },
-];
-
-export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
+export function MobileNavSheet({ links, footerAction }: MobileNavSheetProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -95,7 +49,7 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
           <SheetDescription>Browse pages and account actions.</SheetDescription>
         </SheetHeader>
         <nav className="flex flex-col gap-2 p-4">
-          {(isSignedIn ? userLinks : guestLinks).map((link) => (
+          {links.map((link) => (
             <Button
               className={cn('h-11 justify-start')}
               key={link.href}
@@ -104,19 +58,14 @@ export function MobileNavSheet({ isSignedIn }: MobileNavSheetProps) {
               render={<Link href={link.href} />}
               variant={link.variant ?? 'outline'}
             >
-              {link.icon}
+              <HugeiconsIcon icon={link.icon} strokeWidth={2} />
               {link.label}
             </Button>
           ))}
         </nav>
         <div className="mt-auto flex items-center gap-3 border-t p-4">
           <ModeToggle align="start" className="size-11" />
-          {isSignedIn ? (
-            <MobileSignOutButton
-              className="h-11 flex-1"
-              onSignedOut={() => setOpen(false)}
-            />
-          ) : null}
+          {footerAction}
         </div>
       </SheetContent>
     </Sheet>
