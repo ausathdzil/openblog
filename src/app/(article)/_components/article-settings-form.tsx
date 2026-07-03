@@ -5,7 +5,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
@@ -13,15 +13,23 @@ import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+} from '@/components/ui/combobox';
+import {
   Field,
   FieldDescription,
   FieldError,
+  FieldGroup,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { updateArticle } from '@/lib/article-actions';
-import { TagInput } from './tag-input';
 
 const excerptSchema = z.object({
   excerpt: z
@@ -43,6 +51,7 @@ const excerptSchema = z.object({
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   const { replace, push } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [tagInputValue, setTagInputValue] = useState('');
 
   const form = useForm({
     defaultValues: {
@@ -126,20 +135,77 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         {(field) => {
           const isInvalid =
             field.state.meta.isTouched && !field.state.meta.isValid;
+
+          const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              const newTag = tagInputValue.trim();
+              if (newTag && !field.state.value.includes(newTag)) {
+                field.handleChange([...field.state.value, newTag]);
+              }
+              setTagInputValue('');
+            }
+          };
+
           return (
-            <Field data-invalid={isInvalid ? true : undefined}>
-              <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
-              <TagInput
-                id={field.name}
-                onChange={(val) => field.handleChange(val)}
-                value={field.state.value}
-              />
+            <FieldSet
+              className="space-y-1.5"
+              data-invalid={isInvalid ? true : undefined}
+            >
+              <FieldLegend variant="label">Tags</FieldLegend>
               <FieldDescription>
                 Press Enter or comma to add a tag. Helps readers discover your
                 article.
               </FieldDescription>
+              <FieldGroup>
+                <Combobox
+                  multiple
+                  onOpenChange={() => undefined}
+                  onValueChange={(val) => {
+                    field.handleChange(val as string[]);
+                  }}
+                  open={false}
+                  value={field.state.value}
+                >
+                  <ComboboxChips>
+                    {field.state.value.map((tag, index) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: Tanstack form array fields require index mapping
+                      <form.Field key={`tags-${index}`} name={`tags[${index}]`}>
+                        {(subField) => {
+                          const isSubFieldInvalid =
+                            subField.state.meta.isTouched &&
+                            !subField.state.meta.isValid;
+                          return (
+                            <Field
+                              data-invalid={
+                                isSubFieldInvalid ? true : undefined
+                              }
+                            >
+                              <ComboboxChip value={tag}>{tag}</ComboboxChip>
+                              {isSubFieldInvalid && (
+                                <FieldError
+                                  errors={subField.state.meta.errors}
+                                />
+                              )}
+                            </Field>
+                          );
+                        }}
+                      </form.Field>
+                    ))}
+                    <ComboboxChipsInput
+                      id={field.name}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => setTagInputValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Add a tag…"
+                      value={tagInputValue}
+                    />
+                  </ComboboxChips>
+                </Combobox>
+              </FieldGroup>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
+            </FieldSet>
           );
         }}
       </form.Field>
