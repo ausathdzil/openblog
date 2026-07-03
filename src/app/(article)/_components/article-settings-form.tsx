@@ -14,6 +14,7 @@ import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
+import { TagInput } from '@/components/ui/tag-input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateArticle } from '@/lib/article-actions';
 
@@ -24,6 +25,7 @@ const excerptSchema = z.object({
       z.trim(),
       z.maxLength(255, 'Excerpt must be 255 characters or fewer.')
     ),
+  tags: z.array(z.string()),
 });
 
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
@@ -33,6 +35,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   const form = useForm({
     defaultValues: {
       excerpt: article.excerpt ?? '',
+      tags: article.tags?.map((t) => t.name) ?? [],
     },
     validators: {
       onChange: excerptSchema,
@@ -41,6 +44,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
       startTransition(async () => {
         const res = await updateArticle(article.publicId, {
           excerpt: value.excerpt,
+          tags: value.tags,
           status: 'published',
         });
 
@@ -101,6 +105,18 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
             </Field>
           );
         }}
+      </form.Field>
+
+      <form.Field name="tags">
+        {(field) => (
+          <Field>
+            <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
+            <TagInput
+              onChange={(val) => field.handleChange(val)}
+              value={field.state.value}
+            />
+          </Field>
+        )}
       </form.Field>
 
       <div className="flex justify-end gap-2 pt-4">
