@@ -181,7 +181,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                                 isSubFieldInvalid ? true : undefined
                               }
                             >
-                              <ComboboxChip value={tag}>{tag}</ComboboxChip>
+                              <ComboboxChip>{tag}</ComboboxChip>
                               {isSubFieldInvalid && (
                                 <FieldError
                                   errors={subField.state.meta.errors}
