@@ -30,7 +30,14 @@ const excerptSchema = z.object({
       z.trim(),
       z.maxLength(255, 'Excerpt must be 255 characters or fewer.')
     ),
-  tags: z.array(z.string()),
+  tags: z.array(
+    z
+      .string()
+      .check(
+        z.trim(),
+        z.maxLength(30, 'Each tag must be 30 characters or fewer.')
+      )
+  ),
 });
 
 export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
@@ -73,7 +80,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
 
   return (
     <form
-      className="mx-auto max-w-2xl space-y-4"
+      className="mx-auto max-w-2xl space-y-6"
       id="article-settings-form"
       onSubmit={(e) => {
         e.preventDefault();
@@ -116,18 +123,24 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
       </form.Field>
 
       <form.Field mode="array" name="tags">
-        {(field) => (
-          <Field>
-            <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
-            <TagInput
-              onChange={(val) => field.handleChange(val)}
-              value={field.state.value}
-            />
-            <FieldDescription>
-              Add tags to help readers discover your article.
-            </FieldDescription>
-          </Field>
-        )}
+        {(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid ? true : undefined}>
+              <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
+              <TagInput
+                onChange={(val) => field.handleChange(val)}
+                value={field.state.value}
+              />
+              <FieldDescription>
+                Press Enter or comma to add a tag. Helps readers discover your
+                article.
+              </FieldDescription>
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
       </form.Field>
 
       <div className="flex justify-end gap-2 pt-4">
