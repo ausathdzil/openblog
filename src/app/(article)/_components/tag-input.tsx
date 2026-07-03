@@ -10,11 +10,12 @@ import {
 } from '@/components/ui/combobox';
 
 interface TagInputProps {
+  id?: string;
   onChange: (value: string[]) => void;
   value: string[];
 }
 
-export function TagInput({ value = [], onChange }: TagInputProps) {
+export function TagInput({ id, value = [], onChange }: TagInputProps) {
   const [inputValue, setInputValue] = React.useState('');
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -43,6 +44,7 @@ export function TagInput({ value = [], onChange }: TagInputProps) {
           <ComboboxChip key={tag}>{tag}</ComboboxChip>
         ))}
         <ComboboxChipsInput
+          id={id}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Add a tag…"

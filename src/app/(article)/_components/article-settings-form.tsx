@@ -130,6 +130,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
             <Field data-invalid={isInvalid ? true : undefined}>
               <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
               <TagInput
+                id={field.name}
                 onChange={(val) => field.handleChange(val)}
                 value={field.state.value}
               />
