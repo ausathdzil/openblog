@@ -12,11 +12,16 @@ import * as z from 'zod/mini';
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
-import { TagInput } from './tag-input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateArticle } from '@/lib/article-actions';
+import { TagInput } from './tag-input';
 
 const excerptSchema = z.object({
   excerpt: z
@@ -98,16 +103,19 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 name={field.name}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="A brief summary of your article..."
+                placeholder="A brief summary of your article…"
                 value={field.state.value}
               />
+              <FieldDescription>
+                A short summary of your article for social previews.
+              </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
             </Field>
           );
         }}
       </form.Field>
 
-      <form.Field name="tags" mode="array">
+      <form.Field mode="array" name="tags">
         {(field) => (
           <Field>
             <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
@@ -115,6 +123,9 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
               onChange={(val) => field.handleChange(val)}
               value={field.state.value}
             />
+            <FieldDescription>
+              Add tags to help readers discover your article.
+            </FieldDescription>
           </Field>
         )}
       </form.Field>

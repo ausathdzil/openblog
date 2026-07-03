@@ -1,57 +1,54 @@
-"use client"
+'use client';
 
-import * as React from "react"
+import * as React from 'react';
+
 import {
   Combobox,
-  ComboboxChips,
   ComboboxChip,
+  ComboboxChips,
   ComboboxChipsInput,
-} from "@/components/ui/combobox"
+} from '@/components/ui/combobox';
 
 interface TagInputProps {
-  value: string[]
-  onChange: (value: string[]) => void
+  onChange: (value: string[]) => void;
+  value: string[];
 }
 
 export function TagInput({ value = [], onChange }: TagInputProps) {
-  const [inputValue, setInputValue] = React.useState("")
+  const [inputValue, setInputValue] = React.useState('');
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault()
-      const newTag = inputValue.trim()
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const newTag = inputValue.trim();
       if (newTag && !value.includes(newTag)) {
-        onChange([...value, newTag])
+        onChange([...value, newTag]);
       }
-      setInputValue("")
+      setInputValue('');
     }
-  }
+  };
 
   return (
-    <Combobox 
+    <Combobox
       multiple
-      value={value} 
+      onOpenChange={() => undefined}
       onValueChange={(val) => {
-        onChange(val as string[])
+        onChange(val as string[]);
       }}
-      open={false} 
-      onOpenChange={() => {}}
+      open={false}
+      value={value}
     >
       <ComboboxChips>
-        {value.map(tag => (
-          <ComboboxChip 
-            key={tag} 
-          >
-            {tag}
-          </ComboboxChip>
+        {value.map((tag) => (
+          <ComboboxChip key={tag}>{tag}</ComboboxChip>
         ))}
-        <ComboboxChipsInput 
-          value={inputValue}
+        <ComboboxChipsInput
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Add a tag..."
+          placeholder="Add a tag…"
+          value={inputValue}
         />
       </ComboboxChips>
     </Combobox>
-  )
+  );
 }
