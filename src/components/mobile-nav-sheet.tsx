@@ -1,12 +1,7 @@
 'use client';
 
-import {
-  HomeIcon,
-  Menu01Icon,
-  SearchIcon,
-  UserCircleIcon,
-} from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { Menu01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -25,54 +20,13 @@ import { cn } from '@/lib/utils';
 
 interface MobileNavSheetProps {
   footerAction?: React.ReactNode;
-  links: MobileNavLink[];
+  links: {
+    href: Route;
+    icon: IconSvgElement;
+    label: string;
+    variant?: 'default' | 'outline';
+  }[];
 }
-
-export interface MobileNavLink {
-  href: Route;
-  icon: React.ReactNode;
-  label: string;
-  variant?: 'default' | 'outline';
-}
-
-export const userLinks: MobileNavLink[] = [
-  {
-    href: '/',
-    label: 'Home',
-    icon: <HugeiconsIcon icon={HomeIcon} strokeWidth={2} />,
-  },
-  {
-    href: '/explore',
-    label: 'Explore',
-    icon: <HugeiconsIcon icon={SearchIcon} strokeWidth={2} />,
-  },
-  {
-    href: '/profile',
-    label: 'Profile',
-    icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,
-  },
-];
-
-export const guestLinks: MobileNavLink[] = [
-  {
-    href: '/',
-    label: 'Home',
-    icon: <HugeiconsIcon icon={HomeIcon} strokeWidth={2} />,
-    variant: 'outline',
-  },
-  {
-    href: '/explore',
-    label: 'Explore',
-    icon: <HugeiconsIcon icon={SearchIcon} strokeWidth={2} />,
-    variant: 'outline',
-  },
-  {
-    href: '/sign-in',
-    label: 'Get Started',
-    icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,
-    variant: 'default',
-  },
-];
 
 export function MobileNavSheet({ links, footerAction }: MobileNavSheetProps) {
   const [open, setOpen] = useState(false);
@@ -104,7 +58,7 @@ export function MobileNavSheet({ links, footerAction }: MobileNavSheetProps) {
               render={<Link href={link.href} />}
               variant={link.variant ?? 'outline'}
             >
-              {link.icon}
+              <HugeiconsIcon icon={link.icon} strokeWidth={2} />
               {link.label}
             </Button>
           ))}
