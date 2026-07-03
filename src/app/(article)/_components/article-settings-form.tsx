@@ -14,7 +14,7 @@ import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
-import { TagInput } from '@/components/ui/tag-input';
+import { TagInput } from './tag-input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateArticle } from '@/lib/article-actions';
 
@@ -107,7 +107,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         }}
       </form.Field>
 
-      <form.Field name="tags">
+      <form.Field name="tags" mode="array">
         {(field) => (
           <Field>
             <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
