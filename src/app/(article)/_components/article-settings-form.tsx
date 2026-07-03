@@ -194,20 +194,22 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 Press Enter to add a tag. Helps readers discover your article.
               </FieldDescription>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              <form.Subscribe selector={(state) => state.fieldMeta}>
-                {(fieldMeta) => {
-                  const firstErrorMeta = Object.entries(fieldMeta || {}).find(
-                    ([name, meta]) =>
-                      name.startsWith('tags[') &&
-                      meta?.errors &&
-                      meta.errors.length > 0
-                  )?.[1];
-
-                  return firstErrorMeta ? (
-                    <FieldError errors={firstErrorMeta.errors} />
-                  ) : null;
-                }}
-              </form.Subscribe>
+              <div className="[&>*:not(:first-child)]:hidden">
+                {field.state.value.map((_, index) => (
+                  <form.Field
+                    key={`tags-error-${index}`}
+                    name={`tags[${index}]`}
+                  >
+                    {(subField) => {
+                      const isSubFieldInvalid =
+                        subField.state.meta.errors.length > 0;
+                      return isSubFieldInvalid ? (
+                        <FieldError errors={subField.state.meta.errors} />
+                      ) : null;
+                    }}
+                  </form.Field>
+                ))}
+              </div>
             </Field>
           );
         }}
