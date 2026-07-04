@@ -48,7 +48,7 @@ export async function syncArticleTags(articleId: number, tags: string[]) {
     let [existingTag] = await db
       .select()
       .from(tag)
-      .where(eq(tag.name, tagName));
+      .where(eq(tag.slug, tagSlug));
     if (!existingTag) {
       const [newTag] = await db
         .insert(tag)
