@@ -59,7 +59,7 @@ export async function createArticle(
     throw new InternalServerError('Failed to create article.');
   }
 
-  let finalTags: { id: string; name: string; slug: string }[] = [];
+  let finalTags: { name: string; slug: string }[] = [];
   if (tags && tags.length > 0) {
     await syncArticleTags(articleData.id, tags);
     finalTags = await getTagsForArticle(articleData.id);
@@ -131,9 +131,12 @@ export async function getArticles(
     const { id, ...rest } = a;
     return {
       ...rest,
-      tags: allTags
-        .filter((t) => t.articleId === a.id)
-        .map((t) => ({ id: t.id, name: t.name, slug: t.slug })),
+      tags: allTags.reduce<{ name: string; slug: string }[]>((acc, t) => {
+        if (t.articleId === a.id) {
+          acc.push({ name: t.name, slug: t.slug });
+        }
+        return acc;
+      }, []),
     };
   });
 

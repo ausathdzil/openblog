@@ -4,15 +4,16 @@ import { InternalServerError, NotFoundError } from 'elysia';
 import { db } from '@/db';
 import { articleTag, tag } from '@/db/schema';
 import { generateSlug } from '../utils';
+import type { TagResponse, TagsResponse } from './model';
 
 export async function getTags() {
-  const allTags = await db.select().from(tag);
-  return allTags;
+  const allTags = await db.select({ name: tag.name, slug: tag.slug }).from(tag);
+  return allTags satisfies TagsResponse;
 }
 
 export async function getTagBySlug(slug: string) {
   const [tagData] = await db
-    .select()
+    .select({ name: tag.name, slug: tag.slug })
     .from(tag)
     .where(eq(tag.slug, slug))
     .limit(1);
@@ -21,7 +22,7 @@ export async function getTagBySlug(slug: string) {
     throw new NotFoundError('Tag not found.');
   }
 
-  return tagData;
+  return tagData satisfies TagResponse;
 }
 
 export async function syncArticleTags(articleId: number, tags: string[]) {
@@ -49,7 +50,6 @@ export async function syncArticleTags(articleId: number, tags: string[]) {
 export async function getTagsForArticle(articleId: number) {
   const allTags = await db
     .select({
-      id: tag.id,
       name: tag.name,
       slug: tag.slug,
     })
@@ -68,7 +68,6 @@ export async function getTagsForArticles(articleIds: number[]) {
   const allTags = await db
     .select({
       articleId: articleTag.articleId,
-      id: tag.id,
       name: tag.name,
       slug: tag.slug,
     })

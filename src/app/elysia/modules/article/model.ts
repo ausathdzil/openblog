@@ -2,6 +2,7 @@ import { t } from 'elysia';
 
 import { validation } from '@/app/elysia/modules/article/validation';
 import { authorResponse } from '../author/model';
+import { tagResponse } from '../tag/model';
 
 const { articles } = validation.select;
 const { createArticle } = validation.insert;
@@ -38,9 +39,7 @@ export const articleResponse = t.Object({
   createdAt: articles.createdAt,
   updatedAt: articles.updatedAt,
   author: t.Nullable(authorResponse),
-  tags: t.Optional(
-    t.Array(t.Object({ id: t.String(), name: t.String(), slug: t.String() }))
-  ),
+  tags: t.Optional(t.Array(tagResponse)),
 });
 
 export type ArticleResponse = typeof articleResponse.static;
@@ -55,6 +54,7 @@ const articleListResponse = t.Object({
   createdAt: articles.createdAt,
   updatedAt: articles.updatedAt,
   author: t.Nullable(authorResponse),
+  tags: t.Optional(t.Array(tagResponse)),
 });
 
 export type ArticleListResponse = typeof articleListResponse.static;
