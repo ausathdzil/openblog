@@ -3,6 +3,7 @@ import { t } from 'elysia';
 import { validation } from '@/app/elysia/modules/article/validation';
 import { authorResponse } from '../author/model';
 import { tagResponse } from '../tag/model';
+import { tagArrayValidation } from '../tag/validation';
 
 const { articles } = validation.select;
 const { createArticle } = validation.insert;
@@ -14,7 +15,7 @@ export const createArticleBody = t.Object({
   excerpt: createArticle.excerpt,
   status: createArticle.status,
   coverImage: createArticle.coverImage,
-  tags: t.Optional(t.Array(t.String())),
+  tags: tagArrayValidation,
 });
 
 export type CreateArticleBody = typeof createArticleBody.static;
@@ -82,7 +83,7 @@ export const updateArticleBody = t.Object({
   contentJson: updateArticle.contentJson,
   excerpt: updateArticle.excerpt,
   coverImage: updateArticle.coverImage,
-  tags: t.Optional(t.Array(t.String())),
+  tags: tagArrayValidation,
 });
 
 export type UpdateArticleBody = typeof updateArticleBody.static;
