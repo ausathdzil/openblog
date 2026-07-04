@@ -45,7 +45,7 @@ const excerptSchema = z.object({
         .string()
         .check(
           z.trim(),
-          z.maxLength(15, 'Each tag must be 15 characters or fewer.')
+          z.maxLength(50, 'Each tag must be 50 characters or fewer.')
         )
     )
     .check(z.maxLength(5, 'You can only add up to 5 tags.')),

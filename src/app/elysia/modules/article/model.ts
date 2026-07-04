@@ -14,7 +14,7 @@ export const createArticleBody = t.Object({
   excerpt: createArticle.excerpt,
   status: createArticle.status,
   coverImage: createArticle.coverImage,
-  tags: t.Optional(t.Array(t.String())),
+  tags: t.Optional(t.Array(t.String({ maxLength: 50 }), { maxItems: 5 })),
 });
 
 export type CreateArticleBody = typeof createArticleBody.static;
@@ -82,7 +82,7 @@ export const updateArticleBody = t.Object({
   contentJson: updateArticle.contentJson,
   excerpt: updateArticle.excerpt,
   coverImage: updateArticle.coverImage,
-  tags: t.Optional(t.Array(t.String())),
+  tags: t.Optional(t.Array(t.String({ maxLength: 50 }), { maxItems: 5 })),
 });
 
 export type UpdateArticleBody = typeof updateArticleBody.static;

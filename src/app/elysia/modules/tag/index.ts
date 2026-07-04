@@ -1,4 +1,4 @@
-import { Elysia } from 'elysia';
+import { Elysia, t } from 'elysia';
 
 import { tagInvalid, tagResponse, tagsResponse } from './model';
 import { getTagBySlug, getTags } from './service';
@@ -8,7 +8,10 @@ export const tag = new Elysia({ prefix: '/tags', tags: ['Tags'] })
     Tag: tagResponse,
     Tags: tagsResponse,
   })
-  .get('/', async () => await getTags(), {
+  .get('/', async ({ query }) => await getTags(query), {
+    query: t.Object({
+      q: t.Optional(t.String()),
+    }),
     response: {
       200: 'Tags',
     },
