@@ -5,12 +5,20 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import type { UpdateArticleBody } from '@/app/elysia/modules/article/model';
+import { auth } from '@/lib/auth';
 import { elysia } from '@/lib/eden';
 
 export async function deleteArticle(publicId: string, username: string) {
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { error: { status: 401, message: 'Unauthorized' } };
+  }
+
   const { data, error } = await elysia
     .articles({ publicId })
-    .delete({}, { headers: await headers() });
+    .delete({}, { headers: headersList });
 
   if (error) {
     return {
@@ -37,9 +45,16 @@ export async function deleteArticle(publicId: string, username: string) {
 }
 
 export async function archiveArticle(publicId: string, username: string) {
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { error: { status: 401, message: 'Unauthorized' } };
+  }
+
   const { data, error } = await elysia
     .articles({ publicId })
-    .patch({ status: 'archived' }, { headers: await headers() });
+    .patch({ status: 'archived' }, { headers: headersList });
 
   if (error) {
     return {
@@ -67,9 +82,16 @@ export async function archiveArticle(publicId: string, username: string) {
 }
 
 export async function moveArticleToDraft(publicId: string, username: string) {
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { error: { status: 401, message: 'Unauthorized' } };
+  }
+
   const { data, error } = await elysia
     .articles({ publicId })
-    .patch({ status: 'draft' }, { headers: await headers() });
+    .patch({ status: 'draft' }, { headers: headersList });
 
   if (error) {
     return {
@@ -100,6 +122,13 @@ export async function updateArticle(
   publicId: string,
   { title, contentJson, excerpt, coverImage, status, tags }: UpdateArticleBody
 ) {
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { error: { status: 401, message: 'Unauthorized' } };
+  }
+
   const { data, error } = await elysia.articles({ publicId }).patch(
     {
       title,
@@ -110,7 +139,7 @@ export async function updateArticle(
       tags,
     },
     {
-      headers: await headers(),
+      headers: headersList,
     }
   );
 
@@ -135,13 +164,20 @@ export async function updateArticle(
 }
 
 export async function createDraft() {
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { error: { status: 401, message: 'Unauthorized' } };
+  }
+
   const { data, error } = await elysia.articles.post(
     {
       title: '',
       contentJson: {},
       status: 'draft',
     },
-    { headers: await headers() }
+    { headers: headersList }
   );
 
   if (error) {

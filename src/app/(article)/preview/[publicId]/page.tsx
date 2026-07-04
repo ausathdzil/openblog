@@ -65,7 +65,7 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   const headersRecord = Object.fromEntries(headersList.entries());
 
   const session = await auth.api.getSession({
-    headers: headersRecord,
+    headers: headersList,
   });
 
   if (!session) {
