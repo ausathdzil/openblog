@@ -146,8 +146,8 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 >
                   <ComboboxChips>
                     <ComboboxValue>
-                      {field.state.value.map((_, index) => (
-                        <form.Field key={index} name={`tags[${index}]`}>
+                      {field.state.value.map((value, index) => (
+                        <form.Field key={value} name={`tags[${index}]`}>
                           {(subField) => {
                             const isSubFieldInvalid =
                               subField.state.meta.isTouched &&
@@ -198,9 +198,9 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 <div className="[&>*:not(:first-child)]:hidden">
-                  {field.state.value.map((_, index) => (
+                  {field.state.value.map((value, index) => (
                     <form.Field
-                      key={`tags-error-${index}`}
+                      key={`tags-error-${value}`}
                       name={`tags[${index}]`}
                     >
                       {(subField) => {
