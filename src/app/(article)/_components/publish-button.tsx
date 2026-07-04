@@ -62,9 +62,7 @@ export function PublishButton({
     startTransition(async () => {
       const res = await updateArticle(publicId, {
         title,
-        contentJson: contentJson
-          ? JSON.parse(JSON.stringify(contentJson))
-          : undefined,
+        contentJson: contentJson ? structuredClone(contentJson) : undefined,
         status: status as 'draft' | 'published' | 'archived',
       });
 

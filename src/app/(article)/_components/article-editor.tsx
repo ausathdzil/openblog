@@ -74,7 +74,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
       startTransition(async () => {
         const res = await updateArticle(article.publicId, {
           title: value.title,
-          contentJson: JSON.parse(JSON.stringify(value.contentJson)),
+          contentJson: structuredClone(value.contentJson),
         });
 
         if (res?.error) {
