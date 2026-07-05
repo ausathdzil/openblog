@@ -12,13 +12,9 @@ export async function generateMetadata({
   params,
 }: PageProps<'/editor/[publicId]'>): Promise<Metadata> {
   const headersList = await headers();
-  const headersRecord = Object.fromEntries(headersList.entries());
 
   const { publicId } = await params;
-  const { article, error } = await getArticleByPublicId(
-    headersRecord,
-    publicId
-  );
+  const { article, error } = await getArticleByPublicId(headersList, publicId);
 
   if (error?.status === 404 || !article) {
     return {};
@@ -44,7 +40,6 @@ export default function EditArticlePage({
 
 async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   const headersList = await headers();
-  const headersRecord = Object.fromEntries(headersList.entries());
 
   const session = await auth.api.getSession({
     headers: headersList,
@@ -59,10 +54,7 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
   }
 
   const { publicId } = await params;
-  const { article, error } = await getArticleByPublicId(
-    headersRecord,
-    publicId
-  );
+  const { article, error } = await getArticleByPublicId(headersList, publicId);
 
   if (error?.status === 404 || !article) {
     notFound();

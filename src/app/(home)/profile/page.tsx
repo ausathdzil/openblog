@@ -118,10 +118,9 @@ interface ArticlesProps {
 
 async function Articles({ status, q, page, limit }: ArticlesProps) {
   const headersList = await headers();
-  const headersRecord = Object.fromEntries(headersList.entries());
 
   const { articles, error } = await getCurrentUserArticles(
-    headersRecord,
+    headersList,
     status,
     q,
     page,

@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache';
+import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 
 import { elysia } from '@/lib/eden';
 
@@ -26,11 +27,11 @@ export async function getUserArticles(
 }
 
 export async function getArticleByPublicId(
-  headersRecord: Record<string, string>,
+  headers: ReadonlyHeaders,
   publicId: string
 ) {
   const { data: article, error } = await elysia.articles({ publicId }).get({
-    headers: headersRecord,
+    headers,
   });
 
   return { article, error };
@@ -67,14 +68,14 @@ export async function getAuthors(q?: string, page?: number, limit = 9) {
 }
 
 export async function getCurrentUserArticles(
-  headersRecord: Record<string, string>,
+  headers: ReadonlyHeaders,
   status?: 'draft' | 'published' | 'archived' | undefined,
   q?: string | undefined,
   page?: number,
   limit?: number
 ) {
   const { data: articles, error } = await elysia.me.articles.get({
-    headers: headersRecord,
+    headers,
     query: { status, q, page, limit },
     fetch: {
       cache: 'force-cache',
