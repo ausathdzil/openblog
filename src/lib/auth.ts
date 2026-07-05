@@ -15,6 +15,14 @@ export const auth = betterAuth({
     provider: 'pg',
     schema,
   }),
+  user: {
+    additionalFields: {
+      bio: { type: 'string', required: false },
+      website: { type: 'string', required: false },
+      twitter: { type: 'string', required: false },
+      facebook: { type: 'string', required: false },
+    },
+  },
   socialProviders: {
     google: {
       prompt: 'select_account',
