@@ -1,8 +1,19 @@
 import { passkeyClient } from '@better-auth/passkey/client';
-import { emailOTPClient, usernameClient } from 'better-auth/client/plugins';
+import {
+  emailOTPClient,
+  inferAdditionalFields,
+  usernameClient,
+} from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
+
+import type { auth } from './auth';
 
 export const authClient = createAuthClient({
   basePath: '/elysia/auth/api',
-  plugins: [emailOTPClient(), usernameClient(), passkeyClient()],
+  plugins: [
+    inferAdditionalFields<typeof auth>(),
+    emailOTPClient(),
+    usernameClient(),
+    passkeyClient(),
+  ],
 });
