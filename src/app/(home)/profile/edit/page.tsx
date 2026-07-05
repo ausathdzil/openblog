@@ -10,8 +10,8 @@ import { Muted, Title } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
+import { BioAndLinksForm } from '../../_components/bio-and-links-form';
 import { PasskeySettings } from '../../_components/passkey-settings';
-import { BioAndLinksForm } from './_components/bio-and-links-form';
 
 export const metadata: Metadata = {
   title: 'Edit profile',
@@ -51,15 +51,15 @@ async function EditProfileContent() {
         </Muted>
       </div>
       <ProfileForm
-        defaultName={session.user.name}
-        defaultUsername={session.user.displayUsername ?? ''}
+        name={session.user.name}
         submitLabel="Save Changes"
+        username={session.user.displayUsername ?? ''}
       />
       <BioAndLinksForm
-        defaultBio={session.user.bio ?? ''}
-        defaultFacebook={session.user.facebook ?? ''}
-        defaultTwitter={session.user.twitter ?? ''}
-        defaultWebsite={session.user.website ?? ''}
+        bio={session.user.bio ?? ''}
+        facebook={session.user.facebook ?? ''}
+        twitter={session.user.twitter ?? ''}
+        website={session.user.website ?? ''}
       />
       <PasskeySettings initialPasskeys={passkeys ?? []} />
       <div className="flex flex-wrap items-center justify-between gap-3">

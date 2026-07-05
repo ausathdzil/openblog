@@ -60,16 +60,16 @@ const profileFormSchema = z.object({
     ),
 });
 
-interface ProfileFormProps {
-  defaultName: string;
-  defaultUsername?: string;
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+interface ProfileFormProps extends ProfileFormValues {
   redirectPath?: Route;
   submitLabel?: string;
 }
 
 export function ProfileForm({
-  defaultName,
-  defaultUsername = '',
+  name,
+  username,
   redirectPath,
   submitLabel = 'Save Changes',
 }: ProfileFormProps) {
@@ -83,8 +83,8 @@ export function ProfileForm({
 
   const form = useForm({
     defaultValues: {
-      name: defaultName,
-      username: defaultUsername,
+      name,
+      username,
     },
     validators: {
       onSubmit: profileFormSchema,
@@ -94,8 +94,7 @@ export function ProfileForm({
       startTransition(async () => {
         await authClient.updateUser(
           {
-            name: value.name,
-            username: value.username,
+            ...value,
             displayUsername: value.username,
           },
           {
@@ -183,7 +182,7 @@ export function ProfileForm({
               validators={{
                 onChange: profileFormSchema.shape.username,
                 onChangeAsync: async ({ value }) => {
-                  if (value === defaultUsername) {
+                  if (value === username) {
                     return;
                   }
 

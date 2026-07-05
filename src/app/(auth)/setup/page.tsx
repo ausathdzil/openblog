@@ -29,9 +29,10 @@ export default async function SetupPage() {
         <Title className="text-2xl">Set up your profile</Title>
       </div>
       <ProfileForm
-        defaultName={session.user.name || ''}
+        name={session.user.name ?? ''}
         redirectPath="/profile"
         submitLabel="Complete Setup"
+        username={session.user.displayUsername ?? ''}
       />
     </div>
   );

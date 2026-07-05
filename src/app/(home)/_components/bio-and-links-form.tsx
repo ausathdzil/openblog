@@ -28,15 +28,15 @@ import {
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { elysia as api } from '@/lib/eden';
 import { cn } from '@/lib/utils';
+import { updateBio } from '../_lib/actions';
 
 const bioAndLinksFormSchema = z.object({
   bio: z
     .string()
     .check(z.maxLength(500, 'Bio must be 500 characters or fewer.')),
   website: z
-    .string()
+    .url()
     .check(z.maxLength(255, 'Website must be 255 characters or fewer.')),
   twitter: z
     .string()
@@ -46,18 +46,13 @@ const bioAndLinksFormSchema = z.object({
     .check(z.maxLength(50, 'Facebook handle must be 50 characters or fewer.')),
 });
 
-interface BioAndLinksFormProps {
-  defaultBio: string;
-  defaultFacebook: string;
-  defaultTwitter: string;
-  defaultWebsite: string;
-}
+type BioAndLinksFormProps = z.infer<typeof bioAndLinksFormSchema>;
 
 export function BioAndLinksForm({
-  defaultBio,
-  defaultWebsite,
-  defaultTwitter,
-  defaultFacebook,
+  bio,
+  website,
+  twitter,
+  facebook,
 }: BioAndLinksFormProps) {
   const [formStatus, setFormStatus] = useState<{
     message: string;
@@ -68,10 +63,10 @@ export function BioAndLinksForm({
 
   const form = useForm({
     defaultValues: {
-      bio: defaultBio,
-      website: defaultWebsite,
-      twitter: defaultTwitter,
-      facebook: defaultFacebook,
+      bio: bio ?? '',
+      website: website ?? '',
+      twitter: twitter ?? '',
+      facebook: facebook ?? '',
     },
     validators: {
       onSubmit: bioAndLinksFormSchema,
@@ -79,7 +74,7 @@ export function BioAndLinksForm({
     onSubmit: ({ value }) => {
       setFormStatus(null);
       startTransition(async () => {
-        const { error } = await api.me.profile.patch({
+        const { error } = await updateBio({
           bio: value.bio,
           website: value.website,
           twitter: value.twitter,
@@ -89,7 +84,7 @@ export function BioAndLinksForm({
         if (error) {
           setFormStatus({
             type: 'error',
-            message: error.value?.message || 'Failed to update profile',
+            message: error.message || 'Failed to update profile',
           });
         } else {
           setFormStatus({ type: 'success', message: 'Profile updated' });
@@ -121,12 +116,7 @@ export function BioAndLinksForm({
           }}
         >
           <FieldGroup>
-            <form.Field
-              name="bio"
-              validators={{
-                onChange: bioAndLinksFormSchema.shape.bio,
-              }}
-            >
+            <form.Field name="bio">
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
@@ -151,12 +141,7 @@ export function BioAndLinksForm({
               }}
             </form.Field>
 
-            <form.Field
-              name="website"
-              validators={{
-                onChange: bioAndLinksFormSchema.shape.website,
-              }}
-            >
+            <form.Field name="website">
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
@@ -182,12 +167,7 @@ export function BioAndLinksForm({
               }}
             </form.Field>
 
-            <form.Field
-              name="twitter"
-              validators={{
-                onChange: bioAndLinksFormSchema.shape.twitter,
-              }}
-            >
+            <form.Field name="twitter">
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
@@ -216,12 +196,7 @@ export function BioAndLinksForm({
               }}
             </form.Field>
 
-            <form.Field
-              name="facebook"
-              validators={{
-                onChange: bioAndLinksFormSchema.shape.facebook,
-              }}
-            >
+            <form.Field name="facebook">
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
