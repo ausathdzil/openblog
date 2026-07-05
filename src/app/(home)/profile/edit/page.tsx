@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
 import { PasskeySettings } from '../../_components/passkey-settings';
+import { BioAndLinksForm } from './_components/bio-and-links-form';
 
 export const metadata: Metadata = {
   title: 'Edit profile',
@@ -53,6 +54,12 @@ async function EditProfileContent() {
         defaultName={session.user.name}
         defaultUsername={session.user.displayUsername ?? ''}
         submitLabel="Save Changes"
+      />
+      <BioAndLinksForm
+        defaultBio={session.user.bio ?? ''}
+        defaultFacebook={session.user.facebook ?? ''}
+        defaultTwitter={session.user.twitter ?? ''}
+        defaultWebsite={session.user.website ?? ''}
       />
       <PasskeySettings initialPasskeys={passkeys ?? []} />
       <div className="flex flex-wrap items-center justify-between gap-3">
