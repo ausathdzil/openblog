@@ -168,6 +168,13 @@ export const tag = pgTable('tag', {
     .primaryKey(),
   name: text('name').notNull().unique(),
   slug: text('slug').notNull().unique(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const articleTag = pgTable(
@@ -179,6 +186,13 @@ export const articleTag = pgTable(
     tagId: text('tag_id')
       .notNull()
       .references(() => tag.id, { onDelete: 'cascade' }),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updated_at: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.articleId, table.tagId] }),
