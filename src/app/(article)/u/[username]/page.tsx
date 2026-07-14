@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 
 import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
-import { SearchInput } from '@/components/search-input';
+import { SearchInputWrapper } from '@/components/search-input-wrapper';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
@@ -57,7 +57,7 @@ export default function UserPage({ params, searchParams }: UserPageProps) {
           <Profile params={params} />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-          <SearchInput placeholder="Search articles…" />
+          <SearchInputWrapper placeholder="Search articles…" />
         </Suspense>
         <Suspense fallback={<ArticlesSkeleton />}>
           <UserResults params={params} searchParams={searchParams} />

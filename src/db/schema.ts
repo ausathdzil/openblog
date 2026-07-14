@@ -11,7 +11,6 @@ import {
   text,
   timestamp,
   uniqueIndex,
-  varchar,
 } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 
@@ -28,10 +27,10 @@ export const user = pgTable('user', {
     .notNull(),
   username: text('username').unique(),
   displayUsername: text('display_username'),
-  bio: varchar('bio', { length: 500 }),
-  website: varchar('website', { length: 255 }),
-  twitter: varchar('twitter', { length: 15 }),
-  facebook: varchar('facebook', { length: 50 }),
+  bio: text('bio'),
+  website: text('website'),
+  twitter: text('twitter'),
+  facebook: text('facebook'),
 });
 
 export const session = pgTable(
@@ -128,14 +127,14 @@ export const article = pgTable(
     id: bigint('id', { mode: 'number' })
       .generatedAlwaysAsIdentity()
       .primaryKey(),
-    publicId: varchar('public_id', { length: 12 })
+    publicId: text('public_id')
       .$defaultFn(() => nanoid(12))
       .notNull()
       .unique(),
-    title: varchar('title', { length: 255 }),
-    slug: varchar('slug', { length: 255 }),
+    title: text('title'),
+    slug: text('slug'),
     contentJson: jsonb('content_json'),
-    excerpt: varchar('excerpt', { length: 255 }),
+    excerpt: text('excerpt'),
     status: articleStatus('status').default('draft').notNull(),
     coverImage: text('cover_image'),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -164,11 +163,11 @@ export const article = pgTable(
 );
 
 export const tag = pgTable('tag', {
-  id: varchar('id', { length: 12 })
+  id: text('id')
     .$defaultFn(() => nanoid(12))
     .primaryKey(),
-  name: varchar('name', { length: 50 }).notNull().unique(),
-  slug: varchar('slug', { length: 50 }).notNull().unique(),
+  name: text('name').notNull().unique(),
+  slug: text('slug').notNull().unique(),
 });
 
 export const articleTag = pgTable(
@@ -177,7 +176,7 @@ export const articleTag = pgTable(
     articleId: bigint('article_id', { mode: 'number' })
       .notNull()
       .references(() => article.id, { onDelete: 'cascade' }),
-    tagId: varchar('tag_id', { length: 12 })
+    tagId: text('tag_id')
       .notNull()
       .references(() => tag.id, { onDelete: 'cascade' }),
   },

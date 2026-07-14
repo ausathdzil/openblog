@@ -23,6 +23,8 @@ import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ArticleActions } from '../_components/article-actions';
 import { StatusToggle } from '../_components/status-toggle';
 
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+
 export async function generateMetadata(): Promise<Metadata> {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -43,22 +45,24 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ searchParams }: ProfilePageProps) {
   return (
-    <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
-      <Suspense fallback={<ProfileSkeleton />}>
-        <Profile />
-      </Suspense>
-      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-        <SearchInput placeholder="Search articles…" />
-      </Suspense>
-      <Suspense
-        fallback={<Skeleton className="h-10 w-76.75 justify-self-center" />}
-      >
-        <StatusToggle className="justify-self-center" />
-      </Suspense>
-      <Suspense fallback={<ArticlesSkeleton />}>
-        <ProfileResults searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <NuqsAdapter>
+      <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
+        <Suspense fallback={<ProfileSkeleton />}>
+          <Profile />
+        </Suspense>
+        <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+          <SearchInput placeholder="Search articles…" />
+        </Suspense>
+        <Suspense
+          fallback={<Skeleton className="h-10 w-76.75 justify-self-center" />}
+        >
+          <StatusToggle className="justify-self-center" />
+        </Suspense>
+        <Suspense fallback={<ArticlesSkeleton />}>
+          <ProfileResults searchParams={searchParams} />
+        </Suspense>
+      </main>
+    </NuqsAdapter>
   );
 }
 

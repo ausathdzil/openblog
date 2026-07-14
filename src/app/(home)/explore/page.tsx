@@ -20,6 +20,8 @@ import { getArticles, getAuthors } from '@/lib/article-data';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ScopeToggle } from '../_components/scope-toggle';
 
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+
 export const metadata: Metadata = {
   title: 'Explore',
 };
@@ -30,17 +32,19 @@ interface ExplorePageProps {
 
 export default function ExplorePage({ searchParams }: ExplorePageProps) {
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-6 sm:p-4">
-      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-        <SearchInput placeholder="Search articles or authors…" />
-      </Suspense>
-      <Suspense fallback={<Skeleton className="h-10 w-49 self-center" />}>
-        <ScopeToggle className="self-center" />
-      </Suspense>
-      <Suspense fallback={<ResultsSkeleton />}>
-        <ExploreResults searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <NuqsAdapter>
+      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-6 sm:p-4">
+        <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+          <SearchInput placeholder="Search articles or authors…" />
+        </Suspense>
+        <Suspense fallback={<Skeleton className="h-10 w-49 self-center" />}>
+          <ScopeToggle className="self-center" />
+        </Suspense>
+        <Suspense fallback={<ResultsSkeleton />}>
+          <ExploreResults searchParams={searchParams} />
+        </Suspense>
+      </main>
+    </NuqsAdapter>
   );
 }
 

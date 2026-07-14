@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -45,12 +44,8 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          <Suspense fallback={null}>
-            <NuqsAdapter>
-              {children}
-              <Toaster richColors />
-            </NuqsAdapter>
-          </Suspense>
+          {children}
+          <Toaster richColors />
         </ThemeProvider>
       </body>
     </html>
