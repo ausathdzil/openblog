@@ -1,4 +1,4 @@
-import { afterAll, beforeAll } from 'bun:test';
+import { afterEach, beforeEach } from 'bun:test';
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
@@ -34,7 +34,7 @@ export function setupTestTag(name: string, slug: string) {
     return { tagData };
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const [existing] = await db.select().from(tag).where(eq(tag.slug, slug));
     if (existing) {
       tagData = existing;
@@ -43,7 +43,7 @@ export function setupTestTag(name: string, slug: string) {
     }
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     if (tagData) {
       await cleanupTestTag(tagData.id);
       tagData = null;

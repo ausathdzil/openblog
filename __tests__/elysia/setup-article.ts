@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { slugify } from '@/app/elysia/modules/utils';
 import { db } from '@/db';
-import { article } from '@/db/schema';
+import { article, tag } from '@/db/schema';
 import { getExistingSlugs } from '@/db/utils';
 
 export async function createTestArticle(userId: string) {
@@ -33,6 +33,10 @@ export async function createTestArticle(userId: string) {
 
 export async function cleanupTestArticle(publicId: string) {
   await db.delete(article).where(eq(article.publicId, publicId));
+}
+
+export async function cleanupTestArticleTags(slug: string) {
+  await db.delete(tag).where(eq(tag.slug, slug));
 }
 
 export function setupTestArticle(getUserId: () => string) {

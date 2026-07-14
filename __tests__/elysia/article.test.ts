@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 
 import { elysia } from '@/lib/eden';
-import { cleanupTestArticle, setupTestArticle } from './setup-article';
+import {
+  cleanupTestArticle,
+  cleanupTestArticleTags,
+  setupTestArticle,
+} from './setup-article';
 import { setupAuthContext } from './setup-auth';
 
 const authContext = setupAuthContext();
@@ -10,12 +14,17 @@ const secondaryAuthContext = setupAuthContext();
 describe('Article', () => {
   describe('Create article', () => {
     const createdArticles: string[] = [];
+    const createdTags: string[] = [];
 
     afterEach(async () => {
       await Promise.all(
         createdArticles.map((publicId) => cleanupTestArticle(publicId))
       );
+      await Promise.all(
+        createdTags.map((slug) => cleanupTestArticleTags(slug))
+      );
       createdArticles.length = 0;
+      createdTags.length = 0;
     });
 
     test('return 401 if not authenticated', async () => {
@@ -49,6 +58,7 @@ describe('Article', () => {
         createdArticles.push(data.publicId);
       }
     });
+
     test('return 201 and create an article with tags', async () => {
       const headers = await authContext.authTest.getAuthHeaders({
         userId: authContext.testUser.id,
@@ -71,6 +81,10 @@ describe('Article', () => {
 
       if (data?.publicId) {
         createdArticles.push(data.publicId);
+      }
+
+      if (data?.tags) {
+        createdTags.push(...data.tags.map((t: any) => t.slug));
       }
     });
   });
@@ -209,6 +223,7 @@ describe('Article', () => {
       expect(data?.slug).not.toBe(article.slug);
       expect(data?.slug).toInclude('new-title-for-draft');
     });
+
     test('updates tags correctly', async () => {
       const article = ctx.article;
       const headers = await authContext.authTest.getAuthHeaders({

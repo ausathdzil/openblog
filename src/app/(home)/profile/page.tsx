@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Suspense } from 'react';
 
 import { SearchInput } from '@/components/search-input';
@@ -22,8 +23,6 @@ import { auth } from '@/lib/auth';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ArticleActions } from '../_components/article-actions';
 import { StatusToggle } from '../_components/status-toggle';
-
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await auth.api.getSession({

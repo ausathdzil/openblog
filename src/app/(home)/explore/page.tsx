@@ -1,6 +1,7 @@
 import type { Metadata, Route } from 'next';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Suspense } from 'react';
 
 import { PaginationControl } from '@/components/pagination-control';
@@ -19,8 +20,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getArticles, getAuthors } from '@/lib/article-data';
 import { type SearchParams, searchParamsCache } from '@/lib/search-params';
 import { ScopeToggle } from '../_components/scope-toggle';
-
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 export const metadata: Metadata = {
   title: 'Explore',
