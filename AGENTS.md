@@ -6,6 +6,36 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 
 <!-- END:nextjs-agent-rules -->
 
+<!-- BEGIN:improve-skill-workflow -->
+
+## Improve Skill Workflow
+
+When using the `/improve` skill to create and manage plans, follow these guidelines:
+
+1. Every plan created should be synced with GitHub issues using the `--issues` flag.
+2. Cleanup old DONE plans after we reach 10+ plans.
+3. Plans are stored locally but synced with GitHub issues, so always check with GitHub issues if the `plans/` folder doesn't exist yet.
+4. When trying to do an integration test, `.env` is needed, so always ask the user for it first.
+5. The `plans/` directory is in `.gitignore`. Always check for existing plans before writing to avoid overwriting the `README.md` index or reusing old plan numbers.
+
+<!-- END:improve-skill-workflow -->
+
+<!-- BEGIN:browser-automation -->
+
+## Browser Automation
+
+Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+
+Core workflow:
+1. `agent-browser open <url>` - Navigate to page
+2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
+3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
+4. Re-snapshot after page changes
+
+<!-- END:browser-automation -->
+
+<!-- BEGIN:ultracite-code-standards -->
+
 # Ultracite Code Standards
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
@@ -130,12 +160,4 @@ Biome's linter will catch most issues automatically. Focus your attention on:
 
 Most formatting and common issues are automatically fixed by Biome. Run `bun x ultracite fix` before committing to ensure compliance.
 
-## Browser Automation
-
-Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
-
-Core workflow:
-1. `agent-browser open <url>` - Navigate to page
-2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
-3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
-4. Re-snapshot after page changes
+<!-- END:ultracite-code-standards -->
