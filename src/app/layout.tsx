@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
@@ -44,10 +45,12 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          <NuqsAdapter>
-            {children}
-            <Toaster richColors />
-          </NuqsAdapter>
+          <Suspense fallback={null}>
+            <NuqsAdapter>
+              {children}
+              <Toaster richColors />
+            </NuqsAdapter>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
