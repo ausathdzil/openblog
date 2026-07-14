@@ -50,10 +50,15 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  const initialContent =
+    article.contentJson && Object.keys(article.contentJson).length > 0
+      ? article.contentJson
+      : undefined;
+
   const form = useForm({
     defaultValues: {
       title: article.title ?? '',
-      contentJson: article.contentJson ?? {},
+      contentJson: initialContent,
       status: article.status,
     },
     validators: {
