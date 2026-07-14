@@ -13,6 +13,12 @@ export const validation = {
   insert: spreads(
     {
       createArticle: createInsertSchema(article, {
+        title: t.Optional(
+          t.String({
+            maxLength: 255,
+            error: 'Title must be 255 characters or fewer.',
+          })
+        ),
         excerpt: t.Optional(
           t.Nullable(
             t.String({
@@ -31,6 +37,12 @@ export const validation = {
   update: spreads(
     {
       updateArticle: createUpdateSchema(article, {
+        title: t.Optional(
+          t.String({
+            maxLength: 255,
+            error: 'Title must be 255 characters or fewer.',
+          })
+        ),
         excerpt: t.Optional(
           t.Nullable(
             t.String({
