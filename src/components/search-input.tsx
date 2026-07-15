@@ -40,15 +40,13 @@ export function SearchInput({
   }, []);
 
   const handleSearch = (term: string) => {
-    startTransition(async () => {
-      await setSearchParams(
-        { q: term, page: 1 },
-        {
-          limitUrlUpdates: term === '' ? undefined : debounce(300),
-          startTransition,
-        }
-      );
-    });
+    setSearchParams(
+      { q: term || null, page: 1 },
+      {
+        limitUrlUpdates: term === '' ? undefined : debounce(300),
+        startTransition,
+      }
+    );
   };
 
   const handleKeyDown = (key: string, term: string) => {
