@@ -22,9 +22,7 @@ import { auth } from '@/lib/auth';
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ publicId: string }>;
-}): Promise<Metadata> {
+}: PageProps<'/preview/[publicId]'>): Promise<Metadata> {
   const headersList = await headers();
 
   const { publicId } = await params;
@@ -42,9 +40,7 @@ export async function generateMetadata({
 
 export default function PreviewArticlePage({
   params,
-}: {
-  params: Promise<{ publicId: string }>;
-}) {
+}: PageProps<'/preview/[publicId]'>) {
   return (
     <div className="flex min-h-screen flex-col">
       <Suspense fallback={<Spinner className="m-auto" />}>

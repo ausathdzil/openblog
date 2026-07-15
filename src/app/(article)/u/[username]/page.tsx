@@ -2,13 +2,16 @@ import type { Metadata, Route } from 'next';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { SearchParams } from 'nuqs/server';
 import { Suspense } from 'react';
 
 import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
-import { SearchInputWrapper } from '@/components/search-input-wrapper';
+import { OpenBlogButton } from '@/components/openblog-button';
+import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
   Item,
@@ -19,10 +22,13 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAuthor, getUserArticles } from '@/lib/article-data';
-import { type SearchParams, searchParamsCache } from '@/lib/search-params';
+import {
+  loadSearchParams,
+  type SearchParams as ParsedSearchParams,
+} from '@/lib/search-params';
 
 interface UserPageProps {
-  params: Promise<{ username: string }>;
+  params: PageProps<'/u/[username]'>['params'];
   searchParams: Promise<SearchParams>;
 }
 
@@ -45,9 +51,23 @@ export async function generateMetadata({
 }
 
 export default function UserPage({ params, searchParams }: UserPageProps) {
+  const searchParamsPromise = loadSearchParams(searchParams);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header>
+        <Header.Nav>
+          <OpenBlogButton />
+          <Button
+            className="hidden sm:inline-flex"
+            nativeButton={false}
+            render={<Link href="/explore" />}
+            size="sm"
+            variant="ghost"
+          >
+            Explore
+          </Button>
+        </Header.Nav>
         <Header.Actions>
           <HeaderActions />
         </Header.Actions>
@@ -57,10 +77,10 @@ export default function UserPage({ params, searchParams }: UserPageProps) {
           <Profile params={params} />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-          <SearchInputWrapper placeholder="Search articles…" />
+          <SearchInput placeholder="Search articles…" />
         </Suspense>
         <Suspense fallback={<ArticlesSkeleton />}>
-          <UserResults params={params} searchParams={searchParams} />
+          <UserResults params={params} searchParams={searchParamsPromise} />
         </Suspense>
       </main>
     </div>
@@ -97,9 +117,14 @@ async function Profile({ params }: Omit<UserPageProps, 'searchParams'>) {
   );
 }
 
-async function UserResults({ params, searchParams }: UserPageProps) {
+interface UserResultsProps {
+  params: UserPageProps['params'];
+  searchParams: Promise<ParsedSearchParams>;
+}
+
+async function UserResults({ params, searchParams }: UserResultsProps) {
   const [{ q, page, limit }, { username }] = await Promise.all([
-    searchParamsCache.parse(searchParams),
+    searchParams,
     params,
   ]);
 

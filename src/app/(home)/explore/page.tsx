@@ -1,7 +1,7 @@
 import type { Metadata, Route } from 'next';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import type { SearchParams } from 'nuqs/server';
 import { Suspense } from 'react';
 
 import { PaginationControl } from '@/components/pagination-control';
@@ -18,7 +18,10 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getArticles, getAuthors } from '@/lib/article-data';
-import { type SearchParams, searchParamsCache } from '@/lib/search-params';
+import {
+  loadSearchParams,
+  type SearchParams as ParsedSearchParams,
+} from '@/lib/search-params';
 import { ScopeToggle } from '../_components/scope-toggle';
 
 export const metadata: Metadata = {
@@ -30,25 +33,29 @@ interface ExplorePageProps {
 }
 
 export default function ExplorePage({ searchParams }: ExplorePageProps) {
+  const searchParamsPromise = loadSearchParams(searchParams);
+
   return (
-    <NuqsAdapter>
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-6 sm:p-4">
-        <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-          <SearchInput placeholder="Search articles or authors…" />
-        </Suspense>
-        <Suspense fallback={<Skeleton className="h-10 w-49 self-center" />}>
-          <ScopeToggle className="self-center" />
-        </Suspense>
-        <Suspense fallback={<ResultsSkeleton />}>
-          <ExploreResults searchParams={searchParams} />
-        </Suspense>
-      </main>
-    </NuqsAdapter>
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-6 sm:p-4">
+      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+        <SearchInput placeholder="Search articles or authors…" />
+      </Suspense>
+      <Suspense fallback={<Skeleton className="h-10 w-49 self-center" />}>
+        <ScopeToggle className="self-center" />
+      </Suspense>
+      <Suspense fallback={<ResultsSkeleton />}>
+        <ExploreResults searchParams={searchParamsPromise} />
+      </Suspense>
+    </main>
   );
 }
 
-async function ExploreResults({ searchParams }: ExplorePageProps) {
-  const { q, page, limit, scope } = await searchParamsCache.parse(searchParams);
+interface ExploreResultsProps {
+  searchParams: Promise<ParsedSearchParams>;
+}
+
+async function ExploreResults({ searchParams }: ExploreResultsProps) {
+  const { q, page, limit, scope } = await searchParams;
 
   if (scope === 'authors') {
     return <AuthorsResults limit={limit} page={page} q={q} />;

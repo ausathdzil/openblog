@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import type { SearchParams } from 'nuqs/server';
 import { Suspense } from 'react';
 
 import { SearchInput } from '@/components/search-input';
@@ -20,7 +20,10 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCurrentUserArticles } from '@/lib/article-data';
 import { auth } from '@/lib/auth';
-import { type SearchParams, searchParamsCache } from '@/lib/search-params';
+import {
+  loadSearchParams,
+  type SearchParams as ParsedSearchParams,
+} from '@/lib/search-params';
 import { ArticleActions } from '../_components/article-actions';
 import { StatusToggle } from '../_components/status-toggle';
 
@@ -43,25 +46,25 @@ interface ProfilePageProps {
 }
 
 export default function ProfilePage({ searchParams }: ProfilePageProps) {
+  const searchParamsPromise = loadSearchParams(searchParams);
+
   return (
-    <NuqsAdapter>
-      <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
-        <Suspense fallback={<ProfileSkeleton />}>
-          <Profile />
-        </Suspense>
-        <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-          <SearchInput placeholder="Search articles…" />
-        </Suspense>
-        <Suspense
-          fallback={<Skeleton className="h-10 w-76.75 justify-self-center" />}
-        >
-          <StatusToggle className="justify-self-center" />
-        </Suspense>
-        <Suspense fallback={<ArticlesSkeleton />}>
-          <ProfileResults searchParams={searchParams} />
-        </Suspense>
-      </main>
-    </NuqsAdapter>
+    <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
+      <Suspense fallback={<ProfileSkeleton />}>
+        <Profile />
+      </Suspense>
+      <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+        <SearchInput placeholder="Search articles…" />
+      </Suspense>
+      <Suspense
+        fallback={<Skeleton className="h-10 w-76.75 justify-self-center" />}
+      >
+        <StatusToggle className="justify-self-center" />
+      </Suspense>
+      <Suspense fallback={<ArticlesSkeleton />}>
+        <ProfileResults searchParams={searchParamsPromise} />
+      </Suspense>
+    </main>
   );
 }
 
@@ -105,9 +108,12 @@ async function Profile() {
   );
 }
 
-async function ProfileResults({ searchParams }: ProfilePageProps) {
-  const { status, q, page, limit } =
-    await searchParamsCache.parse(searchParams);
+interface ProfileResultsProps {
+  searchParams: Promise<ParsedSearchParams>;
+}
+
+async function ProfileResults({ searchParams }: ProfileResultsProps) {
+  const { status, q, page, limit } = await searchParams;
 
   return <Articles limit={limit} page={page} q={q} status={status} />;
 }
@@ -119,7 +125,7 @@ interface ArticlesProps {
   status: 'draft' | 'published' | 'archived' | undefined;
 }
 
-async function Articles({ status, q, page, limit }: ArticlesProps) {
+async function Articles({ q, status, page, limit }: ArticlesProps) {
   const headersList = await headers();
 
   const { articles, error } = await getCurrentUserArticles(

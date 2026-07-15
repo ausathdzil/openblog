@@ -2,4 +2,5 @@
 root = "__tests__/elysia"
 
 [install]
-minimumReleaseAge = 259200
+minimumReleaseAge = 259200 # 3 days
+minimumReleaseAgeExcludes = ["next", "react", "react-dom"] # Temporary for 16.3 preview releases
