@@ -240,6 +240,8 @@ describe('Article', () => {
       expect(data?.tags).toBeArray();
       expect(data?.tags?.length).toBe(1);
       expect(data?.tags?.[0]?.name).toBe('updated-tag-1');
+
+      await cleanupTestArticleTags('updated-tag-1');
     });
   });
 
