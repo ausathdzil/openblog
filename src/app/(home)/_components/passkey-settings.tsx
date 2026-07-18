@@ -98,7 +98,10 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
                       (pk.aaguid && getAuthenticatorName(pk.aaguid)) ||
                       'Passkey'}
                   </span>
-                  <span className="text-muted-foreground text-xs">
+                  <span
+                    className="text-muted-foreground text-xs"
+                    suppressHydrationWarning
+                  >
                     Added {new Date(pk.createdAt).toLocaleDateString()}
                   </span>
                 </div>
