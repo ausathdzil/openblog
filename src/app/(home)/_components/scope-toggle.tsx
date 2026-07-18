@@ -14,9 +14,7 @@ export function ScopeToggle(props: React.ComponentProps<typeof ToggleGroup>) {
   const [{ scope }, setSearchParams] = useQueryStates(searchParamsParser);
 
   const handleScopeChange = (scope: 'articles' | 'authors') => {
-    startTransition(async () => {
-      await setSearchParams({ scope, page: 1 }, { startTransition });
-    });
+    setSearchParams({ scope, page: 1 }, { startTransition });
   };
 
   return (

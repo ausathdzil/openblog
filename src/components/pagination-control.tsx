@@ -30,9 +30,7 @@ export function PaginationControl({
   const allPages = generatePagination(page, totalPages);
 
   const handlePageChange = (page: number) => {
-    startTransition(async () => {
-      await setSearchParams({ page }, { startTransition });
-    });
+    setSearchParams({ page }, { startTransition });
   };
 
   return (

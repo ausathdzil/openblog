@@ -1,10 +1,10 @@
 {
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": [
     "ultracite/biome/core",
     "ultracite/biome/react",
     "ultracite/biome/next"
   ],
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "includes": ["!drizzle", "!src/components/ui/*"]
   },
@@ -12,12 +12,17 @@
     "rules": {
       "performance": {
         "noNamespaceImport": "off",
+        "noJsxPropsBind": "off",
         "useTopLevelRegex": "off"
       },
       "style": {
         "noNonNullAssertion": "off",
         "noNestedTernary": "off",
         "useDefaultSwitchClause": "off"
+      },
+      "suspicious": {
+        "noShadow": "off",
+        "noUnnecessaryConditions": "off"
       }
     },
     "domains": {
@@ -38,7 +43,9 @@
               [":ALIAS:", ":PATH:"]
             ]
           }
-        }
+        },
+        "useSortedKeys": "off",
+        "useSortedPackageJson": "off"
       }
     }
   },

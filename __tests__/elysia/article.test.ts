@@ -119,7 +119,7 @@ describe('Article', () => {
     });
 
     test('return 200 and the article', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
 
       const { data, status } = await elysia
         .articles({ publicId: article.publicId })
@@ -146,7 +146,7 @@ describe('Article', () => {
     });
 
     test('return 401 if not authenticated', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
 
       const { status } = await elysia
         .articles({ publicId: article.publicId })
@@ -156,9 +156,8 @@ describe('Article', () => {
     });
 
     test('return 403 if user is not the author', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
 
-      // Get headers for a DIFFERENT user
       const headers = await secondaryAuthContext.authTest.getAuthHeaders({
         userId: secondaryAuthContext.testUser.id,
       });
@@ -177,7 +176,7 @@ describe('Article', () => {
         status: 'draft' as 'draft' | 'published' | 'archived' | undefined,
       };
 
-      const article = ctx.article;
+      const { article } = ctx;
 
       const headers = await authContext.authTest.getAuthHeaders({
         userId: authContext.testUser.id,
@@ -192,7 +191,8 @@ describe('Article', () => {
     });
 
     test('does not regenerate slug when title is updated and article is published', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
+
       const headers = await authContext.authTest.getAuthHeaders({
         userId: authContext.testUser.id,
       });
@@ -206,7 +206,8 @@ describe('Article', () => {
     });
 
     test('regenerates slug when title is updated and article is a draft', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
+
       const headers = await authContext.authTest.getAuthHeaders({
         userId: authContext.testUser.id,
       });
@@ -225,7 +226,8 @@ describe('Article', () => {
     });
 
     test('updates tags correctly', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
+
       const headers = await authContext.authTest.getAuthHeaders({
         userId: authContext.testUser.id,
       });
@@ -257,7 +259,7 @@ describe('Article', () => {
     });
 
     test('return 401 if not authenticated', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
 
       const { status } = await elysia
         .articles({ publicId: article.publicId })
@@ -267,9 +269,8 @@ describe('Article', () => {
     });
 
     test('return 403 if user is not the author', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
 
-      // Get headers for a DIFFERENT user
       const headers = await secondaryAuthContext.authTest.getAuthHeaders({
         userId: secondaryAuthContext.testUser.id,
       });
@@ -282,7 +283,8 @@ describe('Article', () => {
     });
 
     test('return 200 and verify that the article is deleted', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
+
       const headers = await authContext.authTest.getAuthHeaders({
         userId: authContext.testUser.id,
       });

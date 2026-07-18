@@ -266,7 +266,6 @@ async function syncTagsAndGetId(publicId: string, tags?: string[]) {
     await syncArticleTags(intData.id, tags);
     return intData.id;
   }
-  return;
 }
 
 export async function updateArticle(

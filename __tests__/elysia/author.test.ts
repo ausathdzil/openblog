@@ -79,7 +79,7 @@ describe('Author', () => {
     });
 
     test('return 200 and the article', async () => {
-      const article = ctx.article;
+      const { article } = ctx;
 
       const { data, status } = await elysia
         .authors({ username: authContext.testUser.username })

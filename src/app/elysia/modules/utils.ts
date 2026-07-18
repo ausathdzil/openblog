@@ -30,7 +30,7 @@ export async function slugify(
 
   let suffix = 2;
   while (existingSet.has(`${base}-${suffix}`)) {
-    suffix++;
+    suffix += 1;
   }
 
   return `${base}-${suffix}`;

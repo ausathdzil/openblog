@@ -43,24 +43,26 @@ export async function syncArticleTags(articleId: number, tags: string[]) {
     new Set(tags.map((t) => t.trim().toLowerCase()))
   ).filter(Boolean);
 
-  for (const tagName of normalizedTags) {
-    const tagSlug = generateSlug(tagName);
-    let [existingTag] = await db
-      .select()
-      .from(tag)
-      .where(eq(tag.slug, tagSlug));
-    if (!existingTag) {
-      const [newTag] = await db
-        .insert(tag)
-        .values({ name: tagName, slug: tagSlug })
-        .returning();
-      if (!newTag) {
-        throw new InternalServerError('Failed to create tag.');
+  await Promise.all(
+    normalizedTags.map(async (tagName) => {
+      const tagSlug = generateSlug(tagName);
+      let [existingTag] = await db
+        .select()
+        .from(tag)
+        .where(eq(tag.slug, tagSlug));
+      if (!existingTag) {
+        const [newTag] = await db
+          .insert(tag)
+          .values({ name: tagName, slug: tagSlug })
+          .returning();
+        if (!newTag) {
+          throw new InternalServerError('Failed to create tag.');
+        }
+        existingTag = newTag;
       }
-      existingTag = newTag;
-    }
-    await db.insert(articleTag).values({ articleId, tagId: existingTag.id });
-  }
+      await db.insert(articleTag).values({ articleId, tagId: existingTag.id });
+    })
+  );
 }
 
 export async function getTagsForArticle(articleId: number) {
