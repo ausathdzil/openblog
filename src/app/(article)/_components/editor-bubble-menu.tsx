@@ -12,11 +12,11 @@ import {
   TextStrikethroughIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import type { Editor } from '@tiptap/react';
+import { type Editor, useEditorState } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
   Tooltip,
   TooltipContent,
@@ -24,13 +24,38 @@ import {
 } from '@/components/ui/tooltip';
 
 interface EditorBubbleMenuProps {
-  editor: Editor | null;
+  editor: Editor;
 }
 
 export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
-  if (!editor) {
-    return null;
-  }
+  const {
+    isParagraph,
+    isHeading1,
+    isHeading2,
+    isHeading3,
+    isBulletList,
+    isOrderedList,
+    isBlockquote,
+    isBold,
+    isItalic,
+    isStrike,
+    isCode,
+  } = useEditorState({
+    editor,
+    selector: (ctx) => ({
+      isParagraph: ctx.editor.isActive('paragraph'),
+      isHeading1: ctx.editor.isActive('heading', { level: 1 }),
+      isHeading2: ctx.editor.isActive('heading', { level: 2 }),
+      isHeading3: ctx.editor.isActive('heading', { level: 3 }),
+      isBulletList: ctx.editor.isActive('bulletList'),
+      isOrderedList: ctx.editor.isActive('orderedList'),
+      isBlockquote: ctx.editor.isActive('blockquote'),
+      isBold: ctx.editor.isActive('bold'),
+      isItalic: ctx.editor.isActive('italic'),
+      isStrike: ctx.editor.isActive('strike'),
+      isCode: ctx.editor.isActive('code'),
+    }),
+  });
 
   return (
     <BubbleMenu
@@ -38,20 +63,18 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
       editor={editor}
       options={{ placement: 'top-start' }}
     >
-      <ToggleGroup size="sm">
+      <div className="flex items-center gap-1">
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Text"
-                onPressedChange={() =>
-                  editor.chain().focus().setParagraph().run()
-                }
-                pressed={editor.isActive('paragraph')}
-                value="paragraph"
+                onClick={() => editor.chain().focus().setParagraph().run()}
+                size="icon-sm"
+                variant={isParagraph ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={ParagraphIcon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Text</TooltipContent>
@@ -59,16 +82,16 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Heading 1"
-                onPressedChange={() =>
+                onClick={() =>
                   editor.chain().focus().toggleHeading({ level: 1 }).run()
                 }
-                pressed={editor.isActive('heading', { level: 1 })}
-                value="h1"
+                size="icon-sm"
+                variant={isHeading1 ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={Heading01Icon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Heading 1</TooltipContent>
@@ -76,16 +99,16 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Heading 2"
-                onPressedChange={() =>
+                onClick={() =>
                   editor.chain().focus().toggleHeading({ level: 2 }).run()
                 }
-                pressed={editor.isActive('heading', { level: 2 })}
-                value="h2"
+                size="icon-sm"
+                variant={isHeading2 ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={Heading02Icon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Heading 2</TooltipContent>
@@ -93,16 +116,16 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Heading 3"
-                onPressedChange={() =>
+                onClick={() =>
                   editor.chain().focus().toggleHeading({ level: 3 }).run()
                 }
-                pressed={editor.isActive('heading', { level: 3 })}
-                value="h3"
+                size="icon-sm"
+                variant={isHeading3 ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={Heading03Icon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Heading 3</TooltipContent>
@@ -110,20 +133,18 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Bullet List"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleBulletList().run()
-                }
-                pressed={editor.isActive('bulletList')}
-                value="bulletList"
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                size="icon-sm"
+                variant={isBulletList ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon
                   icon={LeftToRightListBulletIcon}
                   size={18}
                   strokeWidth={2}
                 />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Bullet List</TooltipContent>
@@ -131,20 +152,18 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Ordered List"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleOrderedList().run()
-                }
-                pressed={editor.isActive('orderedList')}
-                value="orderedList"
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                size="icon-sm"
+                variant={isOrderedList ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon
                   icon={LeftToRightListNumberIcon}
                   size={18}
                   strokeWidth={2}
                 />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Ordered List</TooltipContent>
@@ -152,38 +171,34 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Blockquote"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleBlockquote().run()
-                }
-                pressed={editor.isActive('blockquote')}
-                value="blockquote"
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                size="icon-sm"
+                variant={isBlockquote ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={QuotesIcon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Blockquote</TooltipContent>
         </Tooltip>
-      </ToggleGroup>
+      </div>
 
-      <Separator className="mx-1 h-6" orientation="vertical" />
+      <Separator orientation="vertical" />
 
-      <ToggleGroup size="sm">
+      <div className="flex items-center gap-1">
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Bold"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleBold().run()
-                }
-                pressed={editor.isActive('bold')}
-                value="bold"
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                size="icon-sm"
+                variant={isBold ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={BoldIcon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Bold</TooltipContent>
@@ -191,20 +206,18 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Italic"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleItalic().run()
-                }
-                pressed={editor.isActive('italic')}
-                value="italic"
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                size="icon-sm"
+                variant={isItalic ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon
                   icon={TextItalicIcon}
                   size={18}
                   strokeWidth={2}
                 />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Italic</TooltipContent>
@@ -212,20 +225,18 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Strikethrough"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleStrike().run()
-                }
-                pressed={editor.isActive('strike')}
-                value="strike"
+                onClick={() => editor.chain().focus().toggleStrike().run()}
+                size="icon-sm"
+                variant={isStrike ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon
                   icon={TextStrikethroughIcon}
                   size={18}
                   strokeWidth={2}
                 />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Strikethrough</TooltipContent>
@@ -233,21 +244,19 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <ToggleGroupItem
+              <Button
                 aria-label="Code"
-                onPressedChange={() =>
-                  editor.chain().focus().toggleCode().run()
-                }
-                pressed={editor.isActive('code')}
-                value="code"
+                onClick={() => editor.chain().focus().toggleCode().run()}
+                size="icon-sm"
+                variant={isCode ? 'secondary' : 'ghost'}
               >
                 <HugeiconsIcon icon={CodeIcon} size={18} strokeWidth={2} />
-              </ToggleGroupItem>
+              </Button>
             }
           />
           <TooltipContent>Code</TooltipContent>
         </Tooltip>
-      </ToggleGroup>
+      </div>
     </BubbleMenu>
   );
 }

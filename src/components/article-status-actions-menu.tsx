@@ -29,10 +29,12 @@ export function ArticleStatusActionsMenu({
 }: ArticleStatusActionsMenuProps) {
   return (
     <>
-      <DropdownMenuItem render={<Link href={`/preview/${publicId}`} />}>
-        Preview
-        <HugeiconsIcon className="ml-auto" icon={ViewIcon} strokeWidth={2} />
-      </DropdownMenuItem>
+      {status === 'published' ? null : (
+        <DropdownMenuItem render={<Link href={`/preview/${publicId}`} />}>
+          Preview
+          <HugeiconsIcon className="ml-auto" icon={ViewIcon} strokeWidth={2} />
+        </DropdownMenuItem>
+      )}
       {status === 'draft' ? null : (
         <DropdownMenuItem onClick={onMoveToDraft}>
           Draft

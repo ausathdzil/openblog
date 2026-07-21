@@ -63,7 +63,7 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
 
   return (
     <>
-      <EditorBubbleMenu editor={editor} />
+      {!!editor && <EditorBubbleMenu editor={editor} />}
       <EditorContent editor={editor} />
     </>
   );
