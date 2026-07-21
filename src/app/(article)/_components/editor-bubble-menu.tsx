@@ -36,8 +36,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
     <BubbleMenu
       className="flex items-center gap-1 rounded-md border border-neutral-200 bg-white p-1 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
       editor={editor}
-      // @ts-expect-error tippyOptions is supported at runtime but missing in types
-      tippyOptions={{ placement: 'top-start' }}
+      options={{ placement: 'top-start' }}
     >
       <ToggleGroup size="sm">
         <Tooltip>
