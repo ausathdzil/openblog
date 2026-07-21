@@ -39,12 +39,21 @@ export async function syncArticleTags(articleId: number, tags: string[]) {
   await db.delete(articleTag).where(eq(articleTag.articleId, articleId));
 
   // Deduplicate and normalize tags
-  const normalizedTags = Array.from(
-    new Set(tags.map((t) => t.trim().toLowerCase()))
-  ).filter(Boolean);
+  const uniqueTagsMap = new Map<string, string>();
+  for (const t of tags) {
+    const trimmed = t.trim();
+    if (!trimmed) {
+      continue;
+    }
+    const slug = generateSlug(trimmed);
+    if (!uniqueTagsMap.has(slug)) {
+      uniqueTagsMap.set(slug, trimmed); // Preserve original casing
+    }
+  }
+  const uniqueTags = Array.from(uniqueTagsMap.values());
 
   await Promise.all(
-    normalizedTags.map(async (tagName) => {
+    uniqueTags.map(async (tagName) => {
       const tagSlug = generateSlug(tagName);
       let [existingTag] = await db
         .select()
