@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
+import { TooltipProvider } from '@/components/ui/tooltip';
+
 export const metadata: Metadata = {
   title: {
     default: 'OpenBlog',
@@ -44,8 +46,10 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          <NuqsAdapter>{children}</NuqsAdapter>
-          <Toaster richColors />
+          <TooltipProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
+            <Toaster richColors />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

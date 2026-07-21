@@ -36,7 +36,7 @@ export function ResizableTextarea({
   };
 
   return (
-    <div className="mb-[0.888889em]">
+    <>
       <textarea
         className={cn(
           'w-full resize-none overflow-hidden focus:outline-none',
@@ -49,7 +49,7 @@ export function ResizableTextarea({
         {...props}
       />
       {isInvalid && <FieldError errors={errors} />}
-    </div>
+    </>
   );
 }
 

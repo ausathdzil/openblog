@@ -11,6 +11,7 @@ import {
 import StarterKit from '@tiptap/starter-kit';
 
 import { CodeBlock } from './code-block';
+import { EditorBubbleMenu } from './editor-bubble-menu';
 import { lowlight } from './lowlight';
 
 interface ContentEditorProps {
@@ -60,5 +61,10 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
     immediatelyRender: false,
   });
 
-  return <EditorContent editor={editor} />;
+  return (
+    <>
+      <EditorBubbleMenu editor={editor} />
+      <EditorContent editor={editor} />
+    </>
+  );
 }
