@@ -15,11 +15,17 @@ test('Profile shows username', async ({ context, page }) => {
   });
   await testUtils.saveUser(user);
 
+  const baseURL = test.info().project.use.baseURL || 'http://localhost:3000';
   const cookies = await testUtils.getCookies({
     userId: user.id,
-    domain: 'localhost',
   });
-  await context.addCookies(cookies);
+
+  await context.addCookies(
+    cookies.map((cookie) => ({
+      ...cookie,
+      url: baseURL,
+    }))
+  );
 
   await page.goto('/profile');
 
