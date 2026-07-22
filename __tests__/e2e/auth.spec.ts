@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { auth, generateUniqueId } from '../auth';
 
-test('Profile shows username', async ({ baseURL, context, page }) => {
+test('Profile shows username', async ({ context, page }) => {
   const ctx = await auth.$context;
   const testUtils = ctx.test;
 
@@ -19,15 +19,7 @@ test('Profile shows username', async ({ baseURL, context, page }) => {
     userId: user.id,
     domain: 'localhost',
   });
-
-  const targetURL = baseURL || 'http://localhost:3000';
-
-  await context.addCookies(
-    cookies.map((cookie) => ({
-      ...cookie,
-      url: targetURL,
-    }))
-  );
+  await context.addCookies(cookies);
 
   await page.goto('/profile');
 

@@ -28,8 +28,8 @@ export default defineConfig({
       use: { ...devices['Desktop Firefox'] },
     },
 
-    // WebKit frequently struggles with dependencies on non-Ubuntu local machines (like Fedora/Arch).
-    ...(process.env.CI
+    // WebKit and Mobile Safari are enabled when running locally via ACT, but skipped in CI.
+    ...(process.env.ACT
       ? [
           {
             name: 'webkit',
