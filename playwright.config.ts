@@ -29,24 +29,23 @@ export default defineConfig({
     },
 
     // WebKit frequently struggles with dependencies on non-Ubuntu local machines (like Fedora/Arch).
-    // Only run WebKit in CI where we know the Ubuntu dependencies are perfectly satisfied.
-    // ...(process.env.CI
-    //   ? [
-    //       {
-    //         name: 'webkit',
-    //         use: { ...devices['Desktop Safari'] },
-    //       },
-    //       {
-    //         name: 'Mobile Safari',
-    //         use: { ...devices['iPhone 12'] },
-    //       },
-    //     ]
-    //   : []),
+    ...(process.env.CI
+      ? [
+          {
+            name: 'webkit',
+            use: { ...devices['Desktop Safari'] },
+          },
+          {
+            name: 'Mobile Safari',
+            use: { ...devices['iPhone 12'] },
+          },
+        ]
+      : []),
 
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
   ],
 
   webServer: {

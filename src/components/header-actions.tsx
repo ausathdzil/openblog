@@ -82,5 +82,5 @@ async function HeaderActionsContent() {
 }
 
 function HeaderActionsFallback() {
-  return <Skeleton className="h-8 w-31 rounded-full" />;
+  return <Skeleton className="h-11 w-31 rounded-full sm:h-8" />;
 }
