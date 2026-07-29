@@ -168,7 +168,7 @@ export function ProfileForm({
                       type="text"
                       value={field.state.value}
                     />
-                    {isInvalid && (
+                    {!!isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
@@ -217,8 +217,6 @@ export function ProfileForm({
                   if (!data.available) {
                     return { message: 'Username is not available.' };
                   }
-
-                  return;
                 },
               }}
             >
@@ -254,7 +252,7 @@ export function ProfileForm({
                         value={field.state.value}
                       />
                     </InputGroup>
-                    {isInvalid && (
+                    {!!isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
@@ -264,7 +262,7 @@ export function ProfileForm({
 
             <Field>
               <Button disabled={isPending} type="submit">
-                {isPending && <Spinner />}
+                {!!isPending && <Spinner />}
                 {submitLabel}
               </Button>
               <Muted

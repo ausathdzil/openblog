@@ -48,7 +48,7 @@ export function ResizableTextarea({
         value={value}
         {...props}
       />
-      {isInvalid && <FieldError errors={errors} />}
+      {!!isInvalid && <FieldError errors={errors} />}
     </>
   );
 }

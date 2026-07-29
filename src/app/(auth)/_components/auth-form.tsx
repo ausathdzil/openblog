@@ -146,7 +146,7 @@ export function AuthForm({
                   <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                   <Input
                     aria-invalid={isInvalid}
-                    autoComplete="email webauthn"
+                    autoComplete="username webauthn"
                     id={field.name}
                     maxLength={100}
                     name={field.name}
@@ -157,14 +157,16 @@ export function AuthForm({
                     type="email"
                     value={field.state.value}
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {!!isInvalid && (
+                    <FieldError errors={field.state.meta.errors} />
+                  )}
                 </Field>
               );
             }}
           </form.Field>
           <Field>
             <Button disabled={isLoading} type="submit">
-              {isLoading && <Spinner />}
+              {!!isLoading && <Spinner />}
               Continue with Email
             </Button>
             {formError ? (

@@ -133,7 +133,7 @@ export function BioAndLinksForm({
                       placeholder="Tell us about yourself"
                       value={field.state.value}
                     />
-                    {isInvalid && (
+                    {!!isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
@@ -159,7 +159,7 @@ export function BioAndLinksForm({
                       type="url"
                       value={field.state.value}
                     />
-                    {isInvalid && (
+                    {!!isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
@@ -188,7 +188,7 @@ export function BioAndLinksForm({
                         value={field.state.value}
                       />
                     </InputGroup>
-                    {isInvalid && (
+                    {!!isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
@@ -217,7 +217,7 @@ export function BioAndLinksForm({
                         value={field.state.value}
                       />
                     </InputGroup>
-                    {isInvalid && (
+                    {!!isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
@@ -227,7 +227,7 @@ export function BioAndLinksForm({
 
             <Field>
               <Button disabled={isPending} type="submit">
-                {isPending && <Spinner />}
+                {!!isPending && <Spinner />}
                 Save Changes
               </Button>
               <Muted

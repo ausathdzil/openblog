@@ -20,7 +20,6 @@ export function CreateArticleButton(
 
       if (error) {
         toast.error(error.message, { position: 'top-center' });
-        return;
       }
     });
   };

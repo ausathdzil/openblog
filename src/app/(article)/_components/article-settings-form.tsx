@@ -124,7 +124,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                   placeholder="What is this article about?"
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                {!!isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
@@ -196,7 +196,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
                   Press <Kbd>Enter</Kbd> or <Kbd>,</Kbd> to add a tag. Helps
                   readers discover your article.
                 </FieldDescription>
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                {!!isInvalid && <FieldError errors={field.state.meta.errors} />}
                 <div className="[&>*:not(:first-child)]:hidden">
                   {field.state.value.map((value, index) => (
                     <form.Field

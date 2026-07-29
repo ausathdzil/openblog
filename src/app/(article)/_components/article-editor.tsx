@@ -250,7 +250,7 @@ function isContentEmpty(contentJson: JSONContent | undefined): boolean {
     contentJson.content &&
     contentJson.content.length === 1
   ) {
-    const first = contentJson.content[0];
+    const [first] = contentJson.content;
     if (first && first.type === 'paragraph' && !first.content) {
       return true;
     }

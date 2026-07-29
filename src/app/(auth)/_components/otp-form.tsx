@@ -144,7 +144,7 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
                       <InputOTPSlot index={5} />
                     </InputOTPGroup>
                   </InputOTP>
-                  {isInvalid && (
+                  {!!isInvalid && (
                     <FieldError
                       className="text-center"
                       errors={field.state.meta.errors}
@@ -175,11 +175,11 @@ export function OtpForm({ email, onBack, className, ...props }: OtpFormProps) {
         </FieldGroup>
         <div className="flex flex-col gap-2">
           <Button disabled={isPending} type="submit">
-            {isPending && <Spinner />}
+            {!!isPending && <Spinner />}
             Verify
           </Button>
           <OtpResendButton email={email} setFormStatus={setFormStatus} />
-          {onBack && (
+          {!!onBack && (
             <Button
               disabled={isPending}
               onClick={onBack}
@@ -253,7 +253,7 @@ function OtpResendButton({ email, setFormStatus }: OtpResendButtonProps) {
       type="button"
       variant="outline"
     >
-      {isPending && <Spinner />}
+      {!!isPending && <Spinner />}
       {labelText}
     </Button>
   );

@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   experimental: {
     inlineCss: true,
     typedEnv: true,
+    useTypeScriptCli: true,
   },
   reactCompiler: true,
   typescript: {
