@@ -3,15 +3,16 @@ import { config } from 'dotenv';
 
 config({ path: '.env.local', quiet: true });
 
+const isCI = !!process.env.CI;
 const baseURL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export default defineConfig({
-  timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
+  timeout: isCI ? 60 * 1000 : 30 * 1000,
   testDir: './__tests__/e2e',
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
+  forbidOnly: isCI,
   retries: 2,
-  workers: process.env.CI ? 1 : undefined,
+  workers: isCI ? 1 : undefined,
   reporter: 'html',
   use: {
     baseURL,

@@ -30,8 +30,13 @@ jobs:
     outputs:
       run-tests: ${{ steps.changes.outputs.src }}
     steps:
+      - name: Detect act
+        id: act
+        shell: bash
+        run: echo "enabled=${ACT:-false}" >> "$GITHUB_OUTPUT"
+
       - name: Notify Vercel
-        if: ${{ !env.ACT }}
+        if: ${{ steps.act.outputs.enabled != 'true' }}
         uses: vercel/repository-dispatch/actions/status@v1
         with:
           name: 'Vercel - openblog: Run-Tests'
