@@ -9,7 +9,7 @@ import {
 import { articleStatus } from '@/db/schema';
 
 export const searchParamsParser = {
-  status: parseAsStringLiteral(articleStatus.enumValues)
+  status: parseAsStringLiteral(articleStatus)
     .withDefault('published')
     .withOptions({ shallow: false, history: 'push' }),
   q: parseAsString

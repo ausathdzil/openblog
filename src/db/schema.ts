@@ -1,11 +1,11 @@
-import { relations } from 'drizzle-orm';
+import { isNotNull, relations, sql } from 'drizzle-orm';
 import {
   bigint,
   boolean,
+  check,
   index,
   integer,
   jsonb,
-  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -115,11 +115,7 @@ export const passkey = pgTable(
   ]
 );
 
-export const articleStatus = pgEnum('article_status', [
-  'draft',
-  'published',
-  'archived',
-]);
+export const articleStatus = ['draft', 'published', 'archived'] as const;
 
 export const article = pgTable(
   'article',
@@ -135,7 +131,7 @@ export const article = pgTable(
     slug: text('slug'),
     contentJson: jsonb('content_json'),
     excerpt: text('excerpt'),
-    status: articleStatus('status').default('draft').notNull(),
+    status: text('status').default('draft').notNull(),
     coverImage: text('cover_image'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
@@ -149,15 +145,18 @@ export const article = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
   },
   (table) => [
-    uniqueIndex('article_author_slug_unique_idx').on(
-      table.authorId,
-      table.slug
-    ),
+    uniqueIndex('article_author_slug_unique_idx')
+      .on(table.authorId, table.slug)
+      .where(isNotNull(table.slug)),
     index('article_status_created_at_idx').on(table.status, table.createdAt),
     index('article_author_status_created_at_idx').on(
       table.authorId,
       table.status,
       table.createdAt
+    ),
+    check(
+      'article_status_check',
+      sql`status in (${sql.raw(articleStatus.map((s) => `'${s}'`).join(', '))})`
     ),
   ]
 );
