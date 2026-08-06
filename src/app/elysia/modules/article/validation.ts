@@ -1,15 +1,23 @@
 import { createInsertSchema, createUpdateSchema } from 'drizzle-typebox';
 import { t } from 'elysia';
 
-import { article, articleTag, tag, user } from '@/db/schema';
+import { article, articleStatus, articleTag, tag, user } from '@/db/schema';
 import { spreads } from '@/db/utils';
+
+const select = spreads(
+  { articles: article, user, tag, articleTags: articleTag },
+  'select'
+);
 
 /** Drizzle→TypeBox field fragments for Elysia `t.Object` / OpenAPI (not the SQL client; see `@/db`). */
 export const validation = {
-  select: spreads(
-    { articles: article, user, tag, articleTags: articleTag },
-    'select'
-  ),
+  select: {
+    ...select,
+    articles: {
+      ...select.articles,
+      status: t.UnionEnum(articleStatus),
+    },
+  },
   insert: spreads(
     {
       createArticle: createInsertSchema(article, {
@@ -27,7 +35,7 @@ export const validation = {
             })
           )
         ),
-        status: t.UnionEnum(['draft', 'published', 'archived'], {
+        status: t.UnionEnum(articleStatus, {
           error: 'Status must be either draft, published, or archived.',
         }),
       }),
@@ -52,7 +60,7 @@ export const validation = {
           )
         ),
         status: t.Optional(
-          t.UnionEnum(['draft', 'published', 'archived'], {
+          t.UnionEnum(articleStatus, {
             error: 'Status must be either draft, published, or archived.',
             default: undefined,
           })
