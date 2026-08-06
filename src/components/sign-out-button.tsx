@@ -3,10 +3,10 @@
 import { LogoutCircle02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from '@/components/ui/toast';
 import { authClient } from '@/lib/auth-client';
 
 export function SignOutButton(
@@ -22,7 +22,10 @@ export function SignOutButton(
             window.location.href = '/sign-in';
           },
           onError: (ctx) => {
-            toast.error(ctx.error.message || 'An unexpected error occurred');
+            toast.add({
+              type: 'error',
+              description: ctx.error.message || 'An unexpected error occurred',
+            });
           },
         },
       });

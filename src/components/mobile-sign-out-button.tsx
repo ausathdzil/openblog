@@ -3,10 +3,10 @@
 import { LogoutCircle02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from '@/components/ui/toast';
 import { authClient } from '@/lib/auth-client';
 
 interface MobileSignOutButtonProps extends React.ComponentProps<typeof Button> {
@@ -28,7 +28,10 @@ export function MobileSignOutButton({
             window.location.href = '/sign-in';
           },
           onError: (ctx) => {
-            toast.error(ctx.error.message || 'An unexpected error occurred');
+            toast.add({
+              type: 'error',
+              description: ctx.error.message || 'An unexpected error occurred.',
+            });
           },
         },
       });

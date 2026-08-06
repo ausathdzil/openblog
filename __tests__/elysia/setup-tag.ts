@@ -14,7 +14,7 @@ export async function createTestTag(name: string, slug: string) {
     .returning();
 
   if (!tagData) {
-    throw new Error('Failed to create test tag');
+    throw new Error('Failed to create test tag.');
   }
 
   return tagData;
@@ -29,7 +29,7 @@ export function setupTestTag(name: string, slug: string) {
 
   const requireTag = () => {
     if (!tagData) {
-      throw new Error('Failed to setup test tag');
+      throw new Error('Failed to setup test tag.');
     }
     return { tagData };
   };

@@ -3,10 +3,10 @@
 import { QuillWrite02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from '@/components/ui/toast';
 import { createDraft } from '@/lib/article-actions';
 
 export function CreateArticleButton(
@@ -19,7 +19,7 @@ export function CreateArticleButton(
       const { error } = await createDraft();
 
       if (error) {
-        toast.error(error.message, { position: 'top-center' });
+        toast.add({ type: 'error', description: error.message });
       }
     });
   };

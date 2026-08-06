@@ -31,7 +31,7 @@ export function setupAuthContext() {
 
   const requireContext = () => {
     if (!(authTest && testUser)) {
-      throw new Error('Auth context is not set up yet');
+      throw new Error('Auth context is not set up yet.');
     }
     return { authTest, testUser };
   };

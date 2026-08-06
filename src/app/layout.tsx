@@ -4,10 +4,10 @@ import type { Metadata, Viewport } from 'next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import './globals.css';
 
+import { Toaster } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const metadata: Metadata = {
@@ -48,7 +48,7 @@ export default function RootLayout({
         >
           <TooltipProvider>
             <NuqsAdapter>{children}</NuqsAdapter>
-            <Toaster richColors />
+            <Toaster />
           </TooltipProvider>
         </ThemeProvider>
       </body>

@@ -3,9 +3,9 @@
 import type { JSONContent } from '@tiptap/react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/toast';
 import { updateArticle } from '@/lib/article-actions';
 
 interface PublishButtonProps extends React.ComponentProps<typeof Button> {
@@ -39,22 +39,25 @@ export function PublishButton({
 
   const handleClick = () => {
     if (!isValid) {
-      toast.error('Please fix all errors before publishing', {
-        position: 'top-center',
+      toast.add({
+        type: 'error',
+        description: 'Please fix the errors before publishing.',
       });
       return;
     }
 
     if (isTitleEmpty) {
-      toast.error('Please enter a title before publishing', {
-        position: 'top-center',
+      toast.add({
+        type: 'error',
+        description: 'Please enter a title before publishing.',
       });
       return;
     }
 
     if (isContentEmpty) {
-      toast.error('Please enter some content before publishing', {
-        position: 'top-center',
+      toast.add({
+        type: 'error',
+        description: 'Please enter some content before publishing.',
       });
       return;
     }
@@ -67,7 +70,7 @@ export function PublishButton({
       });
 
       if (res?.error) {
-        toast.error(res.error.message, { position: 'top-center' });
+        toast.add({ type: 'error', description: res.error.message });
         return;
       }
 

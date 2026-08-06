@@ -8,7 +8,6 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
@@ -17,6 +16,7 @@ import { HeaderTitle } from '@/components/header-title';
 import { OpenBlogButton } from '@/components/openblog-button';
 import { Button } from '@/components/ui/button';
 import { Marker, MarkerContent, MarkerIcon } from '@/components/ui/marker';
+import { toast } from '@/components/ui/toast';
 import { updateArticle } from '@/lib/article-actions';
 import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
@@ -83,7 +83,10 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
         });
 
         if (res?.error) {
-          toast.error(res.error.message, { position: 'top-center' });
+          toast.add({
+            type: 'error',
+            description: res.error.message,
+          });
         } else {
           form.reset(value);
         }

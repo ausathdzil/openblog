@@ -66,7 +66,7 @@ const spread = <
 
     default:
       if (!(Kind in schema)) {
-        throw new Error('Expect a schema');
+        throw new Error('Expect a schema.');
       }
       table = schema;
   }

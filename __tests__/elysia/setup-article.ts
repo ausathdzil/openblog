@@ -25,7 +25,7 @@ export async function createTestArticle(userId: string) {
     .returning();
 
   if (!articleData) {
-    throw new Error('Failed to create test article');
+    throw new Error('Failed to create test article.');
   }
 
   return articleData;
@@ -44,7 +44,7 @@ export function setupTestArticle(getUserId: () => string) {
 
   const requireArticle = () => {
     if (!articleData) {
-      throw new Error('Failed to setup test article');
+      throw new Error('Failed to setup test article.');
     }
     return { articleData };
   };

@@ -7,7 +7,6 @@ import { useForm } from '@tanstack/react-form';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
@@ -30,6 +29,7 @@ import {
 import { Kbd } from '@/components/ui/kbd';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/toast';
 import { updateArticle } from '@/lib/article-actions';
 
 const excerptSchema = z.object({
@@ -73,7 +73,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         });
 
         if (res?.error) {
-          toast.error(res.error.message, { position: 'top-center' });
+          toast.add({ type: 'error', description: res.error.message });
         } else {
           push(
             `/@${article.author?.username}/articles/${article.slug}` as Route

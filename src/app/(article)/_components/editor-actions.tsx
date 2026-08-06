@@ -4,7 +4,6 @@ import { MoreHorizontalIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { ArchiveArticleDialog } from '@/components/archive-article-dialog';
@@ -16,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from '@/components/ui/toast';
 import {
   archiveArticle,
   deleteArticle,
@@ -36,10 +36,10 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
       );
 
       if (res.error) {
-        toast.error(res.error.message);
+        toast.add({ type: 'error', description: res.error.message });
         return;
       }
-      toast.success(res.message);
+      toast.add({ type: 'info', description: res.message });
       setArchiveDialogOpen(false);
       refresh();
     });
@@ -53,10 +53,10 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
       );
 
       if (res.error) {
-        toast.error(res.error.message);
+        toast.add({ type: 'error', description: res.error.message });
         return;
       }
-      toast.success(res.message);
+      toast.add({ description: res.message });
       setDeleteDialogOpen(false);
       push('/profile');
     });
@@ -70,10 +70,10 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
       );
 
       if (res.error) {
-        toast.error(res.error.message);
+        toast.add({ type: 'error', description: res.error.message });
         return;
       }
-      toast.success(res.message);
+      toast.add({ type: 'info', description: res.message });
       refresh();
     });
   };

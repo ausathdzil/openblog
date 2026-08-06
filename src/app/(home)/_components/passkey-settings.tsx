@@ -5,7 +5,6 @@ import { Delete01Icon, Key01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -28,6 +27,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from '@/components/ui/toast';
 import { authClient } from '@/lib/auth-client';
 
 interface UserPasskey {
@@ -50,11 +50,13 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
       const { error } = await authClient.passkey.addPasskey();
 
       if (error) {
-        toast.error(
-          error.message || 'Failed to add passkey. Please try again.'
-        );
+        toast.add({
+          type: 'error',
+          description:
+            error.message || 'Failed to add passkey. Please try again.',
+        });
       } else {
-        toast.success('Passkey added');
+        toast.add({ type: 'success', description: 'Passkey added.' });
         refresh();
       }
     });
@@ -65,11 +67,13 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
       const { error } = await authClient.passkey.deletePasskey({ id });
 
       if (error) {
-        toast.error(
-          error.message || 'Failed to delete passkey. Please try again.'
-        );
+        toast.add({
+          type: 'error',
+          description:
+            error.message || 'Failed to delete passkey. Please try again.',
+        });
       } else {
-        toast.success('Passkey deleted');
+        toast.add({ description: 'Passkey deleted.' });
         refresh();
       }
     });
