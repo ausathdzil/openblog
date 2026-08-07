@@ -18,29 +18,17 @@ on:
 
 permissions:
   contents: read
-  statuses: write
 
 concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  prepare:
+  Prepare:
     runs-on: ubuntu-latest
     outputs:
       run-tests: ${{ steps.changes.outputs.src }}
     steps:
-      - name: Detect act
-        id: act
-        shell: bash
-        run: echo "enabled=${ACT:-false}" >> "$GITHUB_OUTPUT"
-
-      - name: Notify Vercel
-        if: ${{ steps.act.outputs.enabled != 'true' }}
-        uses: vercel/repository-dispatch/actions/status@v1
-        with:
-          name: 'Vercel - openblog: Run-Tests'
-
       - uses: actions/checkout@v6
 
       - name: Check for file changes
@@ -65,9 +53,9 @@ jobs:
               - 'postcss.config.mjs'
               - 'tsconfig.json'
 
-  run-tests:
-    needs: prepare
-    if: ${{ needs.prepare.outputs.run-tests == 'true' }}
+  Run-Tests:
+    needs: Prepare
+    if: ${{ needs.Prepare.outputs.run-tests == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
