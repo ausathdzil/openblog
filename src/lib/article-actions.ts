@@ -13,7 +13,7 @@ export async function deleteArticle(publicId: string, username: string) {
   const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
-    return { error: { status: 401, message: 'Unauthorized' } };
+    return { status: 401, message: 'Unauthorized.' };
   }
 
   const { data, error } = await elysia
@@ -22,25 +22,21 @@ export async function deleteArticle(publicId: string, username: string) {
 
   if (error) {
     return {
-      error: {
-        status: error.status || 500,
-        message:
-          error.value.message || 'An unknown error occurred. Please try again.',
-      },
+      status: error.status || 500,
+      message:
+        error.value.message || 'An unknown error occurred. Please try again.',
     };
   }
 
   if (data) {
     updateTag('articles');
     updateTag(`articles-${username}`);
-    return { message: data.message };
+    return { status: 200, message: data.message };
   }
 
   return {
-    error: {
-      status: 500,
-      message: 'Unable to delete article. Please try again.',
-    },
+    status: 500,
+    message: 'Unable to delete article. Please try again.',
   };
 }
 
@@ -49,7 +45,7 @@ export async function archiveArticle(publicId: string, username: string) {
   const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
-    return { error: { status: 401, message: 'Unauthorized' } };
+    return { status: 401, message: 'Unauthorized.' };
   }
 
   const { data, error } = await elysia
@@ -58,11 +54,9 @@ export async function archiveArticle(publicId: string, username: string) {
 
   if (error) {
     return {
-      error: {
-        status: error.status || 500,
-        message:
-          error.value.message || 'An unknown error occurred. Please try again.',
-      },
+      status: error.status || 500,
+      message:
+        error.value.message || 'An unknown error occurred. Please try again.',
     };
   }
 
@@ -70,14 +64,12 @@ export async function archiveArticle(publicId: string, username: string) {
     updateTag('articles');
     updateTag(`articles-${username}`);
     updateTag(`article-${data.slug}`);
-    return { message: 'Article archived' };
+    return { status: 200, message: 'Article archived.' };
   }
 
   return {
-    error: {
-      status: 500,
-      message: 'Unable to archive article. Please try again.',
-    },
+    status: 500,
+    message: 'Unable to archive article. Please try again.',
   };
 }
 
@@ -86,7 +78,7 @@ export async function moveArticleToDraft(publicId: string, username: string) {
   const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
-    return { error: { status: 401, message: 'Unauthorized' } };
+    return { status: 401, message: 'Unauthorized.' };
   }
 
   const { data, error } = await elysia
@@ -95,11 +87,9 @@ export async function moveArticleToDraft(publicId: string, username: string) {
 
   if (error) {
     return {
-      error: {
-        status: error.status || 500,
-        message:
-          error.value.message || 'An unknown error occurred. Please try again.',
-      },
+      status: error.status || 500,
+      message:
+        error.value.message || 'An unknown error occurred. Please try again.',
     };
   }
 
@@ -107,14 +97,12 @@ export async function moveArticleToDraft(publicId: string, username: string) {
     updateTag('articles');
     updateTag(`articles-${username}`);
     updateTag(`article-${data.slug}`);
-    return { message: 'Article moved to draft' };
+    return { status: 200, message: 'Article moved to draft.' };
   }
 
   return {
-    error: {
-      status: 500,
-      message: 'Unable to move article to draft. Please try again.',
-    },
+    status: 500,
+    message: 'Unable to move article to draft. Please try again.',
   };
 }
 
@@ -126,7 +114,7 @@ export async function updateArticle(
   const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
-    return { error: { status: 401, message: 'Unauthorized' } };
+    return { status: 401, message: 'Unauthorized.' };
   }
 
   const { data, error } = await elysia.articles({ publicId }).patch(
@@ -145,11 +133,9 @@ export async function updateArticle(
 
   if (error) {
     return {
-      error: {
-        status: error.status || 500,
-        message:
-          error.value.message || 'An unknown error occurred. Please try again.',
-      },
+      status: error.status || 500,
+      message:
+        error.value.message || 'An unknown error occurred. Please try again.',
     };
   }
 
@@ -159,8 +145,13 @@ export async function updateArticle(
     }
     updateTag(`articles-${data.author?.username}`);
     updateTag(`article-${data.slug}`);
-    return { data };
+    return { status: 200, message: 'Article updated.' };
   }
+
+  return {
+    status: 500,
+    message: 'Unable to update article. Please try again.',
+  };
 }
 
 export async function createDraft() {
@@ -168,7 +159,7 @@ export async function createDraft() {
   const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
-    return { error: { status: 401, message: 'Unauthorized' } };
+    return { status: 401, message: 'Unauthorized.' };
   }
 
   const { data, error } = await elysia.articles.post(
@@ -182,11 +173,9 @@ export async function createDraft() {
 
   if (error) {
     return {
-      error: {
-        status: error.status || 500,
-        message:
-          error.value.message || 'An unknown error occurred. Please try again.',
-      },
+      status: error.status || 500,
+      message:
+        error.value.message || 'An unknown error occurred. Please try again.',
     };
   }
 
@@ -198,9 +187,7 @@ export async function createDraft() {
   }
 
   return {
-    error: {
-      status: 500,
-      message: 'Unable to create draft. Please try again',
-    },
+    status: 500,
+    message: 'Unable to create draft. Please try again.',
   };
 }

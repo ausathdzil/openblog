@@ -6,6 +6,7 @@ import { useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
+import type { ArticleStatus } from '@/db/schema';
 import { updateArticle } from '@/lib/article-actions';
 
 interface PublishButtonProps extends React.ComponentProps<typeof Button> {
@@ -15,7 +16,7 @@ interface PublishButtonProps extends React.ComponentProps<typeof Button> {
   isValid: boolean;
   onPublished: () => void;
   publicId: string;
-  status: string | null;
+  status: ArticleStatus;
   title: string;
 }
 
@@ -63,18 +64,17 @@ export function PublishButton({
     }
 
     startTransition(async () => {
-      const res = await updateArticle(publicId, {
+      const { status: resStatus, message } = await updateArticle(publicId, {
         title,
         contentJson: contentJson ? structuredClone(contentJson) : undefined,
-        status: status as 'draft' | 'published' | 'archived',
+        status,
       });
 
-      if (res?.error) {
-        toast.add({ type: 'error', description: res.error.message });
-        return;
+      if (resStatus === 200) {
+        replace(`/editor/${publicId}/settings`);
+      } else {
+        toast.add({ type: 'error', description: message });
       }
-
-      replace(`/editor/${publicId}/settings`);
     });
   };
 

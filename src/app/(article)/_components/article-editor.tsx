@@ -77,18 +77,15 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
     },
     onSubmit: ({ value }) => {
       startTransition(async () => {
-        const res = await updateArticle(article.publicId, {
+        const { status, message } = await updateArticle(article.publicId, {
           title: value.title,
           contentJson: structuredClone(value.contentJson),
         });
 
-        if (res?.error) {
-          toast.add({
-            type: 'error',
-            description: res.error.message,
-          });
-        } else {
+        if (status === 200) {
           form.reset(value);
+        } else {
+          toast.add({ type: 'error', description: message });
         }
       });
     },

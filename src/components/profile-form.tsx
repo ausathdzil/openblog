@@ -99,7 +99,7 @@ export function ProfileForm({
           },
           {
             onSuccess: () => {
-              setFormStatus({ type: 'success', message: 'Profile updated' });
+              setFormStatus({ type: 'success', message: 'Profile updated.' });
               if (redirectPath) {
                 push(redirectPath);
               } else {
@@ -109,7 +109,7 @@ export function ProfileForm({
             onError: (ctx) => {
               setFormStatus({
                 type: 'error',
-                message: ctx.error.message || 'An unexpected error occurred',
+                message: ctx.error.message || 'An unexpected error occurred.',
               });
             },
           }

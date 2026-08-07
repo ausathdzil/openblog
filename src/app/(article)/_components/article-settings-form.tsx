@@ -66,18 +66,18 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
     },
     onSubmit: ({ value }) => {
       startTransition(async () => {
-        const res = await updateArticle(article.publicId, {
+        const { status, message } = await updateArticle(article.publicId, {
           excerpt: value.excerpt,
           tags: value.tags,
           status: 'published',
         });
 
-        if (res?.error) {
-          toast.add({ type: 'error', description: res.error.message });
-        } else {
+        if (status === 200) {
           push(
             `/@${article.author?.username}/articles/${article.slug}` as Route
           );
+        } else {
+          toast.add({ type: 'error', description: message });
         }
       });
     },

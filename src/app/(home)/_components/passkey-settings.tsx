@@ -89,7 +89,7 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {initialPasskeys && initialPasskeys.length > 0 ? (
+        {initialPasskeys.length > 0 ? (
           <div className="space-y-3">
             {initialPasskeys.map((pk) => (
               <div

@@ -39,18 +39,17 @@ export function SaveButton({
     }
 
     startTransition(async () => {
-      const res = await updateArticle(article.publicId, {
+      const { status, message } = await updateArticle(article.publicId, {
         title,
         contentJson: contentJson ? structuredClone(contentJson) : undefined,
         status: article.status,
       });
 
-      if (res?.error) {
-        toast.add({ type: 'error', description: res.error.message });
-        return;
+      if (status === 200) {
+        replace(`/editor/${article.publicId}/settings`);
+      } else {
+        toast.add({ type: 'error', description: message });
       }
-
-      replace(`/editor/${article.publicId}/settings`);
     });
   };
 

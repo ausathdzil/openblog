@@ -74,21 +74,21 @@ export function BioAndLinksForm({
     onSubmit: ({ value }) => {
       setFormStatus(null);
       startTransition(async () => {
-        const { error } = await updateBio({
+        const { status, message } = await updateBio({
           bio: value.bio,
           website: value.website,
           twitter: value.twitter,
           facebook: value.facebook,
         });
 
-        if (error) {
+        if (status === 200) {
+          setFormStatus({ type: 'success', message });
+          refresh();
+        } else {
           setFormStatus({
             type: 'error',
-            message: error.message || 'Failed to update profile',
+            message: message || 'Failed to update profile.',
           });
-        } else {
-          setFormStatus({ type: 'success', message: 'Profile updated' });
-          refresh();
         }
       });
     },

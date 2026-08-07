@@ -30,51 +30,51 @@ export function EditorActions({ article }: { article: ArticleResponse }) {
 
   const handleArchive = () => {
     startTransition(async () => {
-      const res = await archiveArticle(
+      const { status, message } = await archiveArticle(
         article.publicId,
         article.author?.username ?? ''
       );
 
-      if (res.error) {
-        toast.add({ type: 'error', description: res.error.message });
-        return;
+      if (status === 200) {
+        toast.add({ type: 'info', description: message });
+        setArchiveDialogOpen(false);
+        refresh();
+      } else {
+        toast.add({ type: 'error', description: message });
       }
-      toast.add({ type: 'info', description: res.message });
-      setArchiveDialogOpen(false);
-      refresh();
     });
   };
 
   const handleDelete = () => {
     startTransition(async () => {
-      const res = await deleteArticle(
+      const { status, message } = await deleteArticle(
         article.publicId,
         article.author?.username ?? ''
       );
 
-      if (res.error) {
-        toast.add({ type: 'error', description: res.error.message });
-        return;
+      if (status === 200) {
+        toast.add({ type: 'info', description: message });
+        setDeleteDialogOpen(false);
+        push('/profile');
+      } else {
+        toast.add({ type: 'error', description: message });
       }
-      toast.add({ description: res.message });
-      setDeleteDialogOpen(false);
-      push('/profile');
     });
   };
 
   const handleMoveToDraft = () => {
     startTransition(async () => {
-      const res = await moveArticleToDraft(
+      const { status, message } = await moveArticleToDraft(
         article.publicId,
         article.author?.username ?? ''
       );
 
-      if (res.error) {
-        toast.add({ type: 'error', description: res.error.message });
-        return;
+      if (status === 200) {
+        toast.add({ type: 'info', description: message });
+        refresh();
+      } else {
+        toast.add({ type: 'error', description: message });
       }
-      toast.add({ type: 'info', description: res.message });
-      refresh();
     });
   };
 

@@ -16,11 +16,8 @@ export function CreateArticleButton(
 
   const handleCreateArticle = () => {
     startTransition(async () => {
-      const { error } = await createDraft();
-
-      if (error) {
-        toast.add({ type: 'error', description: error.message });
-      }
+      const { message } = await createDraft();
+      toast.add({ type: 'error', description: message });
     });
   };
 

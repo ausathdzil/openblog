@@ -24,7 +24,7 @@ export function SignOutButton(
           onError: (ctx) => {
             toast.add({
               type: 'error',
-              description: ctx.error.message || 'An unexpected error occurred',
+              description: ctx.error.message || 'An unexpected error occurred.',
             });
           },
         },
