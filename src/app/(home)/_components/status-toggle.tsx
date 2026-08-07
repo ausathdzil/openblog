@@ -17,8 +17,8 @@ export function StatusToggle(props: React.ComponentProps<typeof ToggleGroup>) {
   const [isPending, startTransition] = useTransition();
   const [{ status }, setSearchParams] = useQueryStates(searchParamsParser);
 
-  const handleStatusChange = (status: 'draft' | 'published' | 'archived') => {
-    setSearchParams({ status, q: null, page: 1 }, { startTransition });
+  const handleStatusChange = (_status: 'draft' | 'published' | 'archived') => {
+    setSearchParams({ status: _status, q: null, page: 1 }, { startTransition });
   };
 
   return (

@@ -17,9 +17,8 @@ export const tag = new Elysia({ prefix: '/tags', tags: ['Tags'] })
     },
   })
   .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'NOT_FOUND':
-        return status(404, { message: error.message });
+    if (code === 'NOT_FOUND') {
+      status(404, { message: error.message });
     }
   })
   .get('/:slug', async ({ params: { slug } }) => await getTagBySlug(slug), {

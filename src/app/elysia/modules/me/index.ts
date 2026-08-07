@@ -25,9 +25,8 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
     AuthError,
   })
   .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'AuthError':
-        return status(error.status, { message: error.message });
+    if (code === 'AuthError') {
+      status(error.status, { message: error.message });
     }
   })
   .get(

@@ -54,8 +54,8 @@ export function ContentEditor({ value, onBlur, onChange }: ContentEditorProps) {
       },
     },
     onBlur,
-    onUpdate: ({ editor }) => {
-      const json = editor.getJSON();
+    onUpdate: ({ editor: _editor }) => {
+      const json = _editor.getJSON();
       onChange(json);
     },
     immediatelyRender: false,

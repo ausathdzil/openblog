@@ -26,9 +26,7 @@ export function SearchInput({
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
+        inputRef.current?.focus();
       }
     };
 
@@ -83,11 +81,11 @@ export function SearchInput({
         {...props}
       />
       {isFocused ? (
-        q ? (
+        !!q && (
           <InputGroupAddon align="inline-end">
             <Kbd>Esc</Kbd>
           </InputGroupAddon>
-        ) : null
+        )
       ) : (
         <InputGroupAddon align="inline-end" className="hidden sm:flex">
           <Kbd>{isMac ? '⌘' : 'Ctrl'}&nbsp;+&nbsp;K</Kbd>

@@ -116,6 +116,7 @@ export const passkey = pgTable(
 );
 
 export const articleStatus = ['draft', 'published', 'archived'] as const;
+export type ArticleStatus = (typeof articleStatus)[number];
 
 export const article = pgTable(
   'article',
@@ -131,7 +132,7 @@ export const article = pgTable(
     slug: text('slug'),
     contentJson: jsonb('content_json'),
     excerpt: text('excerpt'),
-    status: text('status').default('draft').notNull(),
+    status: text('status').$type<ArticleStatus>().default('draft').notNull(),
     coverImage: text('cover_image'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

@@ -29,8 +29,8 @@ export function PaginationControl({
 
   const allPages = generatePagination(page, totalPages);
 
-  const handlePageChange = (page: number) => {
-    setSearchParams({ page }, { startTransition });
+  const handlePageChange = (_page: number) => {
+    setSearchParams({ page: _page }, { startTransition });
   };
 
   return (
@@ -50,16 +50,18 @@ export function PaginationControl({
               >
                 <PaginationEllipsis />
               </PaginationItem>
-            ) : typeof p === 'number' ? (
-              <PaginationItem key={`page-${p}`}>
-                <PaginationButton
-                  isActive={p === page}
-                  onClick={() => handlePageChange(p)}
-                >
-                  {p}
-                </PaginationButton>
-              </PaginationItem>
-            ) : null
+            ) : (
+              typeof p === 'number' && (
+                <PaginationItem key={`page-${p}`}>
+                  <PaginationButton
+                    isActive={p === page}
+                    onClick={() => handlePageChange(p)}
+                  >
+                    {p}
+                  </PaginationButton>
+                </PaginationItem>
+              )
+            )
           )}
           <PaginationItem>
             <PaginationNextButton

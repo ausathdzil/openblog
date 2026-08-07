@@ -12,17 +12,7 @@
     "rules": {
       "performance": {
         "noNamespaceImport": "off",
-        "noJsxPropsBind": "off",
-        "useTopLevelRegex": "off"
-      },
-      "style": {
-        "noNonNullAssertion": "off",
-        "noNestedTernary": "off",
-        "useDefaultSwitchClause": "off"
-      },
-      "suspicious": {
-        "noShadow": "off",
-        "noUnnecessaryConditions": "off"
+        "noJsxPropsBind": "off"
       }
     },
     "domains": {
@@ -61,6 +51,9 @@
         "rules": {
           "complexity": {
             "noBannedTypes": "off"
+          },
+          "style": {
+            "noNestedTernary": "off"
           },
           "suspicious": {
             "noEvolvingTypes": "off",

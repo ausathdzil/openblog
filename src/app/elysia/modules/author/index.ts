@@ -29,9 +29,8 @@ export const author = new Elysia({ prefix: '/authors', tags: ['Authors'] })
     },
   })
   .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'NOT_FOUND':
-        return status(404, { message: error.message });
+    if (code === 'NOT_FOUND') {
+      return status(404, { message: error.message });
     }
   })
   .get(

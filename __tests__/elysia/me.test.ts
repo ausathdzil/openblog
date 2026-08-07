@@ -61,7 +61,7 @@ describe('Me', () => {
       );
 
       expect(status).toBe(200);
-      expect(data?.message).toBe('Profile updated successfully.');
+      expect(data?.message).toBe('Profile updated.');
     });
   });
 });

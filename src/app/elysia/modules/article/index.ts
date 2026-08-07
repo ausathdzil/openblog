@@ -27,17 +27,16 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     AuthError,
   })
   .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'AuthError':
-        return status(error.status, { message: error.message });
+    if (code === 'AuthError') {
+      return status(error.status, { message: error.message });
     }
   })
   .post(
     '',
     async ({ body, set, user }) => {
-      const article = await createArticle(body, user?.id);
+      const _article = await createArticle(body, user?.id);
       set.status = 201;
-      return article;
+      return _article;
     },
     {
       auth: true,
@@ -56,9 +55,8 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
     },
   })
   .onError(({ code, status, error }) => {
-    switch (code) {
-      case 'NOT_FOUND':
-        return status(404, { message: error.message });
+    if (code === 'NOT_FOUND') {
+      return status(404, { message: error.message });
     }
   })
   .get(

@@ -8,6 +8,8 @@ import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { resend } from './resend';
 
+const USERNAME_REGEX = /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/;
+
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   basePath: '/elysia/auth/api',
@@ -65,8 +67,7 @@ export const auth = betterAuth({
        * can't start or end with a dot,
        * and can't contain consecutive dots.
        */
-      usernameValidator: (username) =>
-        /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/.test(username),
+      usernameValidator: (_username) => USERNAME_REGEX.test(_username),
     }),
     passkey({
       rpID: process.env.NEXT_PUBLIC_APP_URL

@@ -5,6 +5,8 @@ import { testUtils, username } from 'better-auth/plugins';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 
+const USERNAME_REGEX = /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/;
+
 /**
  * Duplicated from `src/lib/auth.ts` with `testUtils()` for integration tests only.
  * @see https://better-auth.com/docs/plugins/test-utils
@@ -24,8 +26,7 @@ export const auth = betterAuth({
        * can't start or end with a dot,
        * and can't contain consecutive dots.
        */
-      usernameValidator: (username) =>
-        /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/.test(username),
+      usernameValidator: (_username) => USERNAME_REGEX.test(_username),
     }),
     testUtils(),
   ],

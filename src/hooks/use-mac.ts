@@ -6,10 +6,12 @@ function subscribe() {
   };
 }
 
+const MAC_REGEX = /Mac/;
+
 function getSnapshot() {
   return typeof window === 'undefined'
     ? false
-    : /Mac/.test(window.navigator.userAgent);
+    : MAC_REGEX.test(window.navigator.userAgent);
 }
 
 function getServerSnapshot() {

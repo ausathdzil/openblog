@@ -27,5 +27,5 @@ export async function updateProfile(
     })
     .where(eq(user.id, userId));
 
-  return { message: 'Profile updated successfully.' };
+  return { message: 'Profile updated.' };
 }
