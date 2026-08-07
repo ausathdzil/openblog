@@ -5,12 +5,9 @@ const nextConfig: NextConfig = {
   experimental: {
     inlineCss: true,
     typedEnv: true,
-    useTypeScriptCli: true,
+    turbopackRustReactCompiler: true,
   },
   reactCompiler: true,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   typedRoutes: true,
 
   async rewrites() {
