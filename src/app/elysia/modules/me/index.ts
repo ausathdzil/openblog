@@ -9,11 +9,14 @@ import {
 import { getArticles } from '../article/service';
 import { AuthError, auth } from '../auth';
 import {
+  updateAvatarBody,
+  updateAvatarInvalid,
+  updateAvatarResponse,
   updateProfileBody,
   updateProfileInvalid,
   updateProfileResponse,
 } from './model';
-import { updateProfile } from './service';
+import { updateAvatar, updateProfile } from './service';
 
 export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
   .use(auth)
@@ -62,6 +65,24 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
       response: {
         200: updateProfileResponse,
         401: updateProfileInvalid,
+      },
+    }
+  )
+  .post(
+    '/avatar/upload',
+    async ({ body, user }) => {
+      if (!user) {
+        throw new AuthError('You are not allowed to access this resource.');
+      }
+
+      return await updateAvatar(user.id, body.file);
+    },
+    {
+      auth: true,
+      body: updateAvatarBody,
+      response: {
+        200: updateAvatarResponse,
+        401: updateAvatarInvalid,
       },
     }
   );

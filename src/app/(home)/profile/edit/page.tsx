@@ -10,6 +10,7 @@ import { Muted, Title } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth } from '@/lib/auth';
+import { AvatarUploadForm } from '../../_components/avatar-upload-form';
 import { BioAndLinksForm } from '../../_components/bio-and-links-form';
 import { PasskeySettings } from '../../_components/passkey-settings';
 
@@ -50,6 +51,7 @@ async function EditProfileContent() {
           Manage your account settings and security details.
         </Muted>
       </div>
+      <AvatarUploadForm image={session.user.image} name={session.user.name} />
       <ProfileForm
         name={session.user.name}
         submitLabel="Save Changes"

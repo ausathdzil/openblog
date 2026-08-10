@@ -18,3 +18,20 @@ export const updateProfileBody = t.Object({
 });
 
 export type UpdateProfileBody = typeof updateProfileBody.static;
+
+export const updateAvatarBody = t.Object({
+  file: t.File({
+    type: ['image/jpeg', 'image/png', 'image/webp'],
+    maxSize: '2m',
+    error: 'Avatar must be a JPEG, PNG, or WebP image no larger than 2MB.',
+  }),
+});
+
+export const updateAvatarResponse = t.Object({
+  message: t.String(),
+  url: t.String(),
+});
+
+export const updateAvatarInvalid = t.Object({
+  message: t.String(),
+});

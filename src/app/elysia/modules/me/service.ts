@@ -1,3 +1,4 @@
+import { del, put } from '@vercel/blob';
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
@@ -28,4 +29,26 @@ export async function updateProfile(
     .where(eq(user.id, userId));
 
   return { message: 'Profile updated.' };
+}
+
+export async function updateAvatar(userId: string, file: File) {
+  const extension = file.name.split('.').pop()?.toLowerCase() || '';
+  const pathname = `avatars/${userId}/${crypto.randomUUID()}.${extension}`;
+
+  const blob = await put(pathname, file, {
+    access: 'public',
+  });
+
+  const [current] = await db
+    .select({ image: user.image })
+    .from(user)
+    .where(eq(user.id, userId));
+
+  if (current?.image?.includes('blob.vercel-storage.com')) {
+    await del(current.image);
+  }
+
+  await db.update(user).set({ image: blob.url }).where(eq(user.id, userId));
+
+  return { message: 'Avatar updated.', url: blob.url };
 }

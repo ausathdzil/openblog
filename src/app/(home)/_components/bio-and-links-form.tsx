@@ -104,7 +104,7 @@ export function BioAndLinksForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Public Profile</CardTitle>
+        <CardTitle>Socials</CardTitle>
         <CardDescription>Update your bio and social links.</CardDescription>
       </CardHeader>
       <CardContent>
