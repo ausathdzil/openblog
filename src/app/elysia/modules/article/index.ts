@@ -8,6 +8,9 @@ import {
   articlesResposnse,
   createArticleBody,
   updateArticleBody,
+  uploadCoverImageBody,
+  uploadCoverImageInvalid,
+  uploadCoverImageResponse,
 } from './model';
 import {
   createArticle,
@@ -15,6 +18,7 @@ import {
   getArticleByPublicId,
   getArticles,
   updateArticle,
+  updateCoverImage,
 } from './service';
 
 export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
@@ -97,6 +101,26 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
         401: articleInvalid,
         403: articleInvalid,
         404: articleInvalid,
+      },
+    }
+  )
+  .post(
+    '/:publicId/cover-image/upload',
+    async ({ params, body, user }) => {
+      if (!user) {
+        throw new AuthError('You are not allowed to access this resource.');
+      }
+      return await updateCoverImage(params.publicId, user.id, body.file);
+    },
+    {
+      auth: true,
+      params: t.Object({ publicId: t.String() }),
+      body: uploadCoverImageBody,
+      response: {
+        200: uploadCoverImageResponse,
+        401: uploadCoverImageInvalid,
+        403: uploadCoverImageInvalid,
+        404: uploadCoverImageInvalid,
       },
     }
   );

@@ -1,3 +1,4 @@
+import { del, put } from '@vercel/blob';
 import { and, count, desc, eq, ilike } from 'drizzle-orm';
 import { InternalServerError, NotFoundError } from 'elysia';
 
@@ -382,4 +383,32 @@ export async function deleteArticle(
   await db.delete(article).where(eq(article.publicId, articleData.publicId));
 
   return { message: 'Article deleted.' };
+}
+
+export async function updateCoverImage(
+  publicId: string,
+  userId: string,
+  file: File
+) {
+  const articleData = await getArticleByPublicId(publicId, userId);
+
+  if (articleData.authorId !== userId) {
+    throw new AuthError('You are not allowed to perform this action.', 403);
+  }
+
+  const extension = file.name.split('.').pop()?.toLowerCase() || '';
+  const pathname = `cover-images/${publicId}/${crypto.randomUUID()}.${extension}`;
+
+  const blob = await put(pathname, file, { access: 'public' });
+
+  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
+    await del(articleData.coverImage);
+  }
+
+  await db
+    .update(article)
+    .set({ coverImage: blob.url })
+    .where(eq(article.publicId, publicId));
+
+  return { message: 'Cover image updated.', url: blob.url };
 }

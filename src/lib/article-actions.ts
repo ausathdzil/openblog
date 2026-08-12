@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -151,6 +151,38 @@ export async function updateArticle(
   return {
     status: 500,
     message: 'Unable to update article. Please try again.',
+  };
+}
+
+export async function uploadCoverImage(publicId: string, file: File) {
+  const headersList = await headers();
+  const cookie = headersList.get('cookie') ?? '';
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { status: 401, message: 'Unauthorized.' };
+  }
+
+  const { data, error } = await elysia
+    .articles({ publicId })
+    ['cover-image'].upload.post({ file }, { headers: { cookie } });
+
+  if (error) {
+    return {
+      status: error.status || 500,
+      message:
+        error.value?.message || 'An unknown error occurred. Please try again.',
+    };
+  }
+
+  if (data) {
+    revalidatePath(`/editor/${publicId}`);
+    return { status: 200, message: data.message, url: data.url };
+  }
+
+  return {
+    status: 500,
+    message: 'Unable to upload cover image. Please try again.',
   };
 }
 
