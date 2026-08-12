@@ -10,8 +10,14 @@ import { useRef, useState, useTransition } from 'react';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
-import { Heading, Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Combobox,
   ComboboxChip,
@@ -103,15 +109,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div className="space-y-1.5">
-        <Heading>Article Settings</Heading>
-        <Muted>
-          Changing these details will affect how your article appears in search
-          engine results and social previews.
-        </Muted>
-      </div>
-
+    <>
       <CoverImageForm
         initialCoverImage={article.coverImage ?? null}
         publicId={article.publicId}
@@ -119,152 +117,171 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
         title={article.title ?? undefined}
       />
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
-      >
-        <FieldGroup>
-          <form.Field name="excerpt">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Summary</FieldLabel>
-                  <Textarea
-                    className="min-h-32"
-                    data-invalid={isInvalid}
-                    id={field.name}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="What is this article about?"
-                    value={field.state.value}
-                  />
-                  {!!isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
-                </Field>
-              );
+      <Card>
+        <CardHeader>
+          <CardTitle>Details</CardTitle>
+          <CardDescription>
+            Excerpt and tags affect search and social previews. You can update
+            these anytime.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            className="flex flex-col gap-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
             }}
-          </form.Field>
+          >
+            <FieldGroup>
+              <form.Field name="excerpt">
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Summary</FieldLabel>
+                      <Textarea
+                        className="min-h-32"
+                        data-invalid={isInvalid}
+                        id={field.name}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="What is this article about?"
+                        value={field.state.value}
+                      />
+                      {!!isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
 
-          <form.Field mode="array" name="tags">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
-                  <Combobox
-                    id={field.name}
-                    multiple
-                    name={field.name}
-                    onValueChange={(val) => field.handleChange(val)}
-                    value={field.state.value}
-                  >
-                    <ComboboxChips>
-                      <ComboboxValue>
+              <form.Field mode="array" name="tags">
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Tags</FieldLabel>
+                      <Combobox
+                        id={field.name}
+                        multiple
+                        name={field.name}
+                        onValueChange={(val) => field.handleChange(val)}
+                        value={field.state.value}
+                      >
+                        <ComboboxChips>
+                          <ComboboxValue>
+                            {field.state.value.map((value, index) => (
+                              <form.Field key={value} name={`tags[${index}]`}>
+                                {(subField) => {
+                                  const isSubFieldInvalid =
+                                    subField.state.meta.isTouched &&
+                                    !subField.state.meta.isValid;
+                                  return (
+                                    <ComboboxChip
+                                      aria-invalid={isSubFieldInvalid}
+                                      className="aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
+                                    >
+                                      {subField.state.value}
+                                    </ComboboxChip>
+                                  );
+                                }}
+                              </form.Field>
+                            ))}
+                            <ComboboxChipsInput
+                              aria-invalid={isInvalid}
+                              id={field.name}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onChange={(e) => setTagInputValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ',') {
+                                  e.preventDefault();
+                                  const val = tagInputValue.trim();
+                                  if (
+                                    val !== '' &&
+                                    !field.state.value.includes(val)
+                                  ) {
+                                    field.pushValue(val);
+                                  }
+                                  setTagInputValue('');
+                                }
+
+                                if (
+                                  e.key === 'Backspace' &&
+                                  tagInputValue === ''
+                                ) {
+                                  field.removeValue(
+                                    field.state.value.length - 1
+                                  );
+                                }
+                              }}
+                              placeholder="e.g. tutorial, productivity, design"
+                              value={tagInputValue}
+                            />
+                          </ComboboxValue>
+                        </ComboboxChips>
+                      </Combobox>
+                      <FieldDescription>
+                        Press <Kbd>Enter</Kbd> or <Kbd>,</Kbd> to add a tag.
+                        Helps readers discover your article.
+                      </FieldDescription>
+                      {!!isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                      <div className="[&>*:not(:first-child)]:hidden">
                         {field.state.value.map((value, index) => (
-                          <form.Field key={value} name={`tags[${index}]`}>
+                          <form.Field
+                            key={`tags-error-${value}`}
+                            name={`tags[${index}]`}
+                          >
                             {(subField) => {
                               const isSubFieldInvalid =
-                                subField.state.meta.isTouched &&
-                                !subField.state.meta.isValid;
-                              return (
-                                <ComboboxChip
-                                  aria-invalid={isSubFieldInvalid}
-                                  className="aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
-                                >
-                                  {subField.state.value}
-                                </ComboboxChip>
-                              );
+                                subField.state.meta.errors.length > 0;
+                              return isSubFieldInvalid ? (
+                                <FieldError
+                                  errors={subField.state.meta.errors}
+                                />
+                              ) : null;
                             }}
                           </form.Field>
                         ))}
-                        <ComboboxChipsInput
-                          aria-invalid={isInvalid}
-                          id={field.name}
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => setTagInputValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ',') {
-                              e.preventDefault();
-                              const val = tagInputValue.trim();
-                              if (
-                                val !== '' &&
-                                !field.state.value.includes(val)
-                              ) {
-                                field.pushValue(val);
-                              }
-                              setTagInputValue('');
-                            }
+                      </div>
+                    </Field>
+                  );
+                }}
+              </form.Field>
 
-                            if (e.key === 'Backspace' && tagInputValue === '') {
-                              field.removeValue(field.state.value.length - 1);
-                            }
-                          }}
-                          placeholder="e.g. tutorial, productivity, design"
-                          value={tagInputValue}
-                        />
-                      </ComboboxValue>
-                    </ComboboxChips>
-                  </Combobox>
-                  <FieldDescription>
-                    Press <Kbd>Enter</Kbd> or <Kbd>,</Kbd> to add a tag. Helps
-                    readers discover your article.
-                  </FieldDescription>
-                  {!!isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
+              <Field className="justify-end" orientation="horizontal">
+                <Button
+                  disabled={isPending}
+                  onClick={() => replace(`/editor/${article.publicId}`)}
+                  type="button"
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button disabled={isPending} type="submit">
+                  {isPending ? (
+                    <Spinner />
+                  ) : (
+                    <HugeiconsIcon icon={QuillWrite01Icon} strokeWidth={2} />
                   )}
-                  <div className="[&>*:not(:first-child)]:hidden">
-                    {field.state.value.map((value, index) => (
-                      <form.Field
-                        key={`tags-error-${value}`}
-                        name={`tags[${index}]`}
-                      >
-                        {(subField) => {
-                          const isSubFieldInvalid =
-                            subField.state.meta.errors.length > 0;
-                          return isSubFieldInvalid ? (
-                            <FieldError errors={subField.state.meta.errors} />
-                          ) : null;
-                        }}
-                      </form.Field>
-                    ))}
-                  </div>
-                </Field>
-              );
-            }}
-          </form.Field>
+                  Publish
+                </Button>
+              </Field>
 
-          {!!coverPublishError && (
-            <FieldError errors={[{ message: coverPublishError }]} />
-          )}
-
-          <Field className="justify-end" orientation="horizontal">
-            <Button
-              disabled={isPending}
-              onClick={() => replace(`/editor/${article.publicId}`)}
-              type="button"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button disabled={isPending} type="submit">
-              {isPending ? (
-                <Spinner />
-              ) : (
-                <HugeiconsIcon icon={QuillWrite01Icon} strokeWidth={2} />
+              {!!coverPublishError && (
+                <FieldError errors={[{ message: coverPublishError }]} />
               )}
-              Publish
-            </Button>
-          </Field>
-        </FieldGroup>
-      </form>
-    </div>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   );
 }

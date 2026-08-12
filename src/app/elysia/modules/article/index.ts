@@ -17,6 +17,7 @@ import {
   deleteArticle,
   getArticleByPublicId,
   getArticles,
+  removeCoverImage,
   updateArticle,
   updateCoverImage,
 } from './service';
@@ -118,6 +119,25 @@ export const article = new Elysia({ prefix: '/articles', tags: ['Articles'] })
       body: uploadCoverImageBody,
       response: {
         200: uploadCoverImageResponse,
+        401: uploadCoverImageInvalid,
+        403: uploadCoverImageInvalid,
+        404: uploadCoverImageInvalid,
+      },
+    }
+  )
+  .delete(
+    '/:publicId/cover-image',
+    async ({ params, user }) => {
+      if (!user) {
+        throw new AuthError('You are not allowed to access this resource.');
+      }
+      return await removeCoverImage(params.publicId, user.id);
+    },
+    {
+      auth: true,
+      params: t.Object({ publicId: t.String() }),
+      response: {
+        200: uploadCoverImageInvalid,
         401: uploadCoverImageInvalid,
         403: uploadCoverImageInvalid,
         404: uploadCoverImageInvalid,

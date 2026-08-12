@@ -317,6 +317,12 @@ export async function updateArticle(
   }
 
   if (coverImage !== undefined && coverImage !== articleData.coverImage) {
+    if (
+      coverImage === null &&
+      articleData.coverImage?.includes('blob.vercel-storage.com')
+    ) {
+      await del(articleData.coverImage);
+    }
     payload.coverImage = coverImage;
   }
 
@@ -380,6 +386,10 @@ export async function deleteArticle(
     throw new AuthError('You are not allowed to perform this action.', 403);
   }
 
+  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
+    await del(articleData.coverImage);
+  }
+
   await db.delete(article).where(eq(article.publicId, articleData.publicId));
 
   return { message: 'Article deleted.' };
@@ -411,4 +421,23 @@ export async function updateCoverImage(
     .where(eq(article.publicId, publicId));
 
   return { message: 'Cover image updated.', url: blob.url };
+}
+
+export async function removeCoverImage(publicId: string, userId: string) {
+  const articleData = await getArticleByPublicId(publicId, userId);
+
+  if (articleData.authorId !== userId) {
+    throw new AuthError('You are not allowed to perform this action.', 403);
+  }
+
+  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
+    await del(articleData.coverImage);
+  }
+
+  await db
+    .update(article)
+    .set({ coverImage: null })
+    .where(eq(article.publicId, publicId));
+
+  return { message: 'Cover image removed.' };
 }

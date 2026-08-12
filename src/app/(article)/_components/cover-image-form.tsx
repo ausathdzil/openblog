@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noUnnecessaryConditions: inputRef is nullable until mounted
 'use client';
 
 import { useForm } from '@tanstack/react-form';
@@ -14,13 +15,20 @@ import * as z from 'zod';
 import { Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { updateArticle, uploadCoverImage } from '@/lib/article-actions';
+import { removeCoverImage, uploadCoverImage } from '@/lib/article-actions';
 import { cn } from '@/lib/utils';
 
 const COVER_TYPES = [
@@ -80,7 +88,7 @@ export function CoverImageForm({
     validators: {
       onSubmit: coverImageFormSchema,
     },
-    onSubmit: ({ value, formApi }) => {
+    onSubmit: ({ value }) => {
       setCoverStatus(null);
       startCoverTransition(async () => {
         if (!value.file) {
@@ -97,7 +105,9 @@ export function CoverImageForm({
             message: result.message || 'Cover image updated.',
           });
           form.reset();
-          formApi.setFieldValue('file', null);
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
           refresh();
         } else {
           setCoverStatus({
@@ -147,19 +157,17 @@ export function CoverImageForm({
   const handleCoverRemove = () => {
     setCoverStatus(null);
     startCoverTransition(async () => {
-      const { status, message } = await updateArticle(publicId, {
-        coverImage: null,
-      });
+      const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
         if (coverPreview?.startsWith('blob:')) {
           URL.revokeObjectURL(coverPreview);
         }
         setCoverPreview(null);
         form.reset();
-        // biome-ignore lint/suspicious/noUnnecessaryConditions: inputRef is nullable until mounted
         if (inputRef.current) {
           inputRef.current.value = '';
         }
+        setCoverStatus({ type: 'success', message });
         refresh();
       } else {
         setCoverStatus({ type: 'error', message });
@@ -168,86 +176,100 @@ export function CoverImageForm({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="mx-auto aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
-        {coverPreview ? (
-          // biome-ignore lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image
-          <img
-            alt={title ? `${title} cover image` : 'Cover image preview'}
-            className="h-full w-full object-cover"
-            height={630}
-            src={coverPreview}
-            width={1200}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center p-6 text-muted-foreground text-sm">
-            Choose an image to see preview — 1200x630 recommended
-          </div>
-        )}
-      </div>
-      <form
-        className="flex flex-col gap-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
-      >
-        <FieldGroup>
-          <form.Field name="file">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Cover image</FieldLabel>
-                  <Input
-                    accept={COVER_TYPES.join(',')}
-                    aria-invalid={isInvalid}
-                    disabled={isCoverPending}
-                    id={field.name}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => handleFileChange(e, field.handleChange)}
-                    ref={inputRef}
-                    required
-                    type="file"
-                  />
-                  {!!isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
-                </Field>
-              );
-            }}
-          </form.Field>
-          <Field>
-            <div className="flex gap-2">
-              <Button disabled={isCoverPending} type="submit" variant="outline">
-                Upload
-              </Button>
-              {coverPreview ? (
+    <Card>
+      <CardHeader>
+        <CardTitle>Cover Image</CardTitle>
+        <CardDescription>
+          Upload a JPEG, PNG, WebP, GIF, or AVIF image no larger than 3MB.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="mx-auto mb-6 aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
+          {coverPreview ? (
+            // biome-ignore lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image
+            <img
+              alt={title ? `${title} cover image` : 'Cover image preview'}
+              className="h-full w-full object-cover"
+              height={630}
+              src={coverPreview}
+              width={1200}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center p-6 text-muted-foreground text-sm">
+              Choose an image to see preview — 1200x630 recommended
+            </div>
+          )}
+        </div>
+        <form
+          className="flex flex-col gap-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <FieldGroup>
+            <form.Field name="file">
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel className="sr-only" htmlFor={field.name}>
+                      Cover image
+                    </FieldLabel>
+                    <Input
+                      accept={COVER_TYPES.join(',')}
+                      aria-invalid={isInvalid}
+                      disabled={isCoverPending}
+                      id={field.name}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => handleFileChange(e, field.handleChange)}
+                      ref={inputRef}
+                      required
+                      type="file"
+                    />
+                    {!!isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            </form.Field>
+            <Field>
+              <div className="flex gap-2">
                 <Button
                   disabled={isCoverPending}
-                  onClick={handleCoverRemove}
-                  type="button"
-                  variant="ghost"
+                  type="submit"
+                  variant="outline"
                 >
-                  Remove
+                  Upload
                 </Button>
-              ) : null}
-            </div>
-            <Muted
-              className={cn(
-                coverStatus ? 'visible' : 'invisible',
-                coverStatus?.type === 'error'
-                  ? 'text-destructive'
-                  : 'text-emerald-600 dark:text-emerald-500'
-              )}
-            >
-              {coverStatus?.message || ' '}
-            </Muted>
-          </Field>
-        </FieldGroup>
-      </form>
-    </div>
+                {coverPreview ? (
+                  <Button
+                    disabled={isCoverPending}
+                    onClick={handleCoverRemove}
+                    type="button"
+                    variant="ghost"
+                  >
+                    Remove
+                  </Button>
+                ) : null}
+              </div>
+              <Muted
+                className={cn(
+                  coverStatus ? 'visible' : 'invisible',
+                  coverStatus?.type === 'error'
+                    ? 'text-destructive'
+                    : 'text-emerald-600 dark:text-emerald-500'
+                )}
+              >
+                {coverStatus?.message || ' '}
+              </Muted>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

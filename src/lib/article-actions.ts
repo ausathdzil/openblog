@@ -186,6 +186,38 @@ export async function uploadCoverImage(publicId: string, file: File) {
   };
 }
 
+export async function removeCoverImage(publicId: string) {
+  const headersList = await headers();
+  const cookie = headersList.get('cookie') ?? '';
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    return { status: 401, message: 'Unauthorized.' };
+  }
+
+  const { data, error } = await elysia
+    .articles({ publicId })
+    ['cover-image'].delete({}, { headers: { cookie } });
+
+  if (error) {
+    return {
+      status: error.status || 500,
+      message:
+        error.value?.message || 'An unknown error occurred. Please try again.',
+    };
+  }
+
+  if (data) {
+    revalidatePath(`/editor/${publicId}`);
+    return { status: 200, message: data.message };
+  }
+
+  return {
+    status: 500,
+    message: 'Unable to remove cover image. Please try again.',
+  };
+}
+
 export async function createDraft() {
   const headersList = await headers();
   const session = await auth.api.getSession({ headers: headersList });

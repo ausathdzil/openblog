@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import { ArticleSettingsForm } from '@/app/(article)/_components/article-settings-form';
 import { SettingsHeader } from '@/app/(article)/_components/settings-header';
+import { Muted, Title } from '@/components/typography';
 import { Spinner } from '@/components/ui/spinner';
 import { getArticleByPublicId } from '@/lib/article-data';
 import { auth } from '@/lib/auth';
@@ -64,7 +65,13 @@ async function Settings({ params }: { params: Promise<{ publicId: string }> }) {
   return (
     <>
       <SettingsHeader publicId={publicId} />
-      <main className="p-6 sm:p-4">
+      <main className="mx-auto grid w-full max-w-2xl gap-8 p-6 pb-32 sm:p-4">
+        <div className="space-y-2">
+          <Title>Article settings</Title>
+          <Muted className="text-center">
+            Manage your article&apos;s cover, excerpt, and tags.
+          </Muted>
+        </div>
         <ArticleSettingsForm article={article} />
       </main>
     </>
