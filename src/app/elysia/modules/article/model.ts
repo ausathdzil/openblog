@@ -89,3 +89,21 @@ export const updateArticleBody = t.Object({
 export type UpdateArticleBody = typeof updateArticleBody.static;
 
 export const articleInvalid = t.Object({ message: t.String() });
+
+export const uploadCoverImageBody = t.Object({
+  file: t.File({
+    type: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'],
+    maxSize: '3m',
+    error:
+      'Cover image must be a JPEG, PNG, WebP, GIF, or AVIF image no larger than 3MB.',
+  }),
+});
+
+export const uploadCoverImageResponse = t.Object({
+  message: t.String(),
+  url: t.String(),
+});
+
+export const uploadCoverImageInvalid = t.Object({ message: t.String() });
+
+export type UploadCoverImageBody = typeof uploadCoverImageBody.static;
