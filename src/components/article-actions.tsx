@@ -1,18 +1,25 @@
 'use client';
 
 import {
+  Archive03Icon,
+  Delete01Icon,
   Edit01Icon,
   MoreHorizontalIcon,
+  QuillWrite01Icon,
+  Settings01Icon,
   ViewIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import type { Route } from 'next';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
-import type { ArticleListResponse } from '@/app/elysia/modules/article/model';
+import type {
+  ArticleListResponse,
+  ArticleResponse,
+} from '@/app/elysia/modules/article/model';
 import { ArchiveArticleDialog } from '@/components/archive-article-dialog';
-import { ArticleStatusActionsMenu } from '@/components/article-status-actions-menu';
 import { DeleteArticleDialog } from '@/components/delete-article-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +30,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ItemActions } from '@/components/ui/item';
 import { toast } from '@/components/ui/toast';
 import {
   archiveArticle,
@@ -31,7 +37,17 @@ import {
   moveArticleToDraft,
 } from '@/lib/article-actions';
 
-export function ArticleActions({ article }: { article: ArticleListResponse }) {
+type ArticleActionsArticle = ArticleResponse | ArticleListResponse;
+
+interface ArticleActionsProps {
+  article: ArticleActionsArticle;
+}
+
+export function ArticleActions({ article }: ArticleActionsProps) {
+  const { refresh, push } = useRouter();
+  const pathname = usePathname();
+  const isInEditor = pathname.startsWith(`/editor/${article.publicId}`);
+  const isInSettings = pathname === `/editor/${article.publicId}/settings`;
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -46,6 +62,7 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
       if (status === 200) {
         toast.add({ type: 'info', description: message });
         setArchiveDialogOpen(false);
+        refresh();
       } else {
         toast.add({ type: 'error', description: message });
       }
@@ -62,6 +79,7 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
       if (status === 200) {
         toast.add({ type: 'info', description: message });
         setDeleteDialogOpen(false);
+        push('/profile');
       } else {
         toast.add({ type: 'error', description: message });
       }
@@ -77,6 +95,7 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
 
       if (status === 200) {
         toast.add({ type: 'info', description: message });
+        refresh();
       } else {
         toast.add({ type: 'error', description: message });
       }
@@ -84,7 +103,7 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
   };
 
   return (
-    <ItemActions>
+    <>
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label="Article actions"
@@ -114,28 +133,84 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
                   strokeWidth={2}
                 />
               </DropdownMenuItem>
-            ) : null}
+            ) : (
+              <DropdownMenuItem
+                render={<Link href={`/preview/${article.publicId}`} />}
+              >
+                Preview
+                <HugeiconsIcon
+                  className="ml-auto"
+                  icon={ViewIcon}
+                  strokeWidth={2}
+                />
+              </DropdownMenuItem>
+            )}
+            {isInEditor ? null : (
+              <DropdownMenuItem
+                render={<Link href={`/editor/${article.publicId}`} />}
+              >
+                Edit
+                <HugeiconsIcon
+                  className="ml-auto"
+                  icon={Edit01Icon}
+                  strokeWidth={2}
+                />
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {article.status === 'draft' ? null : (
+              <DropdownMenuItem onClick={handleMoveToDraft}>
+                Draft
+                <HugeiconsIcon
+                  className="ml-auto"
+                  icon={QuillWrite01Icon}
+                  strokeWidth={2}
+                />
+              </DropdownMenuItem>
+            )}
+            {article.status === 'archived' ? null : (
+              <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)}>
+                Archive
+                <HugeiconsIcon
+                  className="ml-auto"
+                  icon={Archive03Icon}
+                  strokeWidth={2}
+                />
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
-              render={<Link href={`/editor/${article.publicId}`} />}
+              onClick={() => setDeleteDialogOpen(true)}
+              variant="destructive"
             >
-              Edit
+              Delete
               <HugeiconsIcon
                 className="ml-auto"
-                icon={Edit01Icon}
+                icon={Delete01Icon}
                 strokeWidth={2}
               />
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <ArticleStatusActionsMenu
-              onArchive={() => setArchiveDialogOpen(true)}
-              onDelete={() => setDeleteDialogOpen(true)}
-              onMoveToDraft={handleMoveToDraft}
-              publicId={article.publicId}
-              status={article.status}
-            />
-          </DropdownMenuGroup>
+          {isInSettings ? null : (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  render={
+                    <Link href={`/editor/${article.publicId}/settings`} />
+                  }
+                >
+                  Settings
+                  <HugeiconsIcon
+                    className="ml-auto"
+                    icon={Settings01Icon}
+                    strokeWidth={2}
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <ArchiveArticleDialog
@@ -150,6 +225,6 @@ export function ArticleActions({ article }: { article: ArticleListResponse }) {
         onOpenChange={setDeleteDialogOpen}
         open={deleteDialogOpen}
       />
-    </ItemActions>
+    </>
   );
 }

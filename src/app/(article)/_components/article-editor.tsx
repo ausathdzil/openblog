@@ -11,6 +11,7 @@ import { useTransition } from 'react';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
+import { ArticleActions } from '@/components/article-actions';
 import { Header } from '@/components/header';
 import { HeaderTitle } from '@/components/header-title';
 import { OpenBlogButton } from '@/components/openblog-button';
@@ -20,7 +21,6 @@ import { toast } from '@/components/ui/toast';
 import { updateArticle } from '@/lib/article-actions';
 import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
-import { EditorActions } from './editor-actions';
 import { PublishButton } from './publish-button';
 import { ResizableTextarea } from './resizable-textarea';
 import { SaveButton } from './save-button';
@@ -121,7 +121,7 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
           >
             {(formState) => (
               <div className="flex items-center gap-2">
-                <EditorActions article={article} />
+                <ArticleActions article={article} />
                 {formState.status === 'published' ? (
                   <SaveButton
                     article={article}

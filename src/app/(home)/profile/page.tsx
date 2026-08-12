@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import type { SearchParams } from 'nuqs/server';
 import { Suspense } from 'react';
 
+import { ArticleActions } from '@/components/article-actions';
 import { SearchInput } from '@/components/search-input';
 import { Large, Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
@@ -24,7 +26,6 @@ import {
   loadSearchParams,
   type SearchParams as ParsedSearchParams,
 } from '@/lib/search-params';
-import { ArticleActions } from '../_components/article-actions';
 import { StatusToggle } from '../_components/status-toggle';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -159,7 +160,9 @@ async function Articles({ q, status, page, limit }: ArticlesProps) {
               <ItemTitle>{article.title || 'Untitled Draft'}</ItemTitle>
               <ItemDescription>{article.excerpt}</ItemDescription>
             </ItemContent>
-            <ArticleActions article={article} />
+            <ItemActions>
+              <ArticleActions article={article} />
+            </ItemActions>
           </Item>
         </li>
       ))}
