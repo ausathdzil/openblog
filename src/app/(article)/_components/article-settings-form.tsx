@@ -57,6 +57,9 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   const [isPending, startTransition] = useTransition();
   const [tagInputValue, setTagInputValue] = useState('');
   const coverImageRef = useRef<CoverImageFormHandle>(null);
+  const [coverPublishError, setCoverPublishError] = useState<string | null>(
+    null
+  );
 
   const form = useForm({
     defaultValues: {
@@ -68,14 +71,12 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
     },
     onSubmit: ({ value }) => {
       if (coverImageRef.current?.hasPendingFile()) {
-        toast.add({
-          type: 'error',
-          description:
-            "You selected a cover image but haven't uploaded it yet. Please upload or remove it before publishing.",
-        });
-        coverImageRef.current.focusInput();
+        setCoverPublishError(
+          "You selected a cover image but haven't uploaded it yet. Please upload or remove it before publishing."
+        );
         return;
       }
+      setCoverPublishError(null);
       startTransition(async () => {
         const { status, message } = await updateArticle(article.publicId, {
           excerpt: value.excerpt,
@@ -239,6 +240,10 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
               );
             }}
           </form.Field>
+
+          {!!coverPublishError && (
+            <FieldError errors={[{ message: coverPublishError }]} />
+          )}
 
           <Field className="justify-end" orientation="horizontal">
             <Button

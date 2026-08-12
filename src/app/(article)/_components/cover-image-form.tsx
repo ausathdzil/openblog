@@ -1,11 +1,9 @@
-/** biome-ignore-all lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image */
 'use client';
 
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import {
   type ChangeEvent,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -22,8 +20,6 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { toast } from '@/components/ui/toast';
 import { updateArticle, uploadCoverImage } from '@/lib/article-actions';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +32,7 @@ const COVER_TYPES = [
 ];
 const MAX_COVER_SIZE = 3 * 1024 * 1024;
 
-const coverFormSchema = z.object({
+const coverImageFormSchema = z.object({
   file: z
     .file('Please select a file.')
     .check(
@@ -50,7 +46,6 @@ const coverFormSchema = z.object({
 });
 
 export interface CoverImageFormHandle {
-  focusInput: () => void;
   hasPendingFile: () => boolean;
 }
 
@@ -67,7 +62,6 @@ export function CoverImageForm({
   ref,
   title,
 }: CoverImageFormProps) {
-  const { refresh } = useRouter();
   const [coverPreview, setCoverPreview] = useState<string | null>(
     initialCoverImage ?? null
   );
@@ -77,11 +71,16 @@ export function CoverImageForm({
   } | null>(null);
   const [isCoverPending, startCoverTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { refresh } = useRouter();
 
-  const coverForm = useForm({
-    defaultValues: { file: null as File | null },
-    validators: { onSubmit: coverFormSchema },
-    onSubmit: ({ value }) => {
+  const form = useForm({
+    defaultValues: {
+      file: null as File | null,
+    },
+    validators: {
+      onSubmit: coverImageFormSchema,
+    },
+    onSubmit: ({ value, formApi }) => {
       setCoverStatus(null);
       startCoverTransition(async () => {
         if (!value.file) {
@@ -97,44 +96,33 @@ export function CoverImageForm({
             type: 'success',
             message: result.message || 'Cover image updated.',
           });
-          toast.add({ type: 'success', description: result.message });
-          coverForm.reset();
+          form.reset();
+          formApi.setFieldValue('file', null);
           refresh();
         } else {
           setCoverStatus({
             type: 'error',
             message: result.message || 'Failed to upload cover image.',
           });
-          toast.add({ type: 'error', description: result.message });
         }
       });
     },
     onSubmitInvalid() {
-      const invalid = document.querySelector(
-        '[aria-invalid="true"]'
-      ) as HTMLElement | null;
-      if (invalid) {
-        invalid.focus();
-      } else {
-        inputRef.current?.focus();
+      const $invalidInput = document.querySelector('[aria-invalid="true"]');
+
+      if ($invalidInput instanceof HTMLElement) {
+        $invalidInput.focus();
       }
     },
   });
 
   useImperativeHandle(ref, () => ({
-    hasPendingFile: () =>
-      !!coverForm.getFieldValue('file') && !!coverPreview?.startsWith('blob:'),
-    focusInput: () => inputRef.current?.focus(),
-  }));
-
-  useEffect(
-    () => () => {
-      if (coverPreview?.startsWith('blob:')) {
-        URL.revokeObjectURL(coverPreview);
-      }
+    hasPendingFile: () => {
+      const formFile = form.getFieldValue('file');
+      const inputFile = inputRef.current?.files?.[0] ?? null;
+      return !!(formFile || inputFile) && !!coverPreview?.startsWith('blob:');
     },
-    [coverPreview]
-  );
+  }));
 
   const handleFileChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -146,7 +134,7 @@ export function CoverImageForm({
     if (!selected) {
       return;
     }
-    const parsed = coverFormSchema.shape.file.safeParse(selected);
+    const parsed = coverImageFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       return;
     }
@@ -167,59 +155,56 @@ export function CoverImageForm({
           URL.revokeObjectURL(coverPreview);
         }
         setCoverPreview(null);
-        setCoverStatus({ type: 'success', message: 'Cover image removed.' });
-        toast.add({ type: 'success', description: 'Cover image removed.' });
-        coverForm.reset();
+        form.reset();
+        // biome-ignore lint/suspicious/noUnnecessaryConditions: inputRef is nullable until mounted
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
         refresh();
       } else {
         setCoverStatus({ type: 'error', message });
-        toast.add({ type: 'error', description: message });
       }
     });
   };
 
   return (
-    <div className="space-y-2">
-      <Field>
-        <FieldLabel htmlFor="cover-image">Cover image</FieldLabel>
-        <div className="mx-auto aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
-          {coverPreview ? (
-            <img
-              alt={title ? `${title} cover image` : 'Cover image preview'}
-              className="h-full w-full object-cover"
-              height={630}
-              src={coverPreview}
-              width={1200}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center p-6 text-muted-foreground text-sm">
-              No cover image — 1200×630 recommended
-            </div>
-          )}
-        </div>
-      </Field>
+    <div className="space-y-6">
+      <div className="mx-auto aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
+        {coverPreview ? (
+          // biome-ignore lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image
+          <img
+            alt={title ? `${title} cover image` : 'Cover image preview'}
+            className="h-full w-full object-cover"
+            height={630}
+            src={coverPreview}
+            width={1200}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center p-6 text-muted-foreground text-sm">
+            Choose an image to see preview — 1200x630 recommended
+          </div>
+        )}
+      </div>
       <form
         className="flex flex-col gap-6"
         onSubmit={(e) => {
           e.preventDefault();
-          coverForm.handleSubmit();
+          form.handleSubmit();
         }}
       >
         <FieldGroup>
-          <coverForm.Field name="file">
+          <form.Field name="file">
             {(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel className="sr-only" htmlFor={field.name}>
-                    Cover image
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Cover image</FieldLabel>
                   <Input
                     accept={COVER_TYPES.join(',')}
                     aria-invalid={isInvalid}
                     disabled={isCoverPending}
-                    id="cover-image"
+                    id={field.name}
                     name={field.name}
                     onBlur={field.handleBlur}
                     onChange={(e) => handleFileChange(e, field.handleChange)}
@@ -233,11 +218,11 @@ export function CoverImageForm({
                 </Field>
               );
             }}
-          </coverForm.Field>
+          </form.Field>
           <Field>
             <div className="flex gap-2">
               <Button disabled={isCoverPending} type="submit" variant="outline">
-                {isCoverPending ? <Spinner /> : null} Upload
+                Upload
               </Button>
               {coverPreview ? (
                 <Button
