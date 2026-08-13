@@ -17,10 +17,8 @@ import { unified } from 'unified';
 
 import { ReadingToc } from '@/app/(article)/_components/reading-toc';
 import type { TocAnchor } from '@/app/(article)/_components/table-of-contents';
-import {
-  createDeterministicGetId,
-  getReadingTime,
-} from '@/app/(article)/_lib/reading-time';
+import { getReadingTime } from '@/app/(article)/_lib/reading-time';
+import { createDeterministicGetId } from '@/app/(article)/_lib/toc';
 import { Header } from '@/components/header';
 import { HeaderActions } from '@/components/header-actions';
 import { OpenBlogButton } from '@/components/openblog-button';
