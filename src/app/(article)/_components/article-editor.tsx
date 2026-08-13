@@ -7,7 +7,7 @@ import type { JSONContent } from '@tiptap/react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
@@ -24,6 +24,7 @@ import { ContentEditor } from './content-editor';
 import { PublishButton } from './publish-button';
 import { ResizableTextarea } from './resizable-textarea';
 import { SaveButton } from './save-button';
+import { TableOfContents, type TocAnchor } from './table-of-contents';
 
 const articleSchema = z.object({
   title: z
@@ -49,6 +50,7 @@ interface HeaderFormSelection {
 export function ArticleEditor({ article }: { article: ArticleResponse }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [tocAnchors, setTocAnchors] = useState<TocAnchor[]>([]);
 
   const initialContent =
     article.contentJson && Object.keys(article.contentJson).length > 0
@@ -165,31 +167,31 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
           </form.Subscribe>
         </Header.Actions>
       </Header>
+      <div className="pointer-events-none fixed right-6 bottom-6 z-20 hidden gap-2 sm:block">
+        {isPending ? (
+          <Marker role="status">
+            <MarkerIcon>
+              <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} />
+            </MarkerIcon>
+            <MarkerContent>Saving…</MarkerContent>
+          </Marker>
+        ) : (
+          <Marker>
+            <MarkerContent>
+              Last saved{' '}
+              {article.updatedAt.toLocaleString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: false,
+              })}
+            </MarkerContent>
+          </Marker>
+        )}
+      </div>
       <main className="prose prose-neutral dark:prose-invert mx-auto size-full p-6 sm:p-4">
-        <div className="pointer-events-none fixed right-6 bottom-6 z-20 hidden gap-2 sm:block">
-          {isPending ? (
-            <Marker role="status">
-              <MarkerIcon>
-                <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} />
-              </MarkerIcon>
-              <MarkerContent>Saving…</MarkerContent>
-            </Marker>
-          ) : (
-            <Marker>
-              <MarkerContent>
-                Last saved{' '}
-                {article.updatedAt.toLocaleString('en-US', {
-                  month: '2-digit',
-                  day: '2-digit',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: false,
-                })}
-              </MarkerContent>
-            </Marker>
-          )}
-        </div>
         <form
           id="article-editor-form"
           onSubmit={(e) => {
@@ -231,12 +233,25 @@ export function ArticleEditor({ article }: { article: ArticleResponse }) {
               <ContentEditor
                 onBlur={field.handleBlur}
                 onChange={field.handleChange}
+                onTocUpdate={setTocAnchors}
                 value={field.state.value as JSONContent}
               />
             )}
           </form.Field>
         </form>
       </main>
+      {/* Floating TOC — lines by default, card on hover */}
+      {tocAnchors.length > 0 && (
+        <div className="fixed top-1/2 right-4 z-10 hidden -translate-y-1/2 md:right-8 md:block">
+          <TableOfContents.EditorProvider anchors={tocAnchors}>
+            <TableOfContents.Shell>
+              <TableOfContents.Root>
+                <TableOfContents.List />
+              </TableOfContents.Root>
+            </TableOfContents.Shell>
+          </TableOfContents.EditorProvider>
+        </div>
+      )}
     </>
   );
 }
