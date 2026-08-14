@@ -150,12 +150,12 @@ export function CoverImageForm({
       onChange(null);
       return;
     }
+    onChange(selected);
     const parsed = coverImageFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       return;
     }
     setPreview(URL.createObjectURL(selected));
-    onChange(selected);
   };
 
   const handleCoverRemove = () => {
@@ -209,7 +209,10 @@ export function CoverImageForm({
           }}
         >
           <FieldGroup>
-            <form.Field name="file">
+            <form.Field
+              name="file"
+              validators={{ onChange: coverImageFormSchema.shape.file }}
+            >
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;

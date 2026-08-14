@@ -125,12 +125,12 @@ export function AvatarUploadForm({
       onChange(null);
       return;
     }
+    onChange(selected);
     const parsed = avatarFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       return;
     }
     setPreview(URL.createObjectURL(selected));
-    onChange(selected);
   };
 
   return (
@@ -154,7 +154,10 @@ export function AvatarUploadForm({
           }}
         >
           <FieldGroup>
-            <form.Field name="file">
+            <form.Field
+              name="file"
+              validators={{ onChange: avatarFormSchema.shape.file }}
+            >
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
