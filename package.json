@@ -54,6 +54,7 @@
     "nuqs": "^2.9.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-easy-crop": "^6.2.3",
     "rehype-highlight": "^7.0.2",
     "rehype-parse": "^9.0.1",
     "rehype-stringify": "^10.0.1",
