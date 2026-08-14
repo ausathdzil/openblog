@@ -51,4 +51,6 @@ node_modules/
 
 # Advisor Plans
 plans/
+docs/
+
 .env*.local
