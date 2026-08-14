@@ -11,6 +11,7 @@ import {
 } from 'react';
 import * as z from 'zod';
 
+import { CropDialog } from '@/components/crop-dialog';
 import { Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
-import { updateAvatar } from '../_lib/actions';
+import { removeAvatar, updateAvatar } from '../_lib/actions';
 
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
@@ -59,6 +60,9 @@ export function AvatarUploadForm({
     type: 'success' | 'error';
   } | null>(null);
   const [preview, setPreview] = useState<string | null>(initialImage ?? null);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
+  const [isCropOpen, setIsCropOpen] = useState(false);
+  const [pendingFileName, setPendingFileName] = useState('avatar.webp');
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { refresh } = useRouter();
@@ -70,6 +74,15 @@ export function AvatarUploadForm({
       }
     },
     [preview]
+  );
+
+  useEffect(
+    () => () => {
+      if (rawImageSrc?.startsWith('blob:')) {
+        URL.revokeObjectURL(rawImageSrc);
+      }
+    },
+    [rawImageSrc]
   );
 
   const form = useForm({
@@ -125,87 +138,158 @@ export function AvatarUploadForm({
       onChange(null);
       return;
     }
-    onChange(selected);
     const parsed = avatarFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
+      onChange(selected);
       return;
     }
-    setPreview(URL.createObjectURL(selected));
+    if (rawImageSrc?.startsWith('blob:')) {
+      URL.revokeObjectURL(rawImageSrc);
+    }
+    setRawImageSrc(URL.createObjectURL(selected));
+    setPendingFileName(selected.name);
+    setIsCropOpen(true);
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    if (rawImageSrc?.startsWith('blob:')) {
+      URL.revokeObjectURL(rawImageSrc);
+    }
+    setRawImageSrc(null);
+    setIsCropOpen(false);
+    setPreview(URL.createObjectURL(croppedFile));
+    form.setFieldValue('file', croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    if (rawImageSrc?.startsWith('blob:')) {
+      URL.revokeObjectURL(rawImageSrc);
+    }
+    setRawImageSrc(null);
+    setIsCropOpen(false);
+  };
+
+  const handleAvatarRemove = () => {
+    setFormStatus(null);
+    startTransition(async () => {
+      const { status, message } = await removeAvatar();
+      if (status === 200) {
+        setPreview(null);
+        form.reset();
+        // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
+        setFormStatus({ type: 'success', message });
+        refresh();
+      } else {
+        setFormStatus({ type: 'error', message });
+      }
+    });
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile Picture</CardTitle>
-        <CardDescription>
-          Upload a JPEG, PNG, or WebP image no larger than 2MB.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Avatar className="mx-auto mb-6 size-32">
-          {preview ? <AvatarImage alt={name} src={preview} /> : null}
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <form
-          className="flex flex-col gap-6"
-          onSubmit={(event) => {
-            event.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.Field
-              name="file"
-              validators={{ onChange: avatarFormSchema.shape.file }}
-            >
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel className="sr-only" htmlFor={field.name}>
-                      Profile Picture
-                    </FieldLabel>
-                    <Input
-                      accept={AVATAR_TYPES.join(',')}
-                      aria-invalid={isInvalid}
-                      disabled={isPending}
-                      id={field.name}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={(event) =>
-                        handleFileChange(event, field.handleChange)
-                      }
-                      ref={inputRef}
-                      required
-                      type="file"
-                    />
-                    {!!isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            </form.Field>
-            <Field>
-              <Button disabled={isPending} type="submit">
-                {!!isPending && <Spinner />}
-                Save Changes
-              </Button>
-              <Muted
-                className={cn(
-                  formStatus ? 'visible' : 'invisible',
-                  formStatus?.type === 'error'
-                    ? 'text-destructive'
-                    : 'text-emerald-600 dark:text-emerald-500'
-                )}
+    <>
+      <CropDialog
+        aspect={1}
+        cropShape="round"
+        fileName={pendingFileName}
+        imageSrc={rawImageSrc}
+        onCancel={handleCropCancel}
+        onCropConfirm={handleCropConfirm}
+        onOpenChange={setIsCropOpen}
+        open={isCropOpen}
+        title="Crop Profile Picture"
+      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Picture</CardTitle>
+          <CardDescription>
+            Upload a JPEG, PNG, or WebP image no larger than 2MB.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Avatar className="mx-auto mb-6 size-32">
+            {preview ? <AvatarImage alt={name} src={preview} /> : null}
+            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <form
+            className="flex flex-col gap-6"
+            onSubmit={(event) => {
+              event.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup>
+              <form.Field
+                name="file"
+                validators={{ onChange: avatarFormSchema.shape.file }}
               >
-                {formStatus?.message || ' '}
-              </Muted>
-            </Field>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel className="sr-only" htmlFor={field.name}>
+                        Profile Picture
+                      </FieldLabel>
+                      <Input
+                        accept={AVATAR_TYPES.join(',')}
+                        aria-invalid={isInvalid}
+                        disabled={isPending}
+                        id={field.name}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          handleFileChange(event, field.handleChange)
+                        }
+                        ref={inputRef}
+                        required
+                        type="file"
+                      />
+                      {!!isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <Field>
+                <div className="flex gap-2">
+                  <Button disabled={isPending} type="submit">
+                    {!!isPending && <Spinner />}
+                    Save Changes
+                  </Button>
+                  {preview ? (
+                    <Button
+                      disabled={isPending}
+                      onClick={handleAvatarRemove}
+                      type="button"
+                      variant="ghost"
+                    >
+                      Remove
+                    </Button>
+                  ) : null}
+                </div>
+                <Muted
+                  className={cn(
+                    formStatus ? 'visible' : 'invisible',
+                    formStatus?.type === 'error'
+                      ? 'text-destructive'
+                      : 'text-emerald-600 dark:text-emerald-500'
+                  )}
+                >
+                  {formStatus?.message || ' '}
+                </Muted>
+              </Field>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   );
 }
