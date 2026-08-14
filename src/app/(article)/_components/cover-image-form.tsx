@@ -5,6 +5,7 @@ import { useForm, useSelector } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import {
   type ChangeEvent,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -79,6 +80,15 @@ export function CoverImageForm({
   const inputRef = useRef<HTMLInputElement>(null);
   const { refresh } = useRouter();
 
+  useEffect(
+    () => () => {
+      if (preview?.startsWith('blob:')) {
+        URL.revokeObjectURL(preview);
+      }
+    },
+    [preview]
+  );
+
   const form = useForm({
     defaultValues: {
       file: null as File | null,
@@ -102,6 +112,7 @@ export function CoverImageForm({
             type: 'success',
             message: message || 'Cover image updated.',
           });
+          form.reset();
           if (inputRef.current) {
             inputRef.current.value = '';
           }
@@ -143,9 +154,6 @@ export function CoverImageForm({
     if (!parsed.success) {
       return;
     }
-    if (preview?.startsWith('blob:')) {
-      URL.revokeObjectURL(preview);
-    }
     setPreview(URL.createObjectURL(selected));
     onChange(selected);
   };
@@ -155,9 +163,6 @@ export function CoverImageForm({
     startTransition(async () => {
       const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
-        if (preview?.startsWith('blob:')) {
-          URL.revokeObjectURL(preview);
-        }
         setPreview(null);
         form.reset();
         if (inputRef.current) {

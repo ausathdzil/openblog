@@ -92,6 +92,7 @@ export function AvatarUploadForm({
             type: 'success',
             message: message || 'Avatar updated.',
           });
+          form.reset();
           // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
           if (inputRef.current) {
             inputRef.current.value = '';
@@ -127,9 +128,6 @@ export function AvatarUploadForm({
     const parsed = avatarFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       return;
-    }
-    if (preview?.startsWith('blob:')) {
-      URL.revokeObjectURL(preview);
     }
     setPreview(URL.createObjectURL(selected));
     onChange(selected);
