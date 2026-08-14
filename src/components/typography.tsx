@@ -12,17 +12,17 @@ export function Title({ className, ...props }: React.ComponentProps<'h1'>) {
   );
 }
 
-export function Heading({ className, ...props }: React.ComponentProps<'h2'>) {
-  return (
-    <h2
-      className={cn(
-        'scroll-m-20 font-semibold text-3xl tracking-tight first:mt-0',
-        className
-      )}
-      {...props}
-    />
-  );
-}
+// export function Heading({ className, ...props }: React.ComponentProps<'h2'>) {
+//   return (
+//     <h2
+//       className={cn(
+//         'scroll-m-20 font-semibold text-3xl tracking-tight first:mt-0',
+//         className
+//       )}
+//       {...props}
+//     />
+//   );
+// }
 
 // export function Subheading({
 //   className,

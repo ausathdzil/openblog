@@ -1,7 +1,7 @@
-// biome-ignore-all lint/suspicious/noUnnecessaryConditions: inputRef is nullable until mounted
+// biome-ignore-all lint/suspicious/noUnnecessaryConditions: Ref is nullable until mounted
 'use client';
 
-import { useForm } from '@tanstack/react-form';
+import { useForm, useSelector } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import {
   type ChangeEvent,
@@ -58,26 +58,24 @@ export interface CoverImageFormHandle {
 }
 
 export interface CoverImageFormProps {
-  initialCoverImage: string | null;
+  initialImage: string | null;
   publicId: string;
   ref?: React.Ref<CoverImageFormHandle>;
   title?: string;
 }
 
 export function CoverImageForm({
-  initialCoverImage,
+  initialImage,
   publicId,
   ref,
   title,
 }: CoverImageFormProps) {
-  const [coverPreview, setCoverPreview] = useState<string | null>(
-    initialCoverImage ?? null
-  );
-  const [coverStatus, setCoverStatus] = useState<{
+  const [formStatus, setFormStatus] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
-  const [isCoverPending, startCoverTransition] = useTransition();
+  const [preview, setPreview] = useState<string | null>(initialImage ?? null);
+  const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const { refresh } = useRouter();
 
@@ -89,30 +87,29 @@ export function CoverImageForm({
       onSubmit: coverImageFormSchema,
     },
     onSubmit: ({ value }) => {
-      setCoverStatus(null);
-      startCoverTransition(async () => {
+      setFormStatus(null);
+      startTransition(async () => {
         if (!value.file) {
           return;
         }
-        const result = await uploadCoverImage(publicId, value.file);
-        if (result.status === 200 && result.url) {
-          if (coverPreview?.startsWith('blob:')) {
-            URL.revokeObjectURL(coverPreview);
-          }
-          setCoverPreview(result.url);
-          setCoverStatus({
+        const { status, message, url } = await uploadCoverImage(
+          publicId,
+          value.file
+        );
+        if (status === 200 && url) {
+          setPreview(url);
+          setFormStatus({
             type: 'success',
-            message: result.message || 'Cover image updated.',
+            message: message || 'Cover image updated.',
           });
-          form.reset();
           if (inputRef.current) {
             inputRef.current.value = '';
           }
           refresh();
         } else {
-          setCoverStatus({
+          setFormStatus({
             type: 'error',
-            message: result.message || 'Failed to upload cover image.',
+            message: message || 'Failed to upload cover image.',
           });
         }
       });
@@ -126,51 +123,50 @@ export function CoverImageForm({
     },
   });
 
+  const file = useSelector(form.store, (state) => state.values.file);
+
   useImperativeHandle(ref, () => ({
-    hasPendingFile: () => {
-      const formFile = form.getFieldValue('file');
-      const inputFile = inputRef.current?.files?.[0] ?? null;
-      return !!(formFile || inputFile) && !!coverPreview?.startsWith('blob:');
-    },
+    hasPendingFile: () => !!file && !!preview?.startsWith('blob:'),
   }));
 
   const handleFileChange = (
     event: ChangeEvent<HTMLInputElement>,
-    onChange: (v: File | null) => void
+    onChange: (value: File | null) => void
   ) => {
+    setFormStatus(null);
     const selected = event.target.files?.[0] ?? null;
-    onChange(selected);
-    setCoverStatus(null);
     if (!selected) {
+      onChange(null);
       return;
     }
     const parsed = coverImageFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       return;
     }
-    if (coverPreview?.startsWith('blob:')) {
-      URL.revokeObjectURL(coverPreview);
+    if (preview?.startsWith('blob:')) {
+      URL.revokeObjectURL(preview);
     }
-    setCoverPreview(URL.createObjectURL(selected));
+    setPreview(URL.createObjectURL(selected));
+    onChange(selected);
   };
 
   const handleCoverRemove = () => {
-    setCoverStatus(null);
-    startCoverTransition(async () => {
+    setFormStatus(null);
+    startTransition(async () => {
       const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
-        if (coverPreview?.startsWith('blob:')) {
-          URL.revokeObjectURL(coverPreview);
+        if (preview?.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
         }
-        setCoverPreview(null);
+        setPreview(null);
         form.reset();
         if (inputRef.current) {
           inputRef.current.value = '';
         }
-        setCoverStatus({ type: 'success', message });
+        setFormStatus({ type: 'success', message });
         refresh();
       } else {
-        setCoverStatus({ type: 'error', message });
+        setFormStatus({ type: 'error', message });
       }
     });
   };
@@ -185,13 +181,13 @@ export function CoverImageForm({
       </CardHeader>
       <CardContent>
         <div className="mx-auto mb-6 aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
-          {coverPreview ? (
+          {preview ? (
             // biome-ignore lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image
             <img
               alt={title ? `${title} cover image` : 'Cover image preview'}
               className="h-full w-full object-cover"
               height={630}
-              src={coverPreview}
+              src={preview}
               width={1200}
             />
           ) : (
@@ -220,7 +216,7 @@ export function CoverImageForm({
                     <Input
                       accept={COVER_TYPES.join(',')}
                       aria-invalid={isInvalid}
-                      disabled={isCoverPending}
+                      disabled={isPending}
                       id={field.name}
                       name={field.name}
                       onBlur={field.handleBlur}
@@ -238,16 +234,12 @@ export function CoverImageForm({
             </form.Field>
             <Field>
               <div className="flex gap-2">
-                <Button
-                  disabled={isCoverPending}
-                  type="submit"
-                  variant="outline"
-                >
+                <Button disabled={isPending} type="submit" variant="outline">
                   Upload
                 </Button>
-                {coverPreview ? (
+                {preview ? (
                   <Button
-                    disabled={isCoverPending}
+                    disabled={isPending}
                     onClick={handleCoverRemove}
                     type="button"
                     variant="ghost"
@@ -258,13 +250,13 @@ export function CoverImageForm({
               </div>
               <Muted
                 className={cn(
-                  coverStatus ? 'visible' : 'invisible',
-                  coverStatus?.type === 'error'
+                  formStatus ? 'visible' : 'invisible',
+                  formStatus?.type === 'error'
                     ? 'text-destructive'
                     : 'text-emerald-600 dark:text-emerald-500'
                 )}
               >
-                {coverStatus?.message || ' '}
+                {formStatus?.message || ' '}
               </Muted>
             </Field>
           </FieldGroup>

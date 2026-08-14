@@ -53,6 +53,6 @@ export default defineConfig({
     command: 'bun start',
     url: baseURL,
     timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !isCI,
   },
 });

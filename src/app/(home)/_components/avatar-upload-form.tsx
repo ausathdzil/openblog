@@ -2,7 +2,13 @@
 
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
-import { type ChangeEvent, useState, useTransition } from 'react';
+import {
+  type ChangeEvent,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import * as z from 'zod';
 
 import { Muted } from '@/components/typography';
@@ -40,19 +46,31 @@ const avatarFormSchema = z.object({
 });
 
 interface AvatarUploadFormProps {
-  image?: string | null;
+  initialImage?: string | null;
   name: string;
 }
 
-export function AvatarUploadForm({ image, name }: AvatarUploadFormProps) {
+export function AvatarUploadForm({
+  initialImage,
+  name,
+}: AvatarUploadFormProps) {
   const [formStatus, setFormStatus] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
-  const [preview, setPreview] = useState<string | null>(image ?? null);
+  const [preview, setPreview] = useState<string | null>(initialImage ?? null);
   const [isPending, startTransition] = useTransition();
-
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const { refresh } = useRouter();
+
+  useEffect(
+    () => () => {
+      if (preview?.startsWith('blob:')) {
+        URL.revokeObjectURL(preview);
+      }
+    },
+    [preview]
+  );
 
   const form = useForm({
     defaultValues: {
@@ -67,16 +85,17 @@ export function AvatarUploadForm({ image, name }: AvatarUploadFormProps) {
         if (!value.file) {
           return;
         }
-
         const { status, message, url } = await updateAvatar(value.file);
-
-        if (status === 200) {
-          setPreview(url ?? null);
+        if (status === 200 && url) {
+          setPreview(url);
           setFormStatus({
             type: 'success',
             message: message || 'Avatar updated.',
           });
-          form.reset();
+          // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
           refresh();
         } else {
           setFormStatus({
@@ -99,9 +118,10 @@ export function AvatarUploadForm({ image, name }: AvatarUploadFormProps) {
     event: ChangeEvent<HTMLInputElement>,
     onChange: (value: File | null) => void
   ) => {
+    setFormStatus(null);
     const selected = event.target.files?.[0] ?? null;
-    onChange(selected);
     if (!selected) {
+      onChange(null);
       return;
     }
     const parsed = avatarFormSchema.shape.file.safeParse(selected);
@@ -112,6 +132,7 @@ export function AvatarUploadForm({ image, name }: AvatarUploadFormProps) {
       URL.revokeObjectURL(preview);
     }
     setPreview(URL.createObjectURL(selected));
+    onChange(selected);
   };
 
   return (
@@ -154,6 +175,7 @@ export function AvatarUploadForm({ image, name }: AvatarUploadFormProps) {
                       onChange={(event) =>
                         handleFileChange(event, field.handleChange)
                       }
+                      ref={inputRef}
                       required
                       type="file"
                     />

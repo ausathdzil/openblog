@@ -51,7 +51,10 @@ async function EditProfileContent() {
           Manage your account settings and security details.
         </Muted>
       </div>
-      <AvatarUploadForm image={session.user.image} name={session.user.name} />
+      <AvatarUploadForm
+        initialImage={session.user.image}
+        name={session.user.name}
+      />
       <ProfileForm
         name={session.user.name}
         submitLabel="Save Changes"

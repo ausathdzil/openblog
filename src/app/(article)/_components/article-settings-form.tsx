@@ -111,7 +111,7 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
   return (
     <>
       <CoverImageForm
-        initialCoverImage={article.coverImage ?? null}
+        initialImage={article.coverImage ?? null}
         publicId={article.publicId}
         ref={coverImageRef}
         title={article.title ?? undefined}

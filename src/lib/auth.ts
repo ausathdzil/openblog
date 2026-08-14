@@ -8,6 +8,14 @@ import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { resend } from './resend';
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+if (!(googleClientId && googleClientSecret)) {
+  throw new Error('Missing Google OAuth credentials.');
+}
+
 const USERNAME_REGEX = /^(?![0-9])(?!\.)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]+$/;
 
 export const auth = betterAuth({
@@ -28,8 +36,8 @@ export const auth = betterAuth({
   socialProviders: {
     google: {
       prompt: 'select_account',
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: googleClientId,
+      clientSecret: googleClientSecret,
     },
   },
   plugins: [
@@ -70,9 +78,7 @@ export const auth = betterAuth({
       usernameValidator: (_username) => USERNAME_REGEX.test(_username),
     }),
     passkey({
-      rpID: process.env.NEXT_PUBLIC_APP_URL
-        ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
-        : 'localhost',
+      rpID: URL.canParse(appUrl) ? new URL(appUrl).hostname : 'localhost',
       rpName: 'OpenBlog',
       registration: {
         afterVerification: async ({ verification }) => ({

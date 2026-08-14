@@ -35,20 +35,28 @@ export async function updateAvatar(userId: string, file: File) {
   const extension = file.name.split('.').pop()?.toLowerCase() || '';
   const pathname = `avatars/${userId}/${crypto.randomUUID()}.${extension}`;
 
-  const blob = await put(pathname, file, {
-    access: 'public',
-  });
+  const [blob, [current]] = await Promise.all([
+    put(pathname, file, { access: 'public' }),
+    db.select({ image: user.image }).from(user).where(eq(user.id, userId)),
+  ]);
 
-  const [current] = await db
-    .select({ image: user.image })
-    .from(user)
-    .where(eq(user.id, userId));
+  const [newImage] = await db
+    .update(user)
+    .set({ image: blob.url })
+    .where(eq(user.id, userId))
+    .returning({ image: user.image });
 
-  if (current?.image?.includes('blob.vercel-storage.com')) {
-    await del(current.image);
+  if (!newImage) {
+    await del(blob.url);
+    throw new Error('Failed to update avatar.');
   }
 
-  await db.update(user).set({ image: blob.url }).where(eq(user.id, userId));
+  if (current?.image?.includes('blob.vercel-storage.com')) {
+    await del(current.image).catch((error) => {
+      // Log, but don't throw
+      console.error('Failed to delete old avatar:', error);
+    });
+  }
 
   return { message: 'Avatar updated.', url: blob.url };
 }
