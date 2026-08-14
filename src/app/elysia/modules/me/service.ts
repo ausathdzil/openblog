@@ -60,3 +60,20 @@ export async function updateAvatar(userId: string, file: File) {
 
   return { message: 'Avatar updated.', url: blob.url };
 }
+
+export async function removeAvatar(userId: string) {
+  const [current] = await db
+    .select({ image: user.image })
+    .from(user)
+    .where(eq(user.id, userId));
+
+  await db.update(user).set({ image: null }).where(eq(user.id, userId));
+
+  if (current?.image?.includes('blob.vercel-storage.com')) {
+    await del(current.image).catch((error) => {
+      console.error('Failed to delete old avatar:', error);
+    });
+  }
+
+  return { message: 'Avatar removed.' };
+}

@@ -9,6 +9,8 @@ import {
 import { getArticles } from '../article/service';
 import { AuthError, auth } from '../auth';
 import {
+  removeAvatarInvalid,
+  removeAvatarResponse,
   updateAvatarBody,
   updateAvatarInvalid,
   updateAvatarResponse,
@@ -16,7 +18,7 @@ import {
   updateProfileInvalid,
   updateProfileResponse,
 } from './model';
-import { updateAvatar, updateProfile } from './service';
+import { removeAvatar, updateAvatar, updateProfile } from './service';
 
 export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
   .use(auth)
@@ -83,6 +85,23 @@ export const me = new Elysia({ prefix: '/me', tags: ['Me'] })
       response: {
         200: updateAvatarResponse,
         401: updateAvatarInvalid,
+      },
+    }
+  )
+  .delete(
+    '/avatar',
+    async ({ user }) => {
+      if (!user) {
+        throw new AuthError('You are not allowed to access this resource.');
+      }
+
+      return await removeAvatar(user.id);
+    },
+    {
+      auth: true,
+      response: {
+        200: removeAvatarResponse,
+        401: removeAvatarInvalid,
       },
     }
   );

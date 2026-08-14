@@ -35,3 +35,10 @@ export const updateAvatarResponse = t.Object({
 export const updateAvatarInvalid = t.Object({
   message: t.String(),
 });
+export const removeAvatarResponse = t.Object({
+  message: t.String(),
+});
+
+export const removeAvatarInvalid = t.Object({
+  message: t.String(),
+});
