@@ -1,6 +1,8 @@
 // biome-ignore-all lint/suspicious/noUnnecessaryConditions: Ref is nullable until mounted
 'use client';
 
+import { CropIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm, useSelector } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import {
@@ -116,6 +118,10 @@ export function CoverImageForm({
             type: 'success',
             message: message || 'Cover image updated.',
           });
+          if (rawImageSrc?.startsWith('blob:')) {
+            URL.revokeObjectURL(rawImageSrc);
+          }
+          setRawImageSrc(null);
           form.reset();
           if (inputRef.current) {
             inputRef.current.value = '';
@@ -168,23 +174,26 @@ export function CoverImageForm({
   };
 
   const handleCropConfirm = (croppedFile: File) => {
-    if (rawImageSrc?.startsWith('blob:')) {
-      URL.revokeObjectURL(rawImageSrc);
-    }
-    setRawImageSrc(null);
     setIsCropOpen(false);
-    setPreview(URL.createObjectURL(croppedFile));
+    setPreview((prev) => {
+      if (prev?.startsWith('blob:')) {
+        URL.revokeObjectURL(prev);
+      }
+      return URL.createObjectURL(croppedFile);
+    });
     form.setFieldValue('file', croppedFile);
   };
 
   const handleCropCancel = () => {
-    if (inputRef.current) {
-      inputRef.current.value = '';
+    if (!form.getFieldValue('file')) {
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+      if (rawImageSrc?.startsWith('blob:')) {
+        URL.revokeObjectURL(rawImageSrc);
+      }
+      setRawImageSrc(null);
     }
-    if (rawImageSrc?.startsWith('blob:')) {
-      URL.revokeObjectURL(rawImageSrc);
-    }
-    setRawImageSrc(null);
     setIsCropOpen(false);
   };
 
@@ -193,6 +202,10 @@ export function CoverImageForm({
     startTransition(async () => {
       const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
+        if (rawImageSrc?.startsWith('blob:')) {
+          URL.revokeObjectURL(rawImageSrc);
+        }
+        setRawImageSrc(null);
         setPreview(null);
         form.reset();
         if (inputRef.current) {
@@ -212,7 +225,7 @@ export function CoverImageForm({
         aspect={1200 / 630}
         cropShape="rect"
         fileName={pendingFileName}
-        imageSrc={rawImageSrc}
+        imageSrc={rawImageSrc ?? preview}
         onCancel={handleCropCancel}
         onCropConfirm={handleCropConfirm}
         onOpenChange={setIsCropOpen}
@@ -243,16 +256,29 @@ export function CoverImageForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mx-auto mb-6 aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
+          <div className="relative mx-auto mb-6 aspect-1200/630 w-full max-w-150 overflow-hidden rounded-md border bg-muted">
             {preview ? (
-              // biome-ignore lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image
-              <img
-                alt={title ? `${title} cover image` : 'Cover image preview'}
-                className="h-full w-full object-cover"
-                height={630}
-                src={preview}
-                width={1200}
-              />
+              <>
+                {/* biome-ignore lint/performance/noImgElement: OG preview is blob URL, fixed 1200x630 via CSS; transient blob: cannot use next/image */}
+                <img
+                  alt={title ? `${title} cover image` : 'Cover image preview'}
+                  className="h-full w-full object-cover"
+                  height={630}
+                  src={preview}
+                  width={1200}
+                />
+                <Button
+                  className="absolute right-3 bottom-3 gap-1.5 bg-background/85 shadow-xs backdrop-blur-xs hover:bg-background"
+                  disabled={isPending}
+                  onClick={() => setIsCropOpen(true)}
+                  size="sm"
+                  type="button"
+                  variant="secondary"
+                >
+                  <HugeiconsIcon icon={CropIcon} size={14} strokeWidth={2} />
+                  Adjust crop
+                </Button>
+              </>
             ) : (
               <div className="flex h-full w-full items-center justify-center p-6 text-muted-foreground text-sm">
                 Choose an image to see preview — 1200x630 recommended

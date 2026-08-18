@@ -1,5 +1,8 @@
+// biome-ignore-all lint/suspicious/noUnnecessaryConditions: Ref is nullable until mounted
 'use client';
 
+import { CropIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import {
@@ -105,8 +108,11 @@ export function AvatarUploadForm({
             type: 'success',
             message: message || 'Avatar updated.',
           });
+          if (rawImageSrc?.startsWith('blob:')) {
+            URL.revokeObjectURL(rawImageSrc);
+          }
+          setRawImageSrc(null);
           form.reset();
-          // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
           if (inputRef.current) {
             inputRef.current.value = '';
           }
@@ -152,24 +158,26 @@ export function AvatarUploadForm({
   };
 
   const handleCropConfirm = (croppedFile: File) => {
-    if (rawImageSrc?.startsWith('blob:')) {
-      URL.revokeObjectURL(rawImageSrc);
-    }
-    setRawImageSrc(null);
     setIsCropOpen(false);
-    setPreview(URL.createObjectURL(croppedFile));
+    setPreview((prev) => {
+      if (prev?.startsWith('blob:')) {
+        URL.revokeObjectURL(prev);
+      }
+      return URL.createObjectURL(croppedFile);
+    });
     form.setFieldValue('file', croppedFile);
   };
 
   const handleCropCancel = () => {
-    // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
-    if (inputRef.current) {
-      inputRef.current.value = '';
+    if (!form.getFieldValue('file')) {
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+      if (rawImageSrc?.startsWith('blob:')) {
+        URL.revokeObjectURL(rawImageSrc);
+      }
+      setRawImageSrc(null);
     }
-    if (rawImageSrc?.startsWith('blob:')) {
-      URL.revokeObjectURL(rawImageSrc);
-    }
-    setRawImageSrc(null);
     setIsCropOpen(false);
   };
 
@@ -178,9 +186,12 @@ export function AvatarUploadForm({
     startTransition(async () => {
       const { status, message } = await removeAvatar();
       if (status === 200) {
+        if (rawImageSrc?.startsWith('blob:')) {
+          URL.revokeObjectURL(rawImageSrc);
+        }
+        setRawImageSrc(null);
         setPreview(null);
         form.reset();
-        // biome-ignore lint/suspicious/noUnnecessaryConditions: ref is nullable until mounted
         if (inputRef.current) {
           inputRef.current.value = '';
         }
@@ -198,7 +209,7 @@ export function AvatarUploadForm({
         aspect={1}
         cropShape="round"
         fileName={pendingFileName}
-        imageSrc={rawImageSrc}
+        imageSrc={rawImageSrc ?? preview}
         onCancel={handleCropCancel}
         onCropConfirm={handleCropConfirm}
         onOpenChange={setIsCropOpen}
@@ -229,10 +240,25 @@ export function AvatarUploadForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Avatar className="mx-auto mb-6 size-32">
-            {preview ? <AvatarImage alt={name} src={preview} /> : null}
-            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <div className="relative mx-auto mb-6 size-32">
+            <Avatar className="size-full">
+              {preview ? <AvatarImage alt={name} src={preview} /> : null}
+              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            {preview ? (
+              <Button
+                aria-label="Adjust crop"
+                className="absolute right-0 bottom-0 size-8 rounded-full shadow-xs"
+                disabled={isPending}
+                onClick={() => setIsCropOpen(true)}
+                size="icon-sm"
+                type="button"
+                variant="secondary"
+              >
+                <HugeiconsIcon icon={CropIcon} size={16} strokeWidth={2} />
+              </Button>
+            ) : null}
+          </div>
           <form
             className="flex flex-col gap-6"
             onSubmit={(event) => {
