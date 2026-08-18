@@ -43,24 +43,39 @@ async function getCroppedImg(
   });
 
   const canvas = document.createElement('canvas');
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  canvas.width = Math.max(1, Math.round(pixelCrop.width));
+  canvas.height = Math.max(1, Math.round(pixelCrop.height));
   const ctx = canvas.getContext('2d');
   if (!ctx) {
     throw new Error('Could not get canvas context');
   }
 
-  ctx.drawImage(
-    image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-    0,
-    0,
-    pixelCrop.width,
-    pixelCrop.height
+  const sourceX = Math.max(0, pixelCrop.x);
+  const sourceY = Math.max(0, pixelCrop.y);
+  const sourceWidth = Math.min(
+    image.naturalWidth - sourceX,
+    pixelCrop.width - (sourceX - pixelCrop.x)
   );
+  const sourceHeight = Math.min(
+    image.naturalHeight - sourceY,
+    pixelCrop.height - (sourceY - pixelCrop.y)
+  );
+  const destX = Math.max(0, -pixelCrop.x);
+  const destY = Math.max(0, -pixelCrop.y);
+
+  if (sourceWidth > 0 && sourceHeight > 0) {
+    ctx.drawImage(
+      image,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      destX,
+      destY,
+      sourceWidth,
+      sourceHeight
+    );
+  }
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -186,7 +201,13 @@ function CropDialogContent({
   ...props
 }: React.ComponentProps<typeof DialogContent>) {
   return (
-    <DialogContent className={cn('sm:max-w-2xl', className)} {...props}>
+    <DialogContent
+      className={cn(
+        'data-open:zoom-in-100 data-closed:zoom-out-100 sm:max-w-2xl',
+        className
+      )}
+      {...props}
+    >
       {children}
     </DialogContent>
   );
@@ -222,6 +243,7 @@ function CropDialogCropper({ className }: { className?: string }) {
             setCroppedAreaPixels(newCroppedAreaPixels);
           }}
           onZoomChange={setZoom}
+          restrictPosition={true}
           showGrid={cropShape === 'rect'}
           zoom={zoom}
         />
