@@ -64,4 +64,25 @@ describe('Me', () => {
       expect(data?.message).toBe('Profile updated.');
     });
   });
+  describe('Avatar', () => {
+    test('return 401 if not authenticated', async () => {
+      const { status } = await elysia.me.avatar.delete({});
+
+      expect(status).toBe(401);
+    });
+
+    test('return 200 and success message when deleting avatar', async () => {
+      const { data, status } = await elysia.me.avatar.delete(
+        {},
+        {
+          headers: await authContext.authTest.getAuthHeaders({
+            userId: authContext.testUser.id,
+          }),
+        }
+      );
+
+      expect(status).toBe(200);
+      expect(data?.message).toBe('Avatar removed.');
+    });
+  });
 });

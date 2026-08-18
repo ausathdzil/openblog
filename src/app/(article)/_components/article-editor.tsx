@@ -12,6 +12,7 @@ import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
 import { ArticleActions } from '@/components/article-actions';
+import { BeforeUnloadGuard } from '@/components/before-unload-guard';
 import { Header } from '@/components/header';
 import { HeaderTitle } from '@/components/header-title';
 import { OpenBlogButton } from '@/components/openblog-button';
@@ -19,7 +20,6 @@ import { Button } from '@/components/ui/button';
 import { Marker, MarkerContent, MarkerIcon } from '@/components/ui/marker';
 import { toast } from '@/components/ui/toast';
 import { updateArticle } from '@/lib/article-actions';
-import { BeforeUnloadGuard } from './before-unload-guard';
 import { ContentEditor } from './content-editor';
 import { PublishButton } from './publish-button';
 import { ResizableTextarea } from './resizable-textarea';

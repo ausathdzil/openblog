@@ -104,7 +104,9 @@ async function Profile({ params }: Omit<UserPageProps, 'searchParams'>) {
   return (
     <div className="grid grid-rows-[auto_auto_auto]">
       <Avatar className="size-36 justify-self-center">
-        <AvatarImage src={author.image ?? ''} />
+        {author.image ? (
+          <AvatarImage alt={author.name} src={author.image} />
+        ) : null}
         <AvatarFallback className="text-6xl">
           {author.name.charAt(0)}
         </AvatarFallback>
