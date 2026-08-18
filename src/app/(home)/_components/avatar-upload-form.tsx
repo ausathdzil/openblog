@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noUnnecessaryConditions: Ref is nullable until mounted
 'use client';
 
-import { CropIcon } from '@hugeicons/core-free-icons';
+import { ImageCropIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
@@ -252,10 +252,11 @@ export function AvatarUploadForm({
                 disabled={isPending}
                 onClick={() => setIsCropOpen(true)}
                 size="icon-sm"
+                title="Adjust crop"
                 type="button"
                 variant="secondary"
               >
-                <HugeiconsIcon icon={CropIcon} size={16} strokeWidth={2} />
+                <HugeiconsIcon icon={ImageCropIcon} size={16} strokeWidth={2} />
               </Button>
             ) : null}
           </div>

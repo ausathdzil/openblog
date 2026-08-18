@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noUnnecessaryConditions: Ref is nullable until mounted
 'use client';
 
-import { CropIcon } from '@hugeicons/core-free-icons';
+import { ImageCropIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm, useSelector } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
@@ -275,7 +275,11 @@ export function CoverImageForm({
                   type="button"
                   variant="secondary"
                 >
-                  <HugeiconsIcon icon={CropIcon} size={14} strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={ImageCropIcon}
+                    size={14}
+                    strokeWidth={2}
+                  />
                   Adjust crop
                 </Button>
               </>
