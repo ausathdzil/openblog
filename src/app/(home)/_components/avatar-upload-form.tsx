@@ -285,7 +285,9 @@ export function AvatarUploadForm({
               >
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      field.state.meta.errors.length > 0) &&
+                    !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel className="sr-only" htmlFor={field.name}>
