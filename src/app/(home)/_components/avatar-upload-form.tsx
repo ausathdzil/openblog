@@ -56,6 +56,12 @@ interface AvatarUploadFormProps {
   name: string;
 }
 
+interface CropTarget {
+  fileName: string;
+  mimeType: string;
+  src: string;
+}
+
 export function AvatarUploadForm({
   initialImage,
   name,
@@ -65,10 +71,7 @@ export function AvatarUploadForm({
     type: 'success' | 'error';
   } | null>(null);
   const [preview, setPreview] = useState<string | null>(initialImage ?? null);
-  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
-  const [isCropOpen, setIsCropOpen] = useState(false);
-  const [pendingFileName, setPendingFileName] = useState('avatar.jpg');
-  const [pendingMimeType, setPendingMimeType] = useState('image/jpeg');
+  const [cropTarget, setCropTarget] = useState<CropTarget | null>(null);
   const [isUploading, startUploadTransition] = useTransition();
   const [isRemoving, startRemoveTransition] = useTransition();
   const isPending = isUploading || isRemoving;
@@ -86,11 +89,11 @@ export function AvatarUploadForm({
 
   useEffect(
     () => () => {
-      if (rawImageSrc?.startsWith('blob:')) {
-        URL.revokeObjectURL(rawImageSrc);
+      if (cropTarget?.src.startsWith('blob:')) {
+        URL.revokeObjectURL(cropTarget.src);
       }
     },
-    [rawImageSrc]
+    [cropTarget]
   );
 
   const form = useForm({
@@ -113,10 +116,10 @@ export function AvatarUploadForm({
             type: 'success',
             message: message || 'Avatar updated.',
           });
-          if (rawImageSrc?.startsWith('blob:')) {
-            URL.revokeObjectURL(rawImageSrc);
+          if (cropTarget?.src.startsWith('blob:')) {
+            URL.revokeObjectURL(cropTarget.src);
           }
-          setRawImageSrc(null);
+          setCropTarget(null);
           form.reset();
           if (inputRef.current) {
             inputRef.current.value = '';
@@ -154,17 +157,21 @@ export function AvatarUploadForm({
       onChange(selected);
       return;
     }
-    if (rawImageSrc?.startsWith('blob:')) {
-      URL.revokeObjectURL(rawImageSrc);
+    if (cropTarget?.src.startsWith('blob:')) {
+      URL.revokeObjectURL(cropTarget.src);
     }
-    setRawImageSrc(URL.createObjectURL(selected));
-    setPendingFileName(selected.name);
-    setPendingMimeType(selected.type || 'image/jpeg');
-    setIsCropOpen(true);
+    setCropTarget({
+      src: URL.createObjectURL(selected),
+      fileName: selected.name,
+      mimeType: selected.type || 'image/jpeg',
+    });
   };
 
   const handleCropConfirm = (croppedFile: File) => {
-    setIsCropOpen(false);
+    if (cropTarget?.src.startsWith('blob:')) {
+      URL.revokeObjectURL(cropTarget.src);
+    }
+    setCropTarget(null);
     setPreview((prev) => {
       if (prev?.startsWith('blob:')) {
         URL.revokeObjectURL(prev);
@@ -184,12 +191,11 @@ export function AvatarUploadForm({
       if (inputRef.current) {
         inputRef.current.value = '';
       }
-      if (rawImageSrc?.startsWith('blob:')) {
-        URL.revokeObjectURL(rawImageSrc);
+      if (cropTarget?.src.startsWith('blob:')) {
+        URL.revokeObjectURL(cropTarget.src);
       }
-      setRawImageSrc(null);
     }
-    setIsCropOpen(false);
+    setCropTarget(null);
   };
 
   const handleAvatarRemove = () => {
@@ -197,10 +203,10 @@ export function AvatarUploadForm({
     startRemoveTransition(async () => {
       const { status, message } = await removeAvatar();
       if (status === 200) {
-        if (rawImageSrc?.startsWith('blob:')) {
-          URL.revokeObjectURL(rawImageSrc);
+        if (cropTarget?.src.startsWith('blob:')) {
+          URL.revokeObjectURL(cropTarget.src);
         }
-        setRawImageSrc(null);
+        setCropTarget(null);
         setPreview(null);
         form.reset();
         if (inputRef.current) {
@@ -222,13 +228,17 @@ export function AvatarUploadForm({
       <CropDialog
         aspect={1}
         cropShape="round"
-        fileName={pendingFileName}
-        imageSrc={rawImageSrc ?? preview}
-        mimeType={pendingMimeType}
+        fileName={cropTarget?.fileName ?? 'avatar.jpg'}
+        imageSrc={cropTarget?.src ?? null}
+        mimeType={cropTarget?.mimeType ?? 'image/jpeg'}
         onCancel={handleCropCancel}
         onCropConfirm={handleCropConfirm}
-        onOpenChange={setIsCropOpen}
-        open={isCropOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleCropCancel();
+          }
+        }}
+        open={Boolean(cropTarget)}
       >
         <CropDialog.Content>
           <CropDialog.Header>
@@ -265,7 +275,15 @@ export function AvatarUploadForm({
                 aria-label="Adjust crop"
                 className="absolute right-0 bottom-0 size-8 rounded-full shadow-xs"
                 disabled={isPending}
-                onClick={() => setIsCropOpen(true)}
+                onClick={() => {
+                  if (preview) {
+                    setCropTarget({
+                      src: preview,
+                      fileName: 'avatar.jpg',
+                      mimeType: 'image/jpeg',
+                    });
+                  }
+                }}
                 size="icon-sm"
                 title="Adjust crop"
                 type="button"

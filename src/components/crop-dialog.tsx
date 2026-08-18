@@ -162,15 +162,18 @@ function CropDialogRoot({
       return;
     }
     setIsProcessing(true);
-    const croppedFile = await getCroppedImg(
-      imageSrc,
-      croppedAreaPixels,
-      fileName,
-      mimeType
-    );
-    setIsProcessing(false);
-    onCropConfirm(croppedFile);
-    onOpenChange(false);
+    try {
+      const croppedFile = await getCroppedImg(
+        imageSrc,
+        croppedAreaPixels,
+        fileName,
+        mimeType
+      );
+      onCropConfirm(croppedFile);
+      onOpenChange(false);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (

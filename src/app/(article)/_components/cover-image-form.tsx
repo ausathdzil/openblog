@@ -51,6 +51,12 @@ const coverImageFormSchema = z.object({
     ),
 });
 
+interface CropTarget {
+  fileName: string;
+  mimeType: string;
+  src: string;
+}
+
 export interface CoverImageFormHandle {
   hasPendingFile: () => boolean;
 }
@@ -73,10 +79,7 @@ export function CoverImageForm({
     type: 'success' | 'error';
   } | null>(null);
   const [preview, setPreview] = useState<string | null>(initialImage ?? null);
-  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
-  const [isCropOpen, setIsCropOpen] = useState(false);
-  const [pendingFileName, setPendingFileName] = useState('cover.jpg');
-  const [pendingMimeType, setPendingMimeType] = useState('image/jpeg');
+  const [cropTarget, setCropTarget] = useState<CropTarget | null>(null);
   const [isUploading, startUploadTransition] = useTransition();
   const [isRemoving, startRemoveTransition] = useTransition();
   const isPending = isUploading || isRemoving;
@@ -94,11 +97,11 @@ export function CoverImageForm({
 
   useEffect(
     () => () => {
-      if (rawImageSrc?.startsWith('blob:')) {
-        URL.revokeObjectURL(rawImageSrc);
+      if (cropTarget?.src.startsWith('blob:')) {
+        URL.revokeObjectURL(cropTarget.src);
       }
     },
-    [rawImageSrc]
+    [cropTarget]
   );
 
   const form = useForm({
@@ -124,10 +127,10 @@ export function CoverImageForm({
             type: 'success',
             message: message || 'Cover image updated.',
           });
-          if (rawImageSrc?.startsWith('blob:')) {
-            URL.revokeObjectURL(rawImageSrc);
+          if (cropTarget?.src.startsWith('blob:')) {
+            URL.revokeObjectURL(cropTarget.src);
           }
-          setRawImageSrc(null);
+          setCropTarget(null);
           form.reset();
           if (inputRef.current) {
             inputRef.current.value = '';
@@ -171,17 +174,21 @@ export function CoverImageForm({
       onChange(selected);
       return;
     }
-    if (rawImageSrc?.startsWith('blob:')) {
-      URL.revokeObjectURL(rawImageSrc);
+    if (cropTarget?.src.startsWith('blob:')) {
+      URL.revokeObjectURL(cropTarget.src);
     }
-    setRawImageSrc(URL.createObjectURL(selected));
-    setPendingFileName(selected.name);
-    setPendingMimeType(selected.type || 'image/jpeg');
-    setIsCropOpen(true);
+    setCropTarget({
+      src: URL.createObjectURL(selected),
+      fileName: selected.name,
+      mimeType: selected.type || 'image/jpeg',
+    });
   };
 
   const handleCropConfirm = (croppedFile: File) => {
-    setIsCropOpen(false);
+    if (cropTarget?.src.startsWith('blob:')) {
+      URL.revokeObjectURL(cropTarget.src);
+    }
+    setCropTarget(null);
     setPreview((prev) => {
       if (prev?.startsWith('blob:')) {
         URL.revokeObjectURL(prev);
@@ -201,12 +208,11 @@ export function CoverImageForm({
       if (inputRef.current) {
         inputRef.current.value = '';
       }
-      if (rawImageSrc?.startsWith('blob:')) {
-        URL.revokeObjectURL(rawImageSrc);
+      if (cropTarget?.src.startsWith('blob:')) {
+        URL.revokeObjectURL(cropTarget.src);
       }
-      setRawImageSrc(null);
     }
-    setIsCropOpen(false);
+    setCropTarget(null);
   };
 
   const handleCoverRemove = () => {
@@ -214,10 +220,10 @@ export function CoverImageForm({
     startRemoveTransition(async () => {
       const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
-        if (rawImageSrc?.startsWith('blob:')) {
-          URL.revokeObjectURL(rawImageSrc);
+        if (cropTarget?.src.startsWith('blob:')) {
+          URL.revokeObjectURL(cropTarget.src);
         }
-        setRawImageSrc(null);
+        setCropTarget(null);
         setPreview(null);
         form.reset();
         if (inputRef.current) {
@@ -239,13 +245,17 @@ export function CoverImageForm({
       <CropDialog
         aspect={1200 / 630}
         cropShape="rect"
-        fileName={pendingFileName}
-        imageSrc={rawImageSrc ?? preview}
-        mimeType={pendingMimeType}
+        fileName={cropTarget?.fileName ?? 'cover.jpg'}
+        imageSrc={cropTarget?.src ?? null}
+        mimeType={cropTarget?.mimeType ?? 'image/jpeg'}
         onCancel={handleCropCancel}
         onCropConfirm={handleCropConfirm}
-        onOpenChange={setIsCropOpen}
-        open={isCropOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleCropCancel();
+          }
+        }}
+        open={Boolean(cropTarget)}
       >
         <CropDialog.Content>
           <CropDialog.Header>
@@ -286,7 +296,15 @@ export function CoverImageForm({
                 <Button
                   className="absolute right-3 bottom-3 gap-1.5 bg-background/85 shadow-xs backdrop-blur-xs hover:bg-background"
                   disabled={isPending}
-                  onClick={() => setIsCropOpen(true)}
+                  onClick={() => {
+                    if (preview) {
+                      setCropTarget({
+                        src: preview,
+                        fileName: 'cover.jpg',
+                        mimeType: 'image/jpeg',
+                      });
+                    }
+                  }}
                   size="sm"
                   type="button"
                   variant="secondary"

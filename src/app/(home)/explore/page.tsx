@@ -149,7 +149,9 @@ async function AuthorsResults({ limit, page, q }: ResultsProps) {
             >
               <ItemMedia>
                 <Avatar className="size-10">
-                  <AvatarImage src={author.image ?? ''} />
+                  {author.image ? (
+                    <AvatarImage alt={author.name} src={author.image} />
+                  ) : null}
                   <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </ItemMedia>
