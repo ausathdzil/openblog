@@ -17,7 +17,7 @@ import * as z from 'zod';
 import { BeforeUnloadGuard } from '@/components/before-unload-guard';
 import { CropDialog } from '@/components/crop-dialog';
 import { Muted } from '@/components/typography';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -245,8 +245,18 @@ export function AvatarUploadForm({
         <CardContent>
           <div className="relative mx-auto mb-6 size-32">
             <Avatar className="size-full">
-              {preview ? <AvatarImage alt={name} src={preview} /> : null}
-              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+              {preview ? (
+                /* biome-ignore lint/performance/noImgElement: avatar preview can be transient blob: URL */
+                <img
+                  alt={name}
+                  className="aspect-square size-full rounded-full object-cover"
+                  height={128}
+                  src={preview}
+                  width={128}
+                />
+              ) : (
+                <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+              )}
             </Avatar>
             {preview ? (
               <Button
