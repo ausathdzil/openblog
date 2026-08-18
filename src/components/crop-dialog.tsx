@@ -1,40 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { createContext, use, useState } from 'react';
 import Cropper from 'react-easy-crop';
 
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
+import { Spinner } from '@/components/ui/spinner';
+import { cn } from '@/lib/utils';
+import { Label } from './ui/label';
 
-const EXTENSION_REGEX = /\.[^.]+$/;
-
-export interface Area {
+interface Area {
   height: number;
   width: number;
   x: number;
   y: number;
 }
 
-export interface CropDialogProps {
-  aspect?: number; // 1 for avatar, 1200 / 630 for cover
-  cropShape?: 'rect' | 'round'; // "round" for avatar, "rect" for cover
-  fileName?: string;
-  imageSrc: string | null;
-  onCancel?: () => void;
-  onCropConfirm: (croppedFile: File) => void;
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-  title?: string;
-}
+const EXTENSION_REGEX = /\.[^.]+$/;
 
-export async function getCroppedImg(
+async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
   fileName = 'cropped.webp',
@@ -88,17 +81,55 @@ export async function getCroppedImg(
   });
 }
 
-export function CropDialog({
+interface CropDialogContextValue {
+  aspect: number;
+  crop: { x: number; y: number };
+  croppedAreaPixels: Area | null;
+  cropShape: 'rect' | 'round';
+  handleConfirm: () => Promise<void>;
+  imageSrc: string | null;
+  isProcessing: boolean;
+  setCrop: (crop: { x: number; y: number }) => void;
+  setCroppedAreaPixels: (area: Area | null) => void;
+  setZoom: (zoom: number) => void;
+  zoom: number;
+}
+
+const CropDialogContext = createContext<CropDialogContextValue | null>(null);
+
+function useCropDialog() {
+  const context = use(CropDialogContext);
+  if (!context) {
+    throw new Error(
+      'CropDialog compound components must be used within CropDialog.Root'
+    );
+  }
+  return context;
+}
+
+interface CropDialogRootProps {
+  aspect?: number;
+  children: React.ReactNode;
+  cropShape?: 'rect' | 'round';
+  fileName?: string;
+  imageSrc: string | null;
+  onCancel?: () => void;
+  onCropConfirm: (croppedFile: File) => void;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+}
+
+function CropDialogRoot({
   open,
   onOpenChange,
   imageSrc,
   aspect = 1,
   cropShape = 'rect',
-  title = 'Crop image',
   fileName = 'cropped.webp',
   onCropConfirm,
   onCancel,
-}: CropDialogProps) {
+  children,
+}: CropDialogRootProps) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -115,82 +146,143 @@ export function CropDialog({
     if (!(imageSrc && croppedAreaPixels)) {
       return;
     }
-    try {
-      setIsProcessing(true);
-      const croppedFile = await getCroppedImg(
-        imageSrc,
-        croppedAreaPixels,
-        fileName
-      );
-      onCropConfirm(croppedFile);
-      onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to crop image:', error);
-    } finally {
-      setIsProcessing(false);
-    }
+    setIsProcessing(true);
+    const croppedFile = await getCroppedImg(
+      imageSrc,
+      croppedAreaPixels,
+      fileName
+    );
+    setIsProcessing(false);
+    onCropConfirm(croppedFile);
+    onOpenChange(false);
   };
 
   return (
-    <Dialog onOpenChange={handleOpenChange} open={open}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            Drag to reposition and adjust zoom to crop your image.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="relative h-80 w-full overflow-hidden rounded-md bg-black">
-          {imageSrc ? (
-            <Cropper
-              aspect={aspect}
-              crop={crop}
-              cropShape={cropShape}
-              image={imageSrc}
-              onCropChange={setCrop}
-              onCropComplete={(_croppedArea, newCroppedAreaPixels) => {
-                setCroppedAreaPixels(newCroppedAreaPixels);
-              }}
-              onZoomChange={setZoom}
-              showGrid={cropShape === 'rect'}
-              zoom={zoom}
-            />
-          ) : null}
-        </div>
-
-        <div className="flex items-center gap-3 py-2">
-          <span className="text-muted-foreground text-xs">Zoom</span>
-          <input
-            aria-label="Zoom"
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-secondary accent-primary"
-            max={3}
-            min={1}
-            onChange={(e) => setZoom(Number(e.target.value))}
-            step={0.05}
-            type="range"
-            value={zoom}
-          />
-        </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            disabled={isProcessing}
-            onClick={() => handleOpenChange(false)}
-            type="button"
-            variant="outline"
-          >
-            Cancel
-          </Button>
-          <Button
-            disabled={isProcessing || !imageSrc}
-            onClick={handleConfirm}
-            type="button"
-          >
-            {isProcessing ? 'Cropping...' : 'Apply Crop'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <CropDialogContext
+      value={{
+        crop,
+        setCrop,
+        zoom,
+        setZoom,
+        croppedAreaPixels,
+        setCroppedAreaPixels,
+        isProcessing,
+        imageSrc,
+        aspect,
+        cropShape,
+        handleConfirm,
+      }}
+    >
+      <Dialog onOpenChange={handleOpenChange} open={open}>
+        {children}
+      </Dialog>
+    </CropDialogContext>
   );
 }
+
+function CropDialogContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogContent>) {
+  return (
+    <DialogContent className={cn('sm:max-w-2xl', className)} {...props}>
+      {children}
+    </DialogContent>
+  );
+}
+
+function CropDialogCropper({ className }: { className?: string }) {
+  const {
+    imageSrc,
+    aspect,
+    crop,
+    setCrop,
+    cropShape,
+    setCroppedAreaPixels,
+    zoom,
+    setZoom,
+  } = useCropDialog();
+
+  return (
+    <div
+      className={cn(
+        'relative h-80 w-full overflow-hidden rounded-md bg-black',
+        className
+      )}
+    >
+      {imageSrc ? (
+        <Cropper
+          aspect={aspect}
+          crop={crop}
+          cropShape={cropShape}
+          image={imageSrc}
+          onCropChange={setCrop}
+          onCropComplete={(_croppedArea, newCroppedAreaPixels) => {
+            setCroppedAreaPixels(newCroppedAreaPixels);
+          }}
+          onZoomChange={setZoom}
+          showGrid={cropShape === 'rect'}
+          zoom={zoom}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function CropDialogZoom({ className }: { className?: string }) {
+  const { zoom, setZoom } = useCropDialog();
+
+  return (
+    <div className={cn('grid w-full gap-3', className)}>
+      <Label htmlFor="zoom">Zoom</Label>
+      <Slider
+        id="zoom"
+        max={3}
+        min={1}
+        onValueChange={(val) => {
+          const next = Array.isArray(val) ? val[0] : val;
+          if (typeof next === 'number') {
+            setZoom(next);
+          }
+        }}
+        step={0.05}
+        value={[zoom]}
+      />
+    </div>
+  );
+}
+
+function CropDialogApply({
+  children = 'Apply Crop',
+  className,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const { isProcessing, imageSrc, handleConfirm } = useCropDialog();
+
+  return (
+    <Button
+      className={className}
+      disabled={isProcessing || !imageSrc}
+      onClick={handleConfirm}
+      type="button"
+      {...props}
+    >
+      {!!isProcessing && <Spinner />}
+      {children}
+    </Button>
+  );
+}
+
+export const CropDialog = Object.assign(CropDialogRoot, {
+  Apply: CropDialogApply,
+  Close: DialogClose,
+  Content: CropDialogContent,
+  Cropper: CropDialogCropper,
+  Description: DialogDescription,
+  Footer: DialogFooter,
+  Header: DialogHeader,
+  Root: CropDialogRoot,
+  Title: DialogTitle,
+  Zoom: CropDialogZoom,
+});

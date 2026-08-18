@@ -217,8 +217,24 @@ export function CoverImageForm({
         onCropConfirm={handleCropConfirm}
         onOpenChange={setIsCropOpen}
         open={isCropOpen}
-        title="Crop Cover Image"
-      />
+      >
+        <CropDialog.Content>
+          <CropDialog.Header>
+            <CropDialog.Title>Crop Cover Image</CropDialog.Title>
+            <CropDialog.Description>
+              Drag to reposition and adjust zoom to crop your image.
+            </CropDialog.Description>
+          </CropDialog.Header>
+          <CropDialog.Cropper />
+          <CropDialog.Zoom />
+          <CropDialog.Footer>
+            <CropDialog.Close
+              render={<Button variant="outline">Cancel</Button>}
+            />
+            <CropDialog.Apply />
+          </CropDialog.Footer>
+        </CropDialog.Content>
+      </CropDialog>
       <Card>
         <CardHeader>
           <CardTitle>Cover Image</CardTitle>
