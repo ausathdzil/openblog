@@ -15,6 +15,7 @@ import {
 } from 'react';
 import * as z from 'zod';
 
+import { BeforeUnloadGuard } from '@/components/before-unload-guard';
 import { CropDialog } from '@/components/crop-dialog';
 import { Muted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/card';
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -37,7 +39,7 @@ import { removeCoverImage, uploadCoverImage } from '@/lib/article-actions';
 import { cn } from '@/lib/utils';
 
 const COVER_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_COVER_SIZE = 3 * 1024 * 1024;
+const MAX_COVER_SIZE = 3 * 1024 * 1024; // 3MB
 
 const coverImageFormSchema = z.object({
   file: z
@@ -73,7 +75,8 @@ export function CoverImageForm({
   const [preview, setPreview] = useState<string | null>(initialImage ?? null);
   const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
-  const [pendingFileName, setPendingFileName] = useState('cover.webp');
+  const [pendingFileName, setPendingFileName] = useState('cover.jpg');
+  const [pendingMimeType, setPendingMimeType] = useState('image/jpeg');
   const [isUploading, startUploadTransition] = useTransition();
   const [isRemoving, startRemoveTransition] = useTransition();
   const isPending = isUploading || isRemoving;
@@ -173,6 +176,7 @@ export function CoverImageForm({
     }
     setRawImageSrc(URL.createObjectURL(selected));
     setPendingFileName(selected.name);
+    setPendingMimeType(selected.type || 'image/jpeg');
     setIsCropOpen(true);
   };
 
@@ -184,6 +188,11 @@ export function CoverImageForm({
       }
       return URL.createObjectURL(croppedFile);
     });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(croppedFile);
+    if (inputRef.current) {
+      inputRef.current.files = dataTransfer.files;
+    }
     form.setFieldValue('file', croppedFile);
   };
 
@@ -222,13 +231,17 @@ export function CoverImageForm({
     });
   };
 
+  const isStaged = preview?.startsWith('blob:');
+
   return (
     <>
+      <BeforeUnloadGuard isDirty={Boolean(isStaged)} />
       <CropDialog
         aspect={1200 / 630}
         cropShape="rect"
         fileName={pendingFileName}
         imageSrc={rawImageSrc ?? preview}
+        mimeType={pendingMimeType}
         onCancel={handleCropCancel}
         onCropConfirm={handleCropConfirm}
         onOpenChange={setIsCropOpen}
@@ -321,6 +334,10 @@ export function CoverImageForm({
                         required
                         type="file"
                       />
+                      <FieldDescription>
+                        Upload to save your changes after selecting a file or
+                        adjusting the crop.
+                      </FieldDescription>
                       {!!isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}

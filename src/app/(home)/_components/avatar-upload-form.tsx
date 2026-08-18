@@ -14,6 +14,7 @@ import {
 } from 'react';
 import * as z from 'zod';
 
+import { BeforeUnloadGuard } from '@/components/before-unload-guard';
 import { CropDialog } from '@/components/crop-dialog';
 import { Muted } from '@/components/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/card';
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -37,7 +39,7 @@ import { cn } from '@/lib/utils';
 import { removeAvatar, updateAvatar } from '../_lib/actions';
 
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
 
 const avatarFormSchema = z.object({
   file: z
@@ -65,7 +67,8 @@ export function AvatarUploadForm({
   const [preview, setPreview] = useState<string | null>(initialImage ?? null);
   const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
-  const [pendingFileName, setPendingFileName] = useState('avatar.webp');
+  const [pendingFileName, setPendingFileName] = useState('avatar.jpg');
+  const [pendingMimeType, setPendingMimeType] = useState('image/jpeg');
   const [isUploading, startUploadTransition] = useTransition();
   const [isRemoving, startRemoveTransition] = useTransition();
   const isPending = isUploading || isRemoving;
@@ -156,6 +159,7 @@ export function AvatarUploadForm({
     }
     setRawImageSrc(URL.createObjectURL(selected));
     setPendingFileName(selected.name);
+    setPendingMimeType(selected.type || 'image/jpeg');
     setIsCropOpen(true);
   };
 
@@ -167,6 +171,11 @@ export function AvatarUploadForm({
       }
       return URL.createObjectURL(croppedFile);
     });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(croppedFile);
+    if (inputRef.current) {
+      inputRef.current.files = dataTransfer.files;
+    }
     form.setFieldValue('file', croppedFile);
   };
 
@@ -205,13 +214,17 @@ export function AvatarUploadForm({
     });
   };
 
+  const isStaged = preview?.startsWith('blob:');
+
   return (
     <>
+      <BeforeUnloadGuard isDirty={Boolean(isStaged)} />
       <CropDialog
         aspect={1}
         cropShape="round"
         fileName={pendingFileName}
         imageSrc={rawImageSrc ?? preview}
+        mimeType={pendingMimeType}
         onCancel={handleCropCancel}
         onCropConfirm={handleCropConfirm}
         onOpenChange={setIsCropOpen}
@@ -295,6 +308,10 @@ export function AvatarUploadForm({
                         required
                         type="file"
                       />
+                      <FieldDescription>
+                        Upload to save your changes after selecting a file or
+                        adjusting the crop.
+                      </FieldDescription>
                       {!!isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}

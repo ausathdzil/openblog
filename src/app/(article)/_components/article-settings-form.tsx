@@ -10,6 +10,7 @@ import { useRef, useState, useTransition } from 'react';
 import * as z from 'zod/mini';
 
 import type { ArticleResponse } from '@/app/elysia/modules/article/model';
+import { BeforeUnloadGuard } from '@/components/before-unload-guard';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -110,6 +111,9 @@ export function ArticleSettingsForm({ article }: { article: ArticleResponse }) {
 
   return (
     <>
+      <form.Subscribe selector={(state) => state.isDirty}>
+        {(isDirty) => <BeforeUnloadGuard isDirty={isDirty} />}
+      </form.Subscribe>
       <CoverImageForm
         initialImage={article.coverImage ?? null}
         publicId={article.publicId}

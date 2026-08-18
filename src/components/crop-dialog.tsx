@@ -25,14 +25,12 @@ interface Area {
   y: number;
 }
 
-const EXTENSION_REGEX = /\.[^.]+$/;
-
 async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
-  fileName = 'cropped.webp',
-  mimeType = 'image/webp',
-  quality = 0.92
+  fileName = 'cropped.jpg',
+  mimeType = 'image/jpeg',
+  quality = 0.95
 ): Promise<File> {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
@@ -85,8 +83,8 @@ async function getCroppedImg(
           return;
         }
         resolve(
-          new File([blob], fileName.replace(EXTENSION_REGEX, '.webp'), {
-            type: blob.type,
+          new File([blob], fileName, {
+            type: blob.type || mimeType,
           })
         );
       },
@@ -128,6 +126,7 @@ interface CropDialogRootProps {
   cropShape?: 'rect' | 'round';
   fileName?: string;
   imageSrc: string | null;
+  mimeType?: string;
   onCancel?: () => void;
   onCropConfirm: (croppedFile: File) => void;
   onOpenChange: (open: boolean) => void;
@@ -140,7 +139,8 @@ function CropDialogRoot({
   imageSrc,
   aspect = 1,
   cropShape = 'rect',
-  fileName = 'cropped.webp',
+  fileName = 'cropped.jpg',
+  mimeType = 'image/jpeg',
   onCropConfirm,
   onCancel,
   children,
@@ -165,7 +165,8 @@ function CropDialogRoot({
     const croppedFile = await getCroppedImg(
       imageSrc,
       croppedAreaPixels,
-      fileName
+      fileName,
+      mimeType
     );
     setIsProcessing(false);
     onCropConfirm(croppedFile);
