@@ -83,17 +83,11 @@ export function AvatarUploadForm({
       if (preview?.startsWith('blob:')) {
         URL.revokeObjectURL(preview);
       }
-    },
-    [preview]
-  );
-
-  useEffect(
-    () => () => {
       if (cropTarget?.src.startsWith('blob:')) {
         URL.revokeObjectURL(cropTarget.src);
       }
     },
-    [cropTarget]
+    [preview, cropTarget]
   );
 
   const form = useForm({
@@ -239,24 +233,8 @@ export function AvatarUploadForm({
           }
         }}
         open={Boolean(cropTarget)}
-      >
-        <CropDialog.Content>
-          <CropDialog.Header>
-            <CropDialog.Title>Crop Profile Picture</CropDialog.Title>
-            <CropDialog.Description>
-              Drag to reposition and adjust zoom to crop your image.
-            </CropDialog.Description>
-          </CropDialog.Header>
-          <CropDialog.Cropper />
-          <CropDialog.Zoom />
-          <CropDialog.Footer>
-            <CropDialog.Close
-              render={<Button variant="outline">Cancel</Button>}
-            />
-            <CropDialog.Apply />
-          </CropDialog.Footer>
-        </CropDialog.Content>
-      </CropDialog>
+        title="Crop Profile Picture"
+      />
       <Card>
         <CardHeader>
           <CardTitle>Profile Picture</CardTitle>
@@ -277,6 +255,7 @@ export function AvatarUploadForm({
                 disabled={isPending}
                 onClick={() => {
                   if (preview) {
+                    setFormStatus(null);
                     setCropTarget({
                       src: preview,
                       fileName: 'avatar.jpg',
