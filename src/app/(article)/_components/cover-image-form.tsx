@@ -32,6 +32,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { removeCoverImage, uploadCoverImage } from '@/lib/article-actions';
 import { cn } from '@/lib/utils';
 
@@ -73,7 +74,9 @@ export function CoverImageForm({
   const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [pendingFileName, setPendingFileName] = useState('cover.webp');
-  const [isPending, startTransition] = useTransition();
+  const [isUploading, startUploadTransition] = useTransition();
+  const [isRemoving, startRemoveTransition] = useTransition();
+  const isPending = isUploading || isRemoving;
   const inputRef = useRef<HTMLInputElement>(null);
   const { refresh } = useRouter();
 
@@ -104,7 +107,7 @@ export function CoverImageForm({
     },
     onSubmit: ({ value }) => {
       setFormStatus(null);
-      startTransition(async () => {
+      startUploadTransition(async () => {
         if (!value.file) {
           return;
         }
@@ -199,7 +202,7 @@ export function CoverImageForm({
 
   const handleCoverRemove = () => {
     setFormStatus(null);
-    startTransition(async () => {
+    startRemoveTransition(async () => {
       const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
         if (rawImageSrc?.startsWith('blob:')) {
@@ -275,11 +278,7 @@ export function CoverImageForm({
                   type="button"
                   variant="secondary"
                 >
-                  <HugeiconsIcon
-                    icon={ImageCropIcon}
-                    size={14}
-                    strokeWidth={2}
-                  />
+                  <HugeiconsIcon icon={ImageCropIcon} strokeWidth={2} />
                   Adjust crop
                 </Button>
               </>
@@ -290,7 +289,6 @@ export function CoverImageForm({
             )}
           </div>
           <form
-            className="flex flex-col gap-6"
             onSubmit={(e) => {
               e.preventDefault();
               form.handleSubmit();
@@ -333,6 +331,7 @@ export function CoverImageForm({
               <Field>
                 <div className="flex gap-2">
                   <Button disabled={isPending} type="submit" variant="outline">
+                    {!!isUploading && <Spinner />}
                     Upload
                   </Button>
                   {preview ? (
@@ -340,8 +339,9 @@ export function CoverImageForm({
                       disabled={isPending}
                       onClick={handleCoverRemove}
                       type="button"
-                      variant="ghost"
+                      variant="destructive"
                     >
+                      {!!isRemoving && <Spinner />}
                       Remove
                     </Button>
                   ) : null}

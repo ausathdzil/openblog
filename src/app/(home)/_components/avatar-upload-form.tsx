@@ -66,7 +66,9 @@ export function AvatarUploadForm({
   const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [pendingFileName, setPendingFileName] = useState('avatar.webp');
-  const [isPending, startTransition] = useTransition();
+  const [isUploading, startUploadTransition] = useTransition();
+  const [isRemoving, startRemoveTransition] = useTransition();
+  const isPending = isUploading || isRemoving;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { refresh } = useRouter();
 
@@ -97,7 +99,7 @@ export function AvatarUploadForm({
     },
     onSubmit: ({ value }) => {
       setFormStatus(null);
-      startTransition(async () => {
+      startUploadTransition(async () => {
         if (!value.file) {
           return;
         }
@@ -183,7 +185,7 @@ export function AvatarUploadForm({
 
   const handleAvatarRemove = () => {
     setFormStatus(null);
-    startTransition(async () => {
+    startRemoveTransition(async () => {
       const { status, message } = await removeAvatar();
       if (status === 200) {
         if (rawImageSrc?.startsWith('blob:')) {
@@ -256,12 +258,11 @@ export function AvatarUploadForm({
                 type="button"
                 variant="secondary"
               >
-                <HugeiconsIcon icon={ImageCropIcon} size={16} strokeWidth={2} />
+                <HugeiconsIcon icon={ImageCropIcon} strokeWidth={2} />
               </Button>
             ) : null}
           </div>
           <form
-            className="flex flex-col gap-6"
             onSubmit={(event) => {
               event.preventDefault();
               form.handleSubmit();
@@ -303,17 +304,18 @@ export function AvatarUploadForm({
               </form.Field>
               <Field>
                 <div className="flex gap-2">
-                  <Button disabled={isPending} type="submit">
-                    {!!isPending && <Spinner />}
-                    Save Changes
+                  <Button disabled={isPending} type="submit" variant="outline">
+                    {!!isUploading && <Spinner />}
+                    Upload
                   </Button>
                   {preview ? (
                     <Button
                       disabled={isPending}
                       onClick={handleAvatarRemove}
                       type="button"
-                      variant="ghost"
+                      variant="destructive"
                     >
+                      {!!isRemoving && <Spinner />}
                       Remove
                     </Button>
                   ) : null}
