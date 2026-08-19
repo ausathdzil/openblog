@@ -40,14 +40,24 @@ export async function updateAvatar(userId: string, file: File) {
     db.select({ image: user.image }).from(user).where(eq(user.id, userId)),
   ]);
 
-  const [newImage] = await db
-    .update(user)
-    .set({ image: blob.url })
-    .where(eq(user.id, userId))
-    .returning({ image: user.image });
+  let newImage: { image: string | null } | undefined;
+  try {
+    [newImage] = await db
+      .update(user)
+      .set({ image: blob.url })
+      .where(eq(user.id, userId))
+      .returning({ image: user.image });
+  } catch (err) {
+    await del(blob.url).catch((deleteError) => {
+      console.error('Failed to cleanup orphaned avatar blob:', deleteError);
+    });
+    throw err;
+  }
 
   if (!newImage) {
-    await del(blob.url);
+    await del(blob.url).catch((deleteError) => {
+      console.error('Failed to cleanup orphaned avatar blob:', deleteError);
+    });
     throw new Error('Failed to update avatar.');
   }
 

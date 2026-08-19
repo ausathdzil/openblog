@@ -1,4 +1,4 @@
-import { t } from 'elysia';
+import { t, validationDetail } from 'elysia';
 
 import { validation } from './validation';
 
@@ -23,7 +23,9 @@ export const updateAvatarBody = t.Object({
   file: t.File({
     type: ['image/jpeg', 'image/png', 'image/webp'],
     maxSize: '2m',
-    error: 'Avatar must be a JPEG, PNG, or WebP image no larger than 2MB.',
+    error: validationDetail(
+      'Avatar must be a JPEG, PNG, or WebP image no larger than 2MB.'
+    ),
   }),
 });
 

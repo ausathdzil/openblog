@@ -386,11 +386,13 @@ export async function deleteArticle(
     throw new AuthError('You are not allowed to perform this action.', 403);
   }
 
-  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
-    await del(articleData.coverImage);
-  }
-
   await db.delete(article).where(eq(article.publicId, articleData.publicId));
+
+  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
+    await del(articleData.coverImage).catch((error) => {
+      console.error('Failed to delete cover image on article delete:', error);
+    });
+  }
 
   return { message: 'Article deleted.' };
 }
@@ -411,14 +413,23 @@ export async function updateCoverImage(
 
   const blob = await put(pathname, file, { access: 'public' });
 
-  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
-    await del(articleData.coverImage);
+  try {
+    await db
+      .update(article)
+      .set({ coverImage: blob.url })
+      .where(eq(article.publicId, publicId));
+  } catch (err) {
+    await del(blob.url).catch((deleteError) => {
+      console.error('Failed to cleanup orphaned cover blob:', deleteError);
+    });
+    throw err;
   }
 
-  await db
-    .update(article)
-    .set({ coverImage: blob.url })
-    .where(eq(article.publicId, publicId));
+  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
+    await del(articleData.coverImage).catch((error) => {
+      console.error('Failed to delete old cover image:', error);
+    });
+  }
 
   return { message: 'Cover image updated.', url: blob.url };
 }
@@ -430,14 +441,16 @@ export async function removeCoverImage(publicId: string, userId: string) {
     throw new AuthError('You are not allowed to perform this action.', 403);
   }
 
-  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
-    await del(articleData.coverImage);
-  }
-
   await db
     .update(article)
     .set({ coverImage: null })
     .where(eq(article.publicId, publicId));
+
+  if (articleData.coverImage?.includes('blob.vercel-storage.com')) {
+    await del(articleData.coverImage).catch((error) => {
+      console.error('Failed to delete old cover image:', error);
+    });
+  }
 
   return { message: 'Cover image removed.' };
 }
