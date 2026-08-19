@@ -35,20 +35,22 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import {
+  ACCEPT_IMAGE_STRING,
+  canBrowserDecodeImage,
+  createImageFileSchema,
+} from '@/lib/image-validation';
 import { cn } from '@/lib/utils';
 import { removeAvatar, updateAvatar } from '../_lib/actions';
 
-const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
 
 const avatarFormSchema = z.object({
-  file: z
-    .file('Please select a file.')
-    .check(
-      z.minSize(1),
-      z.maxSize(MAX_AVATAR_SIZE, 'Image must be less than 2MB.'),
-      z.mime(AVATAR_TYPES, 'Image must be a JPEG, PNG, or WebP.')
-    ),
+  file: createImageFileSchema(
+    MAX_AVATAR_SIZE,
+    'Avatar image',
+    'Image must be less than 2MB.'
+  ),
 });
 
 interface AvatarUploadFormProps {
@@ -136,7 +138,7 @@ export function AvatarUploadForm({
     },
   });
 
-  const handleFileChange = (
+  const handleFileChange = async (
     event: ChangeEvent<HTMLInputElement>,
     onChange: (value: File | null) => void
   ) => {
@@ -149,6 +151,16 @@ export function AvatarUploadForm({
     const parsed = avatarFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       onChange(selected);
+      return;
+    }
+    const canDecode = await canBrowserDecodeImage(selected);
+    if (!canDecode) {
+      onChange(selected);
+      setFormStatus({
+        type: 'error',
+        message:
+          'This image cannot be decoded by your browser. Please select a valid JPEG, PNG, or WebP image.',
+      });
       return;
     }
     if (cropTarget?.src.startsWith('blob:')) {
@@ -302,7 +314,7 @@ export function AvatarUploadForm({
                         Profile Picture
                       </FieldLabel>
                       <Input
-                        accept={AVATAR_TYPES.join(',')}
+                        accept={ACCEPT_IMAGE_STRING}
                         aria-invalid={isInvalid}
                         disabled={isPending}
                         id={field.name}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Cropper from 'react-easy-crop';
 
 import { Button } from '@/components/ui/button';
@@ -122,7 +122,7 @@ export function CropDialog({
 }: CropDialogProps) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const croppedAreaPixelsRef = useRef<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -135,6 +135,7 @@ export function CropDialog({
   };
 
   const handleConfirm = async () => {
+    const croppedAreaPixels = croppedAreaPixelsRef.current;
     if (!(imageSrc && croppedAreaPixels)) {
       return;
     }
@@ -151,9 +152,8 @@ export function CropDialog({
       onOpenChange(false);
     } catch {
       setError('Failed to crop image. Please try again.');
-    } finally {
-      setIsProcessing(false);
     }
+    setIsProcessing(false);
   };
 
   return (
@@ -171,6 +171,13 @@ export function CropDialog({
               crop={crop}
               cropShape={cropShape}
               image={imageSrc}
+              mediaProps={{
+                onError: () => {
+                  setError(
+                    'Failed to load image. The image format may be unsupported by your browser.'
+                  );
+                },
+              }}
               onCropChange={(nextCrop) => {
                 if (error) {
                   setError(null);
@@ -178,7 +185,7 @@ export function CropDialog({
                 setCrop(nextCrop);
               }}
               onCropComplete={(_croppedArea, newCroppedAreaPixels) => {
-                setCroppedAreaPixels(newCroppedAreaPixels);
+                croppedAreaPixelsRef.current = newCroppedAreaPixels;
               }}
               onZoomChange={(nextZoom) => {
                 if (error) {

@@ -36,19 +36,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { removeCoverImage, uploadCoverImage } from '@/lib/article-actions';
+import {
+  ACCEPT_IMAGE_STRING,
+  canBrowserDecodeImage,
+  createImageFileSchema,
+} from '@/lib/image-validation';
 import { cn } from '@/lib/utils';
 
-const COVER_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_COVER_SIZE = 3 * 1024 * 1024; // 3MB
 
 const coverImageFormSchema = z.object({
-  file: z
-    .file('Please select a file.')
-    .check(
-      z.minSize(1),
-      z.maxSize(MAX_COVER_SIZE, 'Cover image must be less than 3MB.'),
-      z.mime(COVER_TYPES, 'Cover image must be a JPEG, PNG, or WebP.')
-    ),
+  file: createImageFileSchema(
+    MAX_COVER_SIZE,
+    'Cover image',
+    'Cover image must be less than 3MB.'
+  ),
 });
 
 interface CropTarget {
@@ -153,7 +155,7 @@ export function CoverImageForm({
     hasPendingFile: () => !!file && !!preview?.startsWith('blob:'),
   }));
 
-  const handleFileChange = (
+  const handleFileChange = async (
     event: ChangeEvent<HTMLInputElement>,
     onChange: (value: File | null) => void
   ) => {
@@ -166,6 +168,16 @@ export function CoverImageForm({
     const parsed = coverImageFormSchema.shape.file.safeParse(selected);
     if (!parsed.success) {
       onChange(selected);
+      return;
+    }
+    const canDecode = await canBrowserDecodeImage(selected);
+    if (!canDecode) {
+      onChange(selected);
+      setFormStatus({
+        type: 'error',
+        message:
+          'This image cannot be decoded by your browser. Please select a valid JPEG, PNG, or WebP image.',
+      });
       return;
     }
     if (cropTarget?.src.startsWith('blob:')) {
@@ -318,7 +330,7 @@ export function CoverImageForm({
                         Cover image
                       </FieldLabel>
                       <Input
-                        accept={COVER_TYPES.join(',')}
+                        accept={ACCEPT_IMAGE_STRING}
                         aria-invalid={isInvalid}
                         disabled={isPending}
                         id={field.name}
