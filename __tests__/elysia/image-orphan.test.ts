@@ -2,7 +2,6 @@ import { describe, expect, spyOn, test } from 'bun:test';
 import * as blobModule from '@vercel/blob';
 import { eq } from 'drizzle-orm';
 
-import { app } from '@/app/elysia/[[...slugs]]/route';
 import {
   deleteArticle,
   removeCoverImage,
@@ -11,6 +10,7 @@ import {
 import { updateAvatar } from '@/app/elysia/modules/me/service';
 import { db } from '@/db';
 import { article, user } from '@/db/schema';
+import { elysia } from '@/lib/eden';
 import { setupTestArticle } from './setup-article';
 import { setupAuthContext } from './setup-auth';
 
@@ -31,23 +31,19 @@ describe('Image Orphan & Dual-write Audit', () => {
         { type: 'image/gif' }
       );
 
-      const formData = new FormData();
-      formData.append('file', gifFile);
-
-      const response = await app.handle(
-        new Request(
-          `http://localhost/elysia/articles/${testArticleContext.article.publicId}/cover-image/upload`,
+      const { error, status } = await elysia
+        .articles({ publicId: testArticleContext.article.publicId })
+        ['cover-image'].upload.post(
           {
-            method: 'POST',
+            file: gifFile,
+          },
+          {
             headers,
-            body: formData,
           }
-        )
-      );
+        );
 
-      expect(response.status).toBe(422);
-      const text = await response.text();
-      expect(text).toContain(
+      expect(status).toBe(422);
+      expect(JSON.stringify(error?.value)).toContain(
         'Cover image must be a JPEG, PNG, or WebP image no larger than 3MB.'
       );
     });
@@ -63,20 +59,17 @@ describe('Image Orphan & Dual-write Audit', () => {
         { type: 'image/gif' }
       );
 
-      const formData = new FormData();
-      formData.append('file', gifFile);
-
-      const response = await app.handle(
-        new Request('http://localhost/elysia/me/avatar/upload', {
-          method: 'POST',
+      const { error, status } = await elysia.me.avatar.upload.post(
+        {
+          file: gifFile,
+        },
+        {
           headers,
-          body: formData,
-        })
+        }
       );
 
-      expect(response.status).toBe(422);
-      const text = await response.text();
-      expect(text).toContain(
+      expect(status).toBe(422);
+      expect(JSON.stringify(error?.value)).toContain(
         'Avatar must be a JPEG, PNG, or WebP image no larger than 2MB.'
       );
     });
