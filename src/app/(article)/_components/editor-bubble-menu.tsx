@@ -1,3 +1,5 @@
+'use client';
+
 import {
   BoldIcon,
   CodeIcon,
@@ -22,12 +24,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface EditorBubbleMenuProps {
   editor: Editor;
 }
 
 export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
+  const isCoarse = useMediaQuery('(pointer: coarse)');
+
   const {
     isParagraph,
     isHeading1,
@@ -57,11 +62,31 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
     }),
   });
 
+  if (isCoarse) {
+    return null;
+  }
+
   return (
     <BubbleMenu
-      className="flex items-center gap-1 rounded-md border border-neutral-200 bg-white p-1 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
+      className="hidden items-center gap-1 rounded-md border border-neutral-200 bg-white p-1 shadow-md md:flex dark:border-neutral-800 dark:bg-neutral-900"
       editor={editor}
       options={{ placement: 'top-start' }}
+      shouldShow={({ from, to }) => {
+        if (typeof window !== 'undefined') {
+          if (window.matchMedia('(pointer: coarse)').matches) {
+            return false;
+          }
+          if (
+            !window.matchMedia('(hover: hover) and (pointer: fine)').matches
+          ) {
+            return false;
+          }
+        }
+        if (from === to) {
+          return false;
+        }
+        return true;
+      }}
     >
       <div className="flex items-center gap-1">
         <Tooltip>
@@ -73,7 +98,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isParagraph ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={ParagraphIcon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={ParagraphIcon} strokeWidth={2} />
               </Button>
             }
           />
@@ -90,7 +115,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isHeading1 ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={Heading01Icon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={Heading01Icon} strokeWidth={2} />
               </Button>
             }
           />
@@ -107,7 +132,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isHeading2 ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={Heading02Icon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={Heading02Icon} strokeWidth={2} />
               </Button>
             }
           />
@@ -124,7 +149,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isHeading3 ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={Heading03Icon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={Heading03Icon} strokeWidth={2} />
               </Button>
             }
           />
@@ -141,7 +166,6 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
               >
                 <HugeiconsIcon
                   icon={LeftToRightListBulletIcon}
-                  size={18}
                   strokeWidth={2}
                 />
               </Button>
@@ -160,7 +184,6 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
               >
                 <HugeiconsIcon
                   icon={LeftToRightListNumberIcon}
-                  size={18}
                   strokeWidth={2}
                 />
               </Button>
@@ -177,7 +200,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isBlockquote ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={QuotesIcon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={QuotesIcon} strokeWidth={2} />
               </Button>
             }
           />
@@ -197,7 +220,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isBold ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={BoldIcon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={BoldIcon} strokeWidth={2} />
               </Button>
             }
           />
@@ -212,11 +235,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isItalic ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon
-                  icon={TextItalicIcon}
-                  size={18}
-                  strokeWidth={2}
-                />
+                <HugeiconsIcon icon={TextItalicIcon} strokeWidth={2} />
               </Button>
             }
           />
@@ -231,11 +250,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isStrike ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon
-                  icon={TextStrikethroughIcon}
-                  size={18}
-                  strokeWidth={2}
-                />
+                <HugeiconsIcon icon={TextStrikethroughIcon} strokeWidth={2} />
               </Button>
             }
           />
@@ -250,7 +265,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
                 size="icon-sm"
                 variant={isCode ? 'secondary' : 'ghost'}
               >
-                <HugeiconsIcon icon={CodeIcon} size={18} strokeWidth={2} />
+                <HugeiconsIcon icon={CodeIcon} strokeWidth={2} />
               </Button>
             }
           />

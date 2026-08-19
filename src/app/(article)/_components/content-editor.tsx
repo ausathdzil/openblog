@@ -13,6 +13,7 @@ import StarterKit from '@tiptap/starter-kit';
 
 import { CodeBlock } from './code-block';
 import { EditorBubbleMenu } from './editor-bubble-menu';
+import { EditorMobileToolbar } from './editor-mobile-toolbar';
 import { lowlight } from './lowlight';
 import type { TocAnchor } from './table-of-contents';
 
@@ -80,7 +81,10 @@ export function ContentEditor({
   return (
     <>
       {!!editor && <EditorBubbleMenu editor={editor} />}
-      <EditorContent editor={editor} />
+      {!!editor && <EditorMobileToolbar editor={editor} />}
+      <div className="pb-16 md:pb-0">
+        <EditorContent editor={editor} />
+      </div>
     </>
   );
 }

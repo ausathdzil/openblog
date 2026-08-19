@@ -120,7 +120,7 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
                       />
                     }
                   >
-                    <HugeiconsIcon icon={Delete01Icon} size={18} />
+                    <HugeiconsIcon icon={Delete01Icon} />
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -140,7 +140,7 @@ export function PasskeySettings({ initialPasskeys }: PasskeySettingsProps) {
                         {isPending ? (
                           <Spinner />
                         ) : (
-                          <HugeiconsIcon icon={Delete01Icon} size={18} />
+                          <HugeiconsIcon icon={Delete01Icon} />
                         )}
                         Continue
                       </AlertDialogAction>
