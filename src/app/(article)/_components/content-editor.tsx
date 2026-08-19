@@ -11,6 +11,7 @@ import {
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
+import { useKeyboardInset } from '@/hooks/use-keyboard-inset';
 import { CodeBlock } from './code-block';
 import { EditorBubbleMenu } from './editor-bubble-menu';
 import { EditorMobileToolbar } from './editor-mobile-toolbar';
@@ -30,6 +31,8 @@ export function ContentEditor({
   onChange,
   onTocUpdate,
 }: ContentEditorProps) {
+  const inset = useKeyboardInset();
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -82,7 +85,16 @@ export function ContentEditor({
     <>
       {!!editor && <EditorBubbleMenu editor={editor} />}
       {!!editor && <EditorMobileToolbar editor={editor} />}
-      <div className="pb-16 md:pb-0">
+      <div
+        className="pb-14 md:pb-0"
+        style={
+          inset > 0
+            ? {
+                paddingBottom: `calc(3.5rem + ${inset}px + env(safe-area-inset-bottom))`,
+              }
+            : undefined
+        }
+      >
         <EditorContent editor={editor} />
       </div>
     </>

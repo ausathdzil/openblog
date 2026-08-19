@@ -6,6 +6,7 @@ import {
 import type { IconSvgElement } from '@hugeicons/react';
 import type { Route } from 'next';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,7 +65,12 @@ async function HeaderActionsContent() {
         {session?.user ? (
           <CreateArticleButton className="h-11" />
         ) : (
-          <Button className="h-11" size="pill-sm">
+          <Button
+            className="h-11"
+            nativeButton={false}
+            render={<Link href="/sign-in" />}
+            size="pill-sm"
+          >
             Get Started
           </Button>
         )}

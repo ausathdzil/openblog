@@ -18,6 +18,7 @@ import { type Editor, useEditorState } from '@tiptap/react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useKeyboardInset } from '@/hooks/use-keyboard-inset';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface EditorMobileToolbarProps {
@@ -26,6 +27,7 @@ interface EditorMobileToolbarProps {
 
 export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
   const isCoarse = useMediaQuery('(pointer: coarse)');
+  const inset = useKeyboardInset();
 
   const {
     isFocused,
@@ -63,10 +65,13 @@ export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col border-neutral-200 border-t bg-white pb-[env(safe-area-inset-bottom)] shadow-lg md:hidden dark:border-neutral-800 dark:bg-neutral-900">
+    <div
+      className="fixed inset-x-0 bottom-0 z-50 flex flex-col border-neutral-200 border-t bg-white pb-[env(safe-area-inset-bottom)] shadow-lg md:hidden dark:border-neutral-800 dark:bg-neutral-900"
+      style={{ transform: `translateY(-${inset}px)` }}
+    >
       <div
         aria-label="Formatting toolbar"
-        className="flex items-center gap-1 overflow-x-auto px-2 py-2 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+        className="scrollbar-thin flex items-center gap-1 overflow-x-auto overscroll-x-contain px-2 py-2 [-webkit-overflow-scrolling:touch] [scrollbar-color:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)_transparent] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5"
         role="toolbar"
       >
         <Button
