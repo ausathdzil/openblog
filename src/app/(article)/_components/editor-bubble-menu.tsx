@@ -24,15 +24,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface EditorBubbleMenuProps {
   editor: Editor;
 }
 
 export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
-  const isCoarse = useMediaQuery('(pointer: coarse)');
-
   const {
     isParagraph,
     isHeading1,
@@ -62,31 +59,12 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
     }),
   });
 
-  if (isCoarse) {
-    return null;
-  }
-
   return (
     <BubbleMenu
-      className="hidden items-center gap-1 rounded-md border border-neutral-200 bg-white p-1 shadow-md md:flex dark:border-neutral-800 dark:bg-neutral-900"
+      className="flex items-center gap-1 rounded-md border border-neutral-200 bg-white p-1 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
       editor={editor}
       options={{ placement: 'top-start' }}
-      shouldShow={({ from, to }) => {
-        if (typeof window !== 'undefined') {
-          if (window.matchMedia('(pointer: coarse)').matches) {
-            return false;
-          }
-          if (
-            !window.matchMedia('(hover: hover) and (pointer: fine)').matches
-          ) {
-            return false;
-          }
-        }
-        if (from === to) {
-          return false;
-        }
-        return true;
-      }}
+      shouldShow={({ from, to }) => from !== to}
     >
       <div className="flex items-center gap-1">
         <Tooltip>

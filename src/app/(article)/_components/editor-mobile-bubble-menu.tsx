@@ -15,20 +15,19 @@ import {
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { type Editor, useEditorState } from '@tiptap/react';
+import { BubbleMenu } from '@tiptap/react/menus';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useMediaQuery } from '@/hooks/use-media-query';
 
-interface EditorMobileToolbarProps {
+interface EditorMobileBubbleMenuProps {
   editor: Editor;
 }
 
-export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
-  const isCoarse = useMediaQuery('(pointer: coarse)');
-
+export function EditorMobileBubbleMenu({
+  editor,
+}: EditorMobileBubbleMenuProps) {
   const {
-    isFocused,
     isParagraph,
     isHeading1,
     isHeading2,
@@ -43,7 +42,6 @@ export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
   } = useEditorState({
     editor,
     selector: (ctx) => ({
-      isFocused: ctx.editor.isFocused,
       isParagraph: ctx.editor.isActive('paragraph'),
       isHeading1: ctx.editor.isActive('heading', { level: 1 }),
       isHeading2: ctx.editor.isActive('heading', { level: 2 }),
@@ -58,17 +56,14 @@ export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
     }),
   });
 
-  if (!(isCoarse && isFocused)) {
-    return null;
-  }
-
   return (
-    <div className="sticky top-14 z-10 -mx-6 mb-4 flex flex-col border-neutral-200 border-y bg-background shadow-sm sm:-mx-4 md:hidden dark:border-neutral-800">
-      <div
-        aria-label="Formatting toolbar"
-        className="scrollbar-thin flex items-center gap-1 overflow-x-auto overscroll-x-contain px-2 py-2 [-webkit-overflow-scrolling:touch] [scrollbar-color:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)_transparent] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5"
-        role="toolbar"
-      >
+    <BubbleMenu
+      className="scrollbar-thin flex max-w-[calc(100vw-16px)] items-center gap-1 overflow-x-auto overscroll-x-contain rounded-md border border-neutral-200 bg-white p-1 shadow-md [scrollbar-color:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)_transparent] dark:border-neutral-800 dark:bg-neutral-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5"
+      editor={editor}
+      options={{ placement: 'bottom-start' }}
+      shouldShow={({ from, to }) => from !== to}
+    >
+      <div className="flex items-center gap-1">
         <Button
           aria-label="Text"
           onClick={() => editor.chain().focus().setParagraph().run()}
@@ -138,9 +133,11 @@ export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
         >
           <HugeiconsIcon icon={QuotesIcon} strokeWidth={2} />
         </Button>
+      </div>
 
-        <Separator orientation="vertical" />
+      <Separator orientation="vertical" />
 
+      <div className="flex items-center gap-1">
         <Button
           aria-label="Bold"
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -178,6 +175,6 @@ export function EditorMobileToolbar({ editor }: EditorMobileToolbarProps) {
           <HugeiconsIcon icon={CodeIcon} strokeWidth={2} />
         </Button>
       </div>
-    </div>
+    </BubbleMenu>
   );
 }

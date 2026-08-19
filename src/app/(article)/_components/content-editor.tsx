@@ -11,9 +11,10 @@ import {
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { CodeBlock } from './code-block';
 import { EditorBubbleMenu } from './editor-bubble-menu';
-import { EditorMobileToolbar } from './editor-mobile-toolbar';
+import { EditorMobileBubbleMenu } from './editor-mobile-bubble-menu';
 import { lowlight } from './lowlight';
 import type { TocAnchor } from './table-of-contents';
 
@@ -30,6 +31,8 @@ export function ContentEditor({
   onChange,
   onTocUpdate,
 }: ContentEditorProps) {
+  const isCoarse = useMediaQuery('(pointer: coarse)');
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -80,8 +83,12 @@ export function ContentEditor({
 
   return (
     <>
-      {!!editor && <EditorBubbleMenu editor={editor} />}
-      {!!editor && <EditorMobileToolbar editor={editor} />}
+      {!!editor &&
+        (isCoarse ? (
+          <EditorMobileBubbleMenu editor={editor} />
+        ) : (
+          <EditorBubbleMenu editor={editor} />
+        ))}
       <EditorContent editor={editor} />
     </>
   );
