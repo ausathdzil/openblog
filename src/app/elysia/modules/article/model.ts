@@ -92,10 +92,9 @@ export const articleInvalid = t.Object({ message: t.String() });
 
 export const uploadCoverImageBody = t.Object({
   file: t.File({
-    type: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'],
+    type: ['image/jpeg', 'image/png', 'image/webp'],
     maxSize: '3m',
-    error:
-      'Cover image must be a JPEG, PNG, WebP, GIF, or AVIF image no larger than 3MB.',
+    error: 'Cover image must be a JPEG, PNG, or WebP image no larger than 3MB.',
   }),
 });
 
