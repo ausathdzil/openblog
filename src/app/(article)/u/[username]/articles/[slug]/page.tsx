@@ -108,7 +108,7 @@ async function Article({ params }: ArticleProps) {
   let docForHtml: JSONContent | null | undefined = contentJson;
   let tocAnchors: TocAnchor[] = [];
 
-  if (contentJson) {
+  if (contentJson?.type === 'doc') {
     try {
       const getId = createDeterministicGetId();
       const tocExt = TocExtension.configure({ getId });
@@ -118,11 +118,21 @@ async function Article({ params }: ArticleProps) {
       tocAnchors = [];
       docForHtml = contentJson;
     }
+  } else {
+    docForHtml = null;
+    tocAnchors = [];
   }
 
   const extensions = [starterKitForReading, TocExtension];
 
-  const rawHtml = docForHtml ? generateHTML(docForHtml, extensions) : '';
+  let rawHtml = '';
+  if (docForHtml?.type === 'doc') {
+    try {
+      rawHtml = generateHTML(docForHtml, extensions);
+    } catch {
+      rawHtml = '';
+    }
+  }
 
   const html = rawHtml
     ? String(

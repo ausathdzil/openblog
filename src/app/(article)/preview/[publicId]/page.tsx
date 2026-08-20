@@ -74,9 +74,15 @@ async function Article({ params }: { params: Promise<{ publicId: string }> }) {
     notFound();
   }
 
-  const rawHtml = article.contentJson
-    ? generateHTML(article.contentJson as JSONContent, extensions)
-    : '';
+  let rawHtml = '';
+  const contentJson = article.contentJson as JSONContent | null | undefined;
+  if (contentJson?.type === 'doc') {
+    try {
+      rawHtml = generateHTML(contentJson, extensions);
+    } catch {
+      rawHtml = '';
+    }
+  }
 
   const html = rawHtml
     ? String(
