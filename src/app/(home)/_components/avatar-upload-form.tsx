@@ -85,11 +85,17 @@ export function AvatarUploadForm({
       if (preview?.startsWith('blob:')) {
         URL.revokeObjectURL(preview);
       }
+    },
+    [preview]
+  );
+
+  useEffect(
+    () => () => {
       if (cropTarget?.src.startsWith('blob:')) {
         URL.revokeObjectURL(cropTarget.src);
       }
     },
-    [preview, cropTarget]
+    [cropTarget]
   );
 
   const form = useForm({
@@ -112,9 +118,6 @@ export function AvatarUploadForm({
             type: 'success',
             message: message || 'Avatar updated.',
           });
-          if (cropTarget?.src.startsWith('blob:')) {
-            URL.revokeObjectURL(cropTarget.src);
-          }
           setCropTarget(null);
           form.reset();
           if (inputRef.current) {
@@ -163,9 +166,6 @@ export function AvatarUploadForm({
       });
       return;
     }
-    if (cropTarget?.src.startsWith('blob:')) {
-      URL.revokeObjectURL(cropTarget.src);
-    }
     setCropTarget({
       src: URL.createObjectURL(selected),
       fileName: selected.name,
@@ -174,16 +174,8 @@ export function AvatarUploadForm({
   };
 
   const handleCropConfirm = (croppedFile: File) => {
-    if (cropTarget?.src.startsWith('blob:')) {
-      URL.revokeObjectURL(cropTarget.src);
-    }
     setCropTarget(null);
-    setPreview((prev) => {
-      if (prev?.startsWith('blob:')) {
-        URL.revokeObjectURL(prev);
-      }
-      return URL.createObjectURL(croppedFile);
-    });
+    setPreview(() => URL.createObjectURL(croppedFile));
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(croppedFile);
     if (inputRef.current) {
@@ -193,13 +185,8 @@ export function AvatarUploadForm({
   };
 
   const handleCropCancel = () => {
-    if (!form.getFieldValue('file')) {
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
-      if (cropTarget?.src.startsWith('blob:')) {
-        URL.revokeObjectURL(cropTarget.src);
-      }
+    if (!form.getFieldValue('file') && inputRef.current) {
+      inputRef.current.value = '';
     }
     setCropTarget(null);
   };
@@ -209,9 +196,6 @@ export function AvatarUploadForm({
     startRemoveTransition(async () => {
       const { status, message } = await removeAvatar();
       if (status === 200) {
-        if (cropTarget?.src.startsWith('blob:')) {
-          URL.revokeObjectURL(cropTarget.src);
-        }
         setCropTarget(null);
         setPreview(null);
         form.reset();
@@ -276,7 +260,15 @@ export function AvatarUploadForm({
                 className="absolute right-0 bottom-0 size-8 rounded-full shadow-xs"
                 disabled={isPending}
                 onClick={() => {
-                  if (preview) {
+                  const file = form.getFieldValue('file');
+                  if (file) {
+                    setFormStatus(null);
+                    setCropTarget({
+                      src: URL.createObjectURL(file),
+                      fileName: file.name,
+                      mimeType: file.type || 'image/jpeg',
+                    });
+                  } else if (preview) {
                     setFormStatus(null);
                     setCropTarget({
                       src: preview,

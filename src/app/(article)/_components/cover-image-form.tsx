@@ -93,11 +93,17 @@ export function CoverImageForm({
       if (preview?.startsWith('blob:')) {
         URL.revokeObjectURL(preview);
       }
+    },
+    [preview]
+  );
+
+  useEffect(
+    () => () => {
       if (cropTarget?.src.startsWith('blob:')) {
         URL.revokeObjectURL(cropTarget.src);
       }
     },
-    [preview, cropTarget]
+    [cropTarget]
   );
 
   const form = useForm({
@@ -123,9 +129,6 @@ export function CoverImageForm({
             type: 'success',
             message: message || 'Cover image updated.',
           });
-          if (cropTarget?.src.startsWith('blob:')) {
-            URL.revokeObjectURL(cropTarget.src);
-          }
           setCropTarget(null);
           form.reset();
           if (inputRef.current) {
@@ -180,9 +183,6 @@ export function CoverImageForm({
       });
       return;
     }
-    if (cropTarget?.src.startsWith('blob:')) {
-      URL.revokeObjectURL(cropTarget.src);
-    }
     setCropTarget({
       src: URL.createObjectURL(selected),
       fileName: selected.name,
@@ -191,16 +191,8 @@ export function CoverImageForm({
   };
 
   const handleCropConfirm = (croppedFile: File) => {
-    if (cropTarget?.src.startsWith('blob:')) {
-      URL.revokeObjectURL(cropTarget.src);
-    }
     setCropTarget(null);
-    setPreview((prev) => {
-      if (prev?.startsWith('blob:')) {
-        URL.revokeObjectURL(prev);
-      }
-      return URL.createObjectURL(croppedFile);
-    });
+    setPreview(() => URL.createObjectURL(croppedFile));
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(croppedFile);
     if (inputRef.current) {
@@ -210,13 +202,8 @@ export function CoverImageForm({
   };
 
   const handleCropCancel = () => {
-    if (!form.getFieldValue('file')) {
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
-      if (cropTarget?.src.startsWith('blob:')) {
-        URL.revokeObjectURL(cropTarget.src);
-      }
+    if (!form.getFieldValue('file') && inputRef.current) {
+      inputRef.current.value = '';
     }
     setCropTarget(null);
   };
@@ -226,9 +213,6 @@ export function CoverImageForm({
     startRemoveTransition(async () => {
       const { status, message } = await removeCoverImage(publicId);
       if (status === 200) {
-        if (cropTarget?.src.startsWith('blob:')) {
-          URL.revokeObjectURL(cropTarget.src);
-        }
         setCropTarget(null);
         setPreview(null);
         form.reset();
@@ -287,7 +271,15 @@ export function CoverImageForm({
                   className="absolute right-3 bottom-3 gap-1.5 bg-background/85 shadow-xs backdrop-blur-xs hover:bg-background"
                   disabled={isPending}
                   onClick={() => {
-                    if (preview) {
+                    const currentFile = form.getFieldValue('file');
+                    if (currentFile) {
+                      setFormStatus(null);
+                      setCropTarget({
+                        src: URL.createObjectURL(currentFile),
+                        fileName: currentFile.name,
+                        mimeType: currentFile.type || 'image/jpeg',
+                      });
+                    } else if (preview) {
                       setFormStatus(null);
                       setCropTarget({
                         src: preview,
