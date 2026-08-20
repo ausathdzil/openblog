@@ -79,7 +79,11 @@ export function ArticleActions({ article }: ArticleActionsProps) {
       if (status === 200) {
         toast.add({ type: 'info', description: message });
         setDeleteDialogOpen(false);
-        push('/profile');
+        if (pathname.startsWith('/profile')) {
+          refresh();
+        } else {
+          push('/profile');
+        }
       } else {
         toast.add({ type: 'error', description: message });
       }
